@@ -3612,6 +3612,19 @@ document.addEventListener('DOMContentLoaded',()=>{
 <style>
 .share-gate{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:24px;background:linear-gradient(135deg,#102f49,#593a7f);font-family:Inter,ui-sans-serif,system-ui,sans-serif}.share-gate[hidden]{display:none}.share-gate__card{width:min(390px,100%);padding:30px;border:1px solid rgba(255,255,255,.2);border-radius:18px;background:rgba(255,255,255,.97);box-shadow:0 20px 60px rgba(0,0,0,.3)}.share-gate__brand{display:flex;align-items:center;gap:8px;color:#5d3c86;font-size:11px;font-weight:850;letter-spacing:.09em;text-transform:uppercase}.share-gate__brand::before{content:'VIP';display:grid;place-items:center;width:32px;height:32px;border-radius:9px;background:#5d3c86;color:#fff;font-size:10px}.share-gate h1{margin:20px 0 7px;color:#173854;font-size:25px;letter-spacing:-.03em}.share-gate p{margin:0 0 19px;color:#697988;font-size:13px;line-height:1.5}.share-gate form{display:grid;gap:10px}.share-gate input{width:100%;box-sizing:border-box;padding:12px 13px;border:1px solid #cfd9e1;border-radius:8px;color:#173854;font:600 14px Inter,ui-sans-serif,sans-serif}.share-gate button{padding:12px;border:0;border-radius:8px;background:#5d3c86;color:#fff;font:800 13px Inter,ui-sans-serif,sans-serif;cursor:pointer}.share-gate__error{min-height:15px;margin:2px 0 0;color:#b13f4a;font-size:11px;font-weight:700}
 </style>
+<script>
+window.addEventListener('load',()=>{
+  const table=document.querySelector('#billing-claim-exceptions-title')?.closest('.audit-block')?.querySelector('table');
+  if(!table||table.dataset.responsibleGroup)return;
+  table.dataset.responsibleGroup='true';
+  table.querySelector('thead tr')?.insertAdjacentHTML('afterbegin','<th>Responsible group</th>');
+  table.querySelectorAll('tbody tr').forEach(row=>{
+    const label=row.querySelector('.label')?.textContent||'';
+    const group=label.includes('not approved')?'Billing + manager review':'Billing';
+    row.insertAdjacentHTML('afterbegin',`<td class="owner-cell"><span class="owner-chip owner-chip--billing">${group}</span></td>`);
+  });
+});
+</script>
 <section class="share-gate" id="share-gate" aria-label="Dashboard sign in"><div class="share-gate__card"><div class="share-gate__brand">VIP Medical Group</div><h1>Control Center</h1><p>Enter the presentation password to view the dashboard.</p><form id="share-gate-form"><input id="share-gate-password" type="password" autocomplete="current-password" placeholder="Password" aria-label="Password" required><button type="submit">Open dashboard</button><div class="share-gate__error" id="share-gate-error" role="alert"></div></form></div></section>
 <script>
 document.addEventListener('DOMContentLoaded',()=>{const gate=document.getElementById('share-gate'),form=document.getElementById('share-gate-form'),input=document.getElementById('share-gate-password'),error=document.getElementById('share-gate-error');if(!gate||!form)return;form.addEventListener('submit',event=>{event.preventDefault();if(input.value==='VIP123'){sessionStorage.setItem('vip-control-center-access','true');gate.hidden=true;return}error.textContent='That password is not correct.'});if(sessionStorage.getItem('vip-control-center-access')==='true')gate.hidden=true});
