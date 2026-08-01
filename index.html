@@ -3047,7 +3047,11 @@ window.addEventListener('load',()=>{
 window.addEventListener('load',()=>{
   const workflow=document.querySelector('[data-audit-panel="clinic-note"]');
   if(!workflow||workflow.querySelector('#billing-claim-exceptions-title'))return;
-  workflow.insertAdjacentHTML('beforeend','<section class="audit-block" aria-labelledby="billing-claim-exceptions-title"><div class="audit-head blue"><h3 id="billing-claim-exceptions-title">Billing claim exceptions</h3><p>Clinical Workflow view of the unresolved claim statuses from Billing data.</p></div><table><colgroup><col><col><col><col><col><col></colgroup><thead><tr><th>Billing exception</th><th>Observed</th><th></th><th>Expected</th><th></th><th>Tie-out</th></tr></thead><tbody><tr class="exception"><td><span class="label">Denied claims, not approved by manager</span><span class="description">Denied claims requiring manager disposition must reconcile to zero.</span></td><td class="value">30</td><td class="operator">−</td><td class="value">0</td><td class="operator">=</td><td class="value"><span class="table-priority-zero is-issue">30</span><span class="variance">⚠ Manager review required</span></td></tr><tr class="exception"><td><span class="label">Pending claims</span><span class="description">Claims awaiting final payer response must reconcile to zero.</span></td><td class="value">84</td><td class="operator">−</td><td class="value">0</td><td class="operator">=</td><td class="value"><span class="table-priority-zero is-issue">84</span><span class="variance">⚠ Review required</span></td></tr><tr class="recon tie-total"><td><span class="label">Billing claim exception total</span><span class="formula">Unresolved denied and pending claims must reconcile to zero.</span></td><td class="value">114</td><td class="operator">−</td><td class="value">0</td><td class="operator">=</td><td class="value"><span class="table-priority-zero is-issue">114</span><span class="variance">⚠ Review required</span></td></tr></tbody></table></section>');
+  const flow=workflow.querySelector('.clinical-workflow-ops');if(!flow)return;
+  const chip='<span class="owner-chip owner-chip--billing">Billing</span>';
+  const control=value=>`<span class="table-priority-zero is-issue" aria-label="Expected-zero control">${value}</span><span class="variance">⚠ Review required</span>`;
+  const row=(label,value)=>`<tr class="exception"><td><span class="label">${label}</span></td><td class="owner-cell">${chip}</td><td class="value">${value}</td><td class="value">0</td><td class="value">${control(value)}</td></tr>`;
+  flow.insertAdjacentHTML('beforeend',`<div class="workflow-transition" aria-hidden="true"></div><section class="audit-block" data-clinical-chunk="billing-claims" aria-labelledby="billing-claim-exceptions-title"><div class="audit-head blue"><h3 id="billing-claim-exceptions-title">Billing claim exceptions</h3><p>Expected-zero operational control.</p></div><table><thead><tr><th>Exception check</th><th>Responsible group</th><th>Observed</th><th>Expected</th><th>Tie-out</th></tr></thead><tbody>${row('Denied claims, not approved by manager',30)+row('Pending claims',84)}</tbody></table></section>`);
 });
 </script>
 <style>
@@ -3615,7 +3619,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 <script>
 window.addEventListener('load',()=>{
   const table=document.querySelector('#billing-claim-exceptions-title')?.closest('.audit-block')?.querySelector('table');
-  if(!table||table.dataset.responsibleGroup)return;
+  if(!table||table.dataset.responsibleGroup||[...table.querySelectorAll('thead th')].some(cell=>cell.textContent.trim()==='Responsible group'))return;
   table.dataset.responsibleGroup='true';
   table.querySelector('thead tr')?.insertAdjacentHTML('afterbegin','<th>Responsible group</th>');
   table.querySelectorAll('tbody tr').forEach(row=>{
