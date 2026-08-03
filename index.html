@@ -3648,4 +3648,18 @@ document.addEventListener('DOMContentLoaded',()=>{
   });
 });
 </script>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const summary=document.querySelector('.monthly-control-list');
+  if(!summary||summary.dataset.billingColumnReady)return;
+  summary.dataset.billingColumnReady='true';
+  const header=summary.querySelector('thead tr');
+  header.children[2].textContent='Clinic';
+  header.children[3].textContent='Back Office';
+  header.children[4].insertAdjacentHTML('beforebegin','<th>Billing</th>');
+  summary.querySelectorAll('tbody tr').forEach(row=>row.children[4].insertAdjacentHTML('beforebegin','<td class="value">0</td>'));
+  const shortenContext=()=>document.querySelectorAll('.reporting-period-context span').forEach(item=>{item.textContent=item.textContent.replaceAll('Clinic Ops','Clinic').replaceAll('Back Office Ops','Back Office')});
+  shortenContext();summary.querySelectorAll('tbody tr').forEach(row=>row.addEventListener('click',()=>setTimeout(shortenContext,0)));
+});
+</script>
 </html>
