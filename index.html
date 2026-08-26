@@ -2323,7 +2323,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     const mainTable=block.querySelector(':scope > table');
     if (!mainTable) return;
     const routes=[
-      ['PPO insurance', 'PPO insurance detail'],
+      ['PPO insurance', 'PPO reimbursement classification detail'],
       ['Medicare insurance', 'Medicare insurance detail'],
       ['INN insurance', 'INN insurance detail'],
       ['HMO insurance', 'HMO insurance detail']
@@ -2336,7 +2336,9 @@ document.addEventListener('DOMContentLoaded',()=>{
     let paths='';
     routes.forEach(([label,heading],index)=>{
       const source=[...mainTable.querySelectorAll('.label')].find(item=>item.textContent.trim()===label)?.closest('tr');
-      const target=[...block.querySelectorAll('.insurance-daughter h4')].find(item=>item.textContent.trim()===heading);
+      const target=label==='PPO insurance'
+        ? [...block.querySelectorAll('.ppo-classification-detail .label')].find(item=>item.textContent.trim()===label)?.closest('tr')
+        : [...block.querySelectorAll('.insurance-daughter h4')].find(item=>item.textContent.trim()===heading);
       if (!source || !target) return;
       const a=source.getBoundingClientRect(),b=target.getBoundingClientRect();
       const sx=a.left-p.left-3,tx=b.left-p.left-3,sy=a.top-p.top+a.height/2,ty=b.top-p.top+b.height/2,lane=36-(index*10);
@@ -2593,8 +2595,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   const leadForms=nav?.querySelector('[data-integrity-subtab="marketing-data"]');
   if (leadForms) {
     const badge=leadForms.querySelector('.integrity-subtab__badge');
-    leadForms.textContent='Marketing Lead Forms';if(badge)leadForms.appendChild(badge);
-    leadForms.setAttribute('aria-label','Marketing Lead Forms');
+    leadForms.textContent='Marketing';if(badge)leadForms.appendChild(badge);
+    leadForms.setAttribute('aria-label','Marketing');
   }
   if (!nav || !content || nav.querySelector('[data-integrity-subtab="marketing-inbound-calls"]')) return;
   const button=document.createElement('button');button.type='button';button.className='integrity-subtab';button.dataset.integritySubtab='marketing-inbound-calls';button.textContent='Marketing Inbound Calls';button.setAttribute('role','tab');
@@ -2999,7 +3001,7 @@ window.addEventListener('load',()=>{
     adjudication=pane.querySelector('#claim-adjudication-title')?.closest('.audit-block');
   }
   const draw=()=>{
-    if(pane.hidden||!adjudication)return;
+    if(pane.hidden||!adjudication||!pane.contains(adjudication)){pane.querySelector('.claim-adjudication-connector')?.remove();return;}
     const from=[...cleanClaim.querySelectorAll('.label')].find(label=>label.textContent.trim()==='Clean claims sent')?.closest('tr');
     const to=adjudication.querySelector('tbody tr');if(!from||!to)return;
     pane.style.position='relative';pane.style.paddingLeft='44px';pane.querySelector('.claim-adjudication-connector')?.remove();
@@ -3067,7 +3069,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(!panel||!zeroSummary||panel.querySelector('.control-center-home'))return;
   if(nav){nav.textContent='Control Center';nav.setAttribute('aria-label','Control Center');}
   const home=document.createElement('section');home.className='control-center-home';
-  home.innerHTML='<div class="control-center-home__intro"><h3>Control Center</h3><p>Choose the view that matches the question: non-negotiable internal controls, or normal operating performance.</p></div><div class="control-center-home__choices"><button type="button" class="control-center-choice control-center-choice--zero" data-control-center-view="zero"><h4>Monthly Zero-Variance Control Summary</h4><p>Closed populations that must reconcile completely. Every exception must ultimately reach zero.</p><span>Open zero-variance controls →</span></button><button type="button" class="control-center-choice control-center-choice--operations" data-control-center-view="operations"><h4>Operations Performance</h4><p>Business-performance measures with expected variance, including missed calls, missed opportunities, and cancellation rates.</p><span>Open operations performance →</span></button></div>';
+  home.innerHTML='<div class="control-center-home__intro"><h3>Control Center</h3><p>Choose the view that matches the question: non-negotiable internal controls, or normal operating performance.</p></div><div class="control-center-home__choices"><button type="button" class="control-center-choice control-center-choice--zero" data-control-center-view="zero"><h4>Monthly Control Summary</h4><p>Closed populations that must reconcile completely. Every exception must ultimately reach zero.</p><span>Open zero-variance controls →</span></button><button type="button" class="control-center-choice control-center-choice--operations" data-control-center-view="operations"><h4>Operations Performance</h4><p>Business-performance measures with expected variance, including missed calls, missed opportunities, and cancellation rates.</p><span>Open operations performance →</span></button></div>';
   const operations=document.createElement('section');operations.className='operations-summary';operations.hidden=true;
   operations.innerHTML='<button type="button" class="operations-summary__back">← Control Center</button><div class="audit-head blue"><h3>Operations performance summary</h3><p>Mock operating measures with expected business variance. These are not Zero-Tier controls.</p></div><div class="operations-metrics"><article class="operations-metric"><span>Missed inbound calls</span><b>34</b><small>Mock monthly count</small></article><article class="operations-metric"><span>Missed opportunities</span><b>61</b><small>Mock monthly count</small></article><article class="operations-metric"><span>Cancellation rate</span><b>8.4%</b><small>Mock monthly rate</small></article></div><div class="source-note">Starter mockup only — detailed operational measures can be added from your examples.</div>';
   const activate=view=>{home.hidden=view!=='home';zeroSummary.hidden=view!=='zero';operations.hidden=view!=='operations';};
@@ -3094,7 +3096,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const operations=document.querySelector('.operations-summary');
   const choices=home?.querySelector('.control-center-home__choices');
   if(!home||!zero||!operations||!choices)return;
-  choices.innerHTML='<button type="button" class="control-center-choice control-center-choice--zero" data-control-center-card="zero"><h4>Monthly Zero-Variance Control Summary</h4><p>Closed populations that must reconcile completely. Every exception must ultimately reach zero.</p><span>Open zero-variance controls →</span></button><button type="button" class="control-center-choice control-center-choice--operations" data-control-center-card="marketing"><h4>Marketing Performance</h4><p>Missed calls, missed opportunities, campaign flow, and conversion performance.</p><span>Open marketing performance →</span></button><button type="button" class="control-center-choice control-center-choice--operations" data-control-center-card="clinical"><h4>Clinical Operations</h4><p>Operational measures for the clinical workflow.</p><span>Open clinical operations →</span></button><button type="button" class="control-center-choice control-center-choice--operations" data-control-center-card="back-office"><h4>Back Office Operations</h4><p>Operational measures for administrative and support workflows.</p><span>Open back office operations →</span></button><button type="button" class="control-center-choice control-center-choice--operations" data-control-center-card="billing"><h4>Billing Performance</h4><p>Operational measures for the billing and collections workflow.</p><span>Open billing performance →</span></button>';
+  choices.innerHTML='<button type="button" class="control-center-choice control-center-choice--zero" data-control-center-card="zero"><h4>Monthly Control Summary</h4><p>Closed populations that must reconcile completely. Every exception must ultimately reach zero.</p><span>Open zero-variance controls →</span></button><button type="button" class="control-center-choice control-center-choice--operations" data-control-center-card="marketing"><h4>Marketing Performance</h4><p>Missed calls, missed opportunities, campaign flow, and conversion performance.</p><span>Open marketing performance →</span></button><button type="button" class="control-center-choice control-center-choice--operations" data-control-center-card="clinical"><h4>Clinical Operations</h4><p>Operational measures for the clinical workflow.</p><span>Open clinical operations →</span></button><button type="button" class="control-center-choice control-center-choice--operations" data-control-center-card="back-office"><h4>Back Office Operations</h4><p>Operational measures for administrative and support workflows.</p><span>Open back office operations →</span></button><button type="button" class="control-center-choice control-center-choice--operations" data-control-center-card="billing"><h4>Billing Performance</h4><p>Operational measures for the billing and collections workflow.</p><span>Open billing performance →</span></button>';
   choices.addEventListener('click',event=>{const card=event.target.closest('[data-control-center-card]');if(!card)return;const view=card.dataset.controlCenterCard;home.hidden=true;zero.hidden=view!=='zero';operations.hidden=view==='zero';if(view!=='zero')operations.querySelector(`[data-operations-view="${view}"]`)?.click()});
 });
 </script>
@@ -3661,5 +3663,718 @@ document.addEventListener('DOMContentLoaded',()=>{
   const shortenContext=()=>document.querySelectorAll('.reporting-period-context span').forEach(item=>{item.textContent=item.textContent.replaceAll('Clinic Ops','Clinic').replaceAll('Back Office Ops','Back Office')});
   shortenContext();summary.querySelectorAll('tbody tr').forEach(row=>row.addEventListener('click',()=>setTimeout(shortenContext,0)));
 });
+</script>
+<style>
+.control-center-home__section{grid-column:1/-1;padding:18px;border:1px solid #dfe5ea;border-radius:14px;background:#f7fafc}.control-center-home__section-head{margin-bottom:13px}.control-center-home__section-head h4{margin:0;color:#173854;font-size:19px;letter-spacing:-.02em}.control-center-home__section-head p{margin:5px 0 0;color:#71808d;font-size:11px}.control-center-home__section-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.control-center-home__section--operations{background:#fff}.control-center-choice--nodes{border-top:4px solid #147c83}.patient-node-placeholder{padding:22px;border:1px dashed #a8c8cc;border-radius:12px;background:#f3fbfb}.patient-node-placeholder h4{margin:0;color:#155b62;font-size:18px}.patient-node-placeholder p{margin:7px 0 0;color:#617681;font-size:12px;line-height:1.55}.patient-node-placeholder__flow{display:flex;align-items:center;gap:8px;margin-top:18px;overflow:auto}.patient-node-placeholder__flow span{min-width:max-content;padding:9px 12px;border-radius:999px;background:#dceff0;color:#155b62;font-size:10px;font-weight:850}.patient-node-placeholder__flow i{color:#6c9296;font-style:normal;font-weight:850}@media(max-width:720px){.control-center-home__section-grid{grid-template-columns:1fr}}
+.audit-block table th.avg-time-heading,.audit-block table td.avg-time-cell{width:112px;min-width:112px;text-align:center;white-space:nowrap}.audit-block table td.avg-time-cell{color:#747783;font-weight:750}.audit-block table tr.exception td.avg-time-cell,.audit-block table tr:has(.is-issue) td.avg-time-cell,.audit-block table tr:has(.variance) td.avg-time-cell{color:#ad3f38;font-size:1.05rem;font-weight:850}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const choices=document.querySelector('.control-center-home__choices');
+  const operations=document.querySelector('.operations-summary');
+  const zeroCard=choices?.querySelector('[data-control-center-card="zero"]');
+  if(!choices||!operations||!zeroCard||choices.querySelector('[data-control-center-card="nodes"]'))return;
+
+  const patientSection=document.createElement('section');patientSection.className='control-center-home__section control-center-home__section--patient';
+  patientSection.innerHTML='<div class="control-center-home__section-head"><h4>Patient Journey as Data Nodes</h4><p>Monthly controls and operating nodes that follow the patient journey across connected systems.</p></div><div class="control-center-home__section-grid"></div>';
+  const patientGrid=patientSection.querySelector('.control-center-home__section-grid');
+  choices.prepend(patientSection);patientGrid.append(zeroCard);
+
+  const nodesCard=document.createElement('button');nodesCard.type='button';nodesCard.className='control-center-choice control-center-choice--nodes';nodesCard.dataset.controlCenterCard='nodes';
+  nodesCard.innerHTML='<h4>Monthly Operational Nodes</h4><p>Monthly patient-journey nodes with operating volume, flow, and exception context.</p><div class="control-center-choice__owner">Ericka</div><span>Open monthly operational nodes →</span>';
+  patientGrid.append(nodesCard);
+
+  const performanceSection=document.createElement('section');performanceSection.className='control-center-home__section control-center-home__section--operations';
+  performanceSection.innerHTML='<div class="control-center-home__section-head"><h4>Operational Performance</h4><p>Team and channel views for the normal operating measures behind the patient journey.</p></div><div class="control-center-home__section-grid"></div>';
+  const performanceGrid=performanceSection.querySelector('.control-center-home__section-grid');
+  [...choices.children].filter(child=>child.classList.contains('control-center-choice')).forEach(card=>performanceGrid.append(card));
+  choices.append(performanceSection);
+
+  const tabs=operations.querySelector('.operations-subtabs');
+  const nodesTab=document.createElement('button');nodesTab.type='button';nodesTab.className='integrity-subtab';nodesTab.dataset.operationsView='nodes';nodesTab.textContent='Monthly Operational Nodes';tabs?.prepend(nodesTab);
+  const nodesPane=document.createElement('div');nodesPane.className='operations-view';nodesPane.dataset.operationsPane='nodes';nodesPane.hidden=true;
+  nodesPane.innerHTML='<div class="patient-node-placeholder"><h4>Monthly Operational Nodes</h4><p>This new tab is ready for the detailed monthly node design. It will connect operating volume and exception timing across the full patient journey.</p><div class="patient-node-placeholder__flow"><span>Lead</span><i>→</i><span>Appointment</span><i>→</i><span>Encounter</span><i>→</i><span>LOMN / PA</span><i>→</i><span>Billing</span></div></div>';
+  operations.append(nodesPane);
+
+  nodesTab.addEventListener('click',()=>{
+    operations.querySelectorAll('[data-operations-view]').forEach(button=>button.classList.toggle('is-active',button===nodesTab));
+    operations.querySelectorAll('[data-operations-pane]').forEach(pane=>pane.hidden=pane!==nodesPane);
+    const heading=operations.querySelector('.audit-head h3'),description=operations.querySelector('.audit-head p');
+    if(heading)heading.textContent='Monthly Operational Nodes';
+    if(description)description.textContent='Patient-journey operating nodes for the selected monthly reporting period.';
+  });
+});
+</script>
+<script>
+window.addEventListener('load',()=>{
+  const sampleDays=label=>{let hash=0;for(const character of label)hash=((hash*31)+character.charCodeAt(0))>>>0;return((hash%61)/10).toFixed(1)};
+  const addAverageTimeColumn=table=>{
+    if(table.dataset.avgTimeEnhanced==='true')return;
+    const headingRow=table.querySelector('thead tr');if(!headingRow)return;
+    const heading=document.createElement('th');heading.className='avg-time-heading';heading.textContent='AVG TIME (DAYS)';headingRow.appendChild(heading);
+    table.querySelectorAll('tbody tr').forEach(row=>{
+      const cell=document.createElement('td');cell.className='avg-time-cell';
+      const label=row.querySelector('.label')?.textContent.trim()||row.textContent.trim();
+      cell.textContent=sampleDays(label);
+      cell.setAttribute('aria-label',`Average resolution time: ${cell.textContent} days (representative)`);
+      row.appendChild(cell);
+    });
+    table.dataset.avgTimeEnhanced='true';
+  };
+  const enhanceTables=root=>root.querySelectorAll?.('.audit-block table').forEach(addAverageTimeColumn);
+  enhanceTables(document);
+  new MutationObserver(mutations=>mutations.forEach(mutation=>mutation.addedNodes.forEach(node=>{if(node.nodeType!==Node.ELEMENT_NODE)return;if(node.matches?.('.audit-block table'))addAverageTimeColumn(node);enhanceTables(node)}))).observe(document.body,{childList:true,subtree:true});
+});
+</script>
+<style>
+.clinical-exception-chart{margin:0 0 22px;padding:20px;border:1px solid #dbe4eb;border-radius:14px;background:#fff;box-shadow:0 7px 20px rgba(23,56,84,.07)}.clinical-exception-chart__head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:12px}.clinical-exception-chart__head h3{margin:0;color:#173854;font-size:20px;letter-spacing:-.02em}.clinical-exception-chart__head p{margin:5px 0 0;color:#6d7d89;font-size:11px}.clinical-exception-chart__legend{display:flex;align-items:center;gap:6px;color:#a53932;font-size:10px;font-weight:800;white-space:nowrap}.clinical-exception-chart__legend::before{content:'';width:10px;height:10px;border-radius:3px;background:#cf5a58}.clinical-exception-chart__scroll{overflow-x:auto;padding-bottom:4px}.clinical-exception-chart svg{display:block;min-width:100%;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.clinical-exception-chart .grid-line{stroke:#e5eaee;stroke-width:1}.clinical-exception-chart .axis-line{stroke:#9aa8b2;stroke-width:1}.clinical-exception-chart .axis-label{fill:#6f7d87;font-size:10px;font-weight:700}.clinical-exception-chart .x-label{fill:#556774;font-size:9px;font-weight:750}.clinical-exception-chart .bar{fill:#cf5a58}.clinical-exception-chart .bar-value{fill:#9f3435;font-size:10px;font-weight:850}.clinical-exception-chart .axis-title{fill:#526675;font-size:10px;font-weight:850;letter-spacing:.04em;text-transform:uppercase}
+.clinical-exception-chart__insight{margin-top:14px;padding:16px 18px;border-left:4px solid #476d9c;border-radius:8px;background:#eef4f9}.clinical-exception-chart__insight h4{margin:0;color:#173854;font-size:13px}.clinical-exception-chart__insight p{margin:6px 0 0;color:#506575;font-size:11px;line-height:1.6}.clinical-exception-chart__insight strong{color:#a53932}
+</style>
+<script>
+window.addEventListener('load',()=>{
+  const workflow=document.querySelector('[data-audit-panel="clinic-note"] .clinical-workflow-ops');
+  if(!workflow||workflow.querySelector('.clinical-exception-chart'))return;
+  const rows=[...workflow.querySelectorAll('tr.exception')].map(row=>({
+    label:row.querySelector('.label')?.textContent.trim()||'Exception check',
+    value:Number.parseFloat(row.querySelector('.avg-time-cell')?.textContent)||0
+  }));
+  if(!rows.length)return;
+
+  const width=Math.max(940,rows.length*105),height=390;
+  const margin={top:30,right:24,bottom:145,left:58};
+  const plotWidth=width-margin.left-margin.right,plotHeight=height-margin.top-margin.bottom;
+  const maxValue=Math.max(...rows.map(row=>row.value));
+  const yMax=Math.max(6,Math.ceil(maxValue));
+  const step=plotWidth/rows.length,barWidth=Math.min(48,step*.58);
+  const y=value=>margin.top+plotHeight-(value/yMax)*plotHeight;
+  const escape=value=>value.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
+  const ticks=Array.from({length:yMax+1},(_,index)=>index);
+  const grid=ticks.map(tick=>`<line class="grid-line" x1="${margin.left}" y1="${y(tick)}" x2="${width-margin.right}" y2="${y(tick)}"/><text class="axis-label" x="${margin.left-10}" y="${y(tick)+3}" text-anchor="end">${tick}</text>`).join('');
+  const bars=rows.map((row,index)=>{
+    const center=margin.left+step*(index+.5),top=y(row.value),barHeight=Math.max(2,margin.top+plotHeight-top);
+    const shortLabel=row.label.length>32?row.label.slice(0,30)+'…':row.label;
+    return `<g><title>${escape(row.label)}: ${row.value.toFixed(1)} days</title><rect class="bar" x="${center-barWidth/2}" y="${top}" width="${barWidth}" height="${barHeight}" rx="5"/><text class="bar-value" x="${center}" y="${top-7}" text-anchor="middle">${row.value.toFixed(1)}</text><text class="x-label" x="${center}" y="${margin.top+plotHeight+17}" text-anchor="end" transform="rotate(-43 ${center} ${margin.top+plotHeight+17})">${escape(shortLabel)}</text></g>`;
+  }).join('');
+
+  const chart=document.createElement('section');chart.className='clinical-exception-chart';chart.setAttribute('aria-labelledby','clinical-exception-chart-title');
+  chart.innerHTML=`<div class="clinical-exception-chart__head"><div><h3 id="clinical-exception-chart-title">Clinical workflow exception resolution time</h3><p>Average days to tie out each red exception check in this monthly workflow.</p></div><span class="clinical-exception-chart__legend">Avg time (days)</span></div><div class="clinical-exception-chart__scroll"><svg role="img" aria-label="Bar chart of average resolution time by clinical workflow exception" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">${grid}<line class="axis-line" x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${margin.top+plotHeight}"/><line class="axis-line" x1="${margin.left}" y1="${margin.top+plotHeight}" x2="${width-margin.right}" y2="${margin.top+plotHeight}"/><text class="axis-title" x="15" y="${margin.top+plotHeight/2}" text-anchor="middle" transform="rotate(-90 15 ${margin.top+plotHeight/2})">AVG TIME (DAYS)</text>${bars}</svg></div><aside class="clinical-exception-chart__insight"><h4>How this identifies the most impactful improvements</h4><p>The average number of days shows where an exception remains unresolved longest and where work, patient progression, or billing can stay blocked. <strong>The tallest bars are the best first places to investigate</strong>: shortening those delays removes the largest pockets of waiting time. When two checks have similar resolution times, prioritize the one occurring more often or affecting a later, revenue-critical step in the patient journey. Tracking the metric monthly then confirms whether the workflow change actually reduced time to tie-out.</p></aside>`;
+  workflow.prepend(chart);
+});
+</script>
+<style>
+.billing-node{display:grid;gap:16px}.billing-node__source{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:17px 19px;border-radius:13px;background:linear-gradient(120deg,#173854,#315f7c);color:#fff}.billing-node__source h3{margin:0;font-size:20px}.billing-node__source p{margin:5px 0 0;color:#dce9f1;font-size:11px}.billing-node__truth{padding:7px 10px;border:1px solid rgba(255,255,255,.4);border-radius:999px;font-size:9px;font-weight:850;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}.billing-node__kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.billing-node__kpi{padding:15px;border:1px solid #dfe7ed;border-radius:11px;background:#fff}.billing-node__kpi span{display:block;color:#687986;font-size:9px;font-weight:850;letter-spacing:.04em;text-transform:uppercase}.billing-node__kpi b{display:block;margin-top:7px;color:#173854;font-size:23px}.billing-node__kpi small{display:block;margin-top:4px;color:#617481;font-size:9px}.billing-node__grid{display:grid;grid-template-columns:1.12fr .88fr;gap:12px}.billing-node__panel{padding:17px;border:1px solid #dfe7ed;border-radius:12px;background:#fff}.billing-node__panel h4{margin:0;color:#173854;font-size:14px}.billing-node__panel>p{margin:4px 0 14px;color:#71808d;font-size:10px}.billing-node__flow{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center}.billing-node__stage{padding:14px;border-radius:10px;background:#eef4f8;text-align:center}.billing-node__stage b{display:block;color:#173854;font-size:22px}.billing-node__stage span{display:block;margin-top:4px;color:#5f7280;font-size:9px;font-weight:800}.billing-node__arrow{color:#718a99;font-size:20px;font-weight:900}.billing-node__outcomes{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}.billing-node__outcome{padding:10px;border-radius:8px;background:#e9f5ee;color:#2e6d4e;text-align:center}.billing-node__outcome.is-risk{background:#fde8e9;color:#a53932}.billing-node__outcome b{display:block;font-size:16px}.billing-node__outcome span{display:block;margin-top:3px;font-size:8px;font-weight:800}.billing-node__bars{display:grid;gap:13px;margin-top:16px}.billing-node__bar-row{display:grid;grid-template-columns:145px 1fr 40px;gap:8px;align-items:center}.billing-node__bar-row span{color:#526675;font-size:9px;font-weight:750}.billing-node__track{height:18px;border-radius:5px;background:#edf1f4;overflow:hidden}.billing-node__track i{display:block;height:100%;border-radius:5px;background:#cf5a58}.billing-node__bar-row b{color:#a53932;font-size:11px}.billing-node__table{margin:0;width:100%}.billing-node__table th{background:#f3f7fa;color:#5c6e7b;font-size:9px;text-transform:uppercase}.billing-node__table td{font-size:10px}.billing-node__table tr.is-risk td{background:#fde8e9;color:#a53932;font-weight:750}.billing-node__table tr.is-total td{background:#e8f5ee;color:#2c7652;font-weight:850}.billing-node__note{padding:13px 15px;border-left:4px solid #7653a6;border-radius:8px;background:#f3eff9;color:#566775;font-size:10px;line-height:1.55}.billing-node__note strong{color:#523777}@media(max-width:800px){.billing-node__kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.billing-node__grid{grid-template-columns:1fr}}@media(max-width:520px){.billing-node__source{display:block}.billing-node__truth{display:inline-block;margin-top:10px}.billing-node__kpis{grid-template-columns:1fr}.billing-node__outcomes{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const operations=document.querySelector('.operations-summary');
+  const pane=operations?.querySelector('[data-operations-pane="billing"]');
+  const tab=operations?.querySelector('[data-operations-view="billing"]');
+  if(!operations||!pane||!tab)return;
+  pane.classList.add('billing-node');
+  pane.innerHTML=`
+    <header class="billing-node__source"><div><h3>Billing Operational Node</h3><p>Monthly claim flow grounded in the zero-variance claim-adjudication reconciliation.</p></div><span class="billing-node__truth">Source of truth · Zero-Variance Control</span></header>
+    <div class="billing-node__kpis">
+      <article class="billing-node__kpi"><span>Clean claims sent</span><b>1,159</b><small>Clearinghouse API population</small></article>
+      <article class="billing-node__kpi"><span>Paid claims</span><b>1,000</b><small>86.3% of clean claims</small></article>
+      <article class="billing-node__kpi"><span>Open action population</span><b>114</b><small>30 manager review + 84 pending</small></article>
+      <article class="billing-node__kpi"><span>Rollup avg time</span><b>2.9 days</b><small>Monthly adjudication cycle metric</small></article>
+    </div>
+    <div class="billing-node__grid">
+      <section class="billing-node__panel"><h4>Claim adjudication node flow</h4><p>The operating view begins with the reconciled population, then separates final and actionable outcomes.</p><div class="billing-node__flow"><div class="billing-node__stage"><b>1,159</b><span>Clean claims sent</span></div><div class="billing-node__arrow">→</div><div class="billing-node__stage"><b>1,159</b><span>Payer responses reconciled</span></div><div class="billing-node__outcomes"><div class="billing-node__outcome"><b>1,000</b><span>Paid</span></div><div class="billing-node__outcome"><b>45</b><span>Denied · manager approved</span></div><div class="billing-node__outcome is-risk"><b>30</b><span>Denied · manager review</span></div><div class="billing-node__outcome is-risk"><b>84</b><span>Pending</span></div></div></div></section>
+      <section class="billing-node__panel"><h4>Where action has the most impact</h4><p>Average days for the two unresolved billing populations.</p><div class="billing-node__bars"><div class="billing-node__bar-row"><span>Denied, not approved</span><div class="billing-node__track"><i style="width:54.4%"></i></div><b>3.1</b></div><div class="billing-node__bar-row"><span>Pending claims</span><div class="billing-node__track"><i style="width:100%"></i></div><b>5.7</b></div></div></section>
+    </div>
+    <section class="billing-node__panel"><h4>Zero-variance billing data carried into the operational node</h4><p>These values are inherited from the reconciled monthly control rather than independently entered operational metrics.</p><table class="billing-node__table"><thead><tr><th>Claim adjudication population</th><th>Clearinghouse</th><th>Payer response</th><th>Tie-out</th><th>Avg time (days)</th></tr></thead><tbody><tr><td>Clean claims sent</td><td class="value">1,159</td><td class="value">1,159</td><td class="value">0</td><td class="value">1.3</td></tr><tr><td>Paid claims</td><td class="value">1,000</td><td class="value">1,000</td><td class="value">0</td><td class="value">5.6</td></tr><tr><td>Denied claims, approved by manager</td><td class="value">45</td><td class="value">45</td><td class="value">0</td><td class="value">0.8</td></tr><tr class="is-risk"><td>Denied claims, not approved by manager</td><td class="value">30</td><td class="value">30</td><td class="value">30</td><td class="value">3.1</td></tr><tr class="is-risk"><td>Pending claims</td><td class="value">84</td><td class="value">84</td><td class="value">84</td><td class="value">5.7</td></tr><tr class="is-total"><td>Claim-adjudication rollup</td><td class="value">1,159</td><td class="value">1,159</td><td class="value">0</td><td class="value">2.9</td></tr></tbody></table></section>
+    <div class="billing-node__note"><strong>Data lineage:</strong> the operational Billing tab starts with the Monthly Zero-Variance Control population as its data truth. Future billing operating measures should extend this reconciled base instead of creating a separate count.</div>`;
+  const activateBillingHeading=()=>{const heading=operations.querySelector('.audit-head h3'),description=operations.querySelector('.audit-head p');if(heading)heading.textContent='Monthly Operational Nodes · Billing';if(description)description.textContent='Billing operations derived from the reconciled monthly zero-variance claim population.'};
+  tab.addEventListener('click',activateBillingHeading);
+});
+</script>
+<style>
+.selected-month-shell>.integrity-subtabs{width:100%;margin:0 0 4px;box-sizing:border-box}.selected-month-shell>.period-detail-nav{display:none!important}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const shell=document.querySelector('.selected-month-shell');
+  const integrity=document.querySelector('[data-audit-panel="appointment"]');
+  const purpleNav=integrity?.querySelector('.integrity-subtabs');
+  const oldTopLevelNav=shell?.querySelector('.period-detail-nav');
+  if(!shell||!purpleNav)return;
+  oldTopLevelNav?.setAttribute('aria-hidden','true');
+  shell.appendChild(purpleNav);
+  purpleNav.setAttribute('aria-label','Monthly zero-variance control navigation');
+});
+</script>
+<style>
+.selected-month-shell>.integrity-subtabs{grid-template-columns:140px repeat(7,minmax(0,1fr));align-items:stretch;overflow:visible}
+.efficiency-opportunities-nav{grid-template-columns:140px repeat(4,minmax(0,1fr));align-items:stretch;overflow:visible}
+.selected-month-shell>.integrity-subtabs{display:grid}
+.control-nav-title{flex:0 0 140px;box-sizing:border-box;padding:8px 10px;color:#523777;font:850 11px/1 Inter,ui-sans-serif,sans-serif;letter-spacing:.06em;white-space:nowrap}
+.efficiency-opportunities-nav{display:grid;gap:6px;width:100%;margin:0 0 4px;padding:6px;box-sizing:border-box;border:1px solid #cfe5d8;border-radius:12px;background:#eef8f2}
+.efficiency-opportunities-nav .control-nav-title{color:#26704f}
+.selected-month-shell>.integrity-subtabs .integrity-subtab,.efficiency-opportunities-nav__item{display:inline-flex;align-items:center;justify-content:center;width:100%;min-width:0;min-height:40px;box-sizing:border-box;margin:0;padding:7px 8px;border:0;border-radius:8px;font:750 clamp(9px,.72vw,12px)/1.15 Inter,ui-sans-serif,sans-serif;letter-spacing:0;white-space:normal;text-align:center;overflow-wrap:anywhere}
+.efficiency-opportunities-nav__item{background:#d9f0e3;color:#256849;box-shadow:0 1px 3px rgba(31,103,72,.14)}
+.selected-month-shell>.integrity-subtabs .integrity-subtab{box-sizing:border-box;background:#e9dff7;color:#60408c;box-shadow:0 1px 3px rgba(82,55,119,.14)}
+.selected-month-shell>.integrity-subtabs .integrity-subtab:hover{background:#dfd0f2}
+.selected-month-shell>.integrity-subtabs .integrity-subtab.has-tie-out-issue{background:#f7d9d7;color:#a53630;box-shadow:0 1px 3px rgba(139,42,37,.15)}
+.selected-month-shell>.integrity-subtabs .integrity-subtab.has-tie-out-issue:hover{background:#f1ccca}
+.selected-month-shell>.integrity-subtabs .integrity-subtab:focus-visible{outline:3px solid rgba(82,55,119,.24);outline-offset:2px}
+@media(max-width:680px){.selected-month-shell>.integrity-subtabs,.efficiency-opportunities-nav{grid-template-columns:1fr 1fr}.control-nav-title{grid-column:1/-1;width:auto;padding-bottom:3px}.selected-month-shell>.integrity-subtabs .integrity-subtab,.efficiency-opportunities-nav__item{font-size:10px}}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const shell=document.querySelector('.selected-month-shell');
+  const purpleNav=shell?.querySelector(':scope > .integrity-subtabs');
+  if(!shell||!purpleNav||purpleNav.querySelector('.control-nav-title'))return;
+  const zeroTitle=document.createElement('strong');
+  zeroTitle.className='control-nav-title';
+  zeroTitle.textContent='ZERO TIE OUT:';
+  purpleNav.prepend(zeroTitle);
+
+  const efficiencyNav=document.createElement('div');
+  efficiencyNav.className='efficiency-opportunities-nav';
+  efficiencyNav.setAttribute('aria-label','Efficiency opportunities navigation');
+  const efficiencyTitle=document.createElement('strong');
+  efficiencyTitle.className='control-nav-title';
+  efficiencyTitle.textContent='NORTHSTAR:';
+  efficiencyNav.append(efficiencyTitle);
+  purpleNav.querySelectorAll('.integrity-subtab').forEach(tab=>{
+    if(['insurance','marketing-overview','marketing-inbound-calls'].includes(tab.dataset.integritySubtab))return;
+    const item=document.createElement('button');
+    item.type='button';
+    item.className='efficiency-opportunities-nav__item';
+    item.dataset.efficiencySubtab=tab.dataset.integritySubtab;
+    item.textContent=[...tab.childNodes].filter(node=>node.nodeType===Node.TEXT_NODE).map(node=>node.textContent).join('').trim();
+    if(tab.dataset.integritySubtab==='appointment')item.textContent='Operations + Marketing';
+    if(tab.dataset.integritySubtab==='lomn-data')item.textContent='Clinical + Marketing';
+    if(tab.dataset.integritySubtab==='marketing-data')item.textContent='Marketing';
+    efficiencyNav.append(item);
+  });
+  purpleNav.insertAdjacentElement('afterend',efficiencyNav);
+});
+</script>
+<script>
+window.addEventListener('load',()=>{
+  const integrity=document.querySelector('[data-audit-panel="appointment"]');
+  const purpleNav=document.querySelector('.selected-month-shell > .integrity-subtabs');
+  if(!integrity||!purpleNav)return;
+  purpleNav.querySelectorAll('.integrity-subtab').forEach(tab=>{
+    const pane=integrity.querySelector(`[data-integrity-pane="${tab.dataset.integritySubtab}"]`);
+    const issueCount=pane?[...pane.querySelectorAll('tr.exception')].filter(row=>row.querySelector('.table-priority-zero.is-issue, .variance')).length:0;
+    tab.querySelector('.integrity-subtab__badge')?.remove();
+    tab.querySelector('.zero-tie-out-count')?.remove();
+    tab.classList.toggle('has-tie-out-issue',issueCount>0);
+    tab.setAttribute('aria-label',`${[...tab.childNodes].filter(node=>node.nodeType===Node.TEXT_NODE).map(node=>node.textContent).join('').trim()}: ${issueCount?`${issueCount} open zero tie-out ${issueCount===1?'issue':'issues'}`:'all zero tie-outs clear'}`);
+  });
+});
+</script>
+<style>
+.zero-variance-chart{margin:0 0 22px;padding:20px;border:1px solid #ded7e8;border-radius:14px;background:#fff;box-shadow:0 7px 20px rgba(82,55,119,.08)}.zero-variance-chart__head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}.zero-variance-chart__head h3{margin:0;color:#2e2350;font-size:20px;letter-spacing:-.02em}.zero-variance-chart__head p{margin:5px 0 0;color:#6d7482;font-size:11px}.zero-variance-chart__legend{display:flex;align-items:center;gap:6px;color:#a53932;font-size:10px;font-weight:850;white-space:nowrap}.zero-variance-chart__legend::before{content:'';width:10px;height:10px;border-radius:3px;background:#cf5a58}.zero-variance-chart__scroll{overflow-x:auto;margin-top:10px}.zero-variance-chart svg{display:block;min-width:100%;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.zero-variance-chart .grid{stroke:#e7e9ed;stroke-width:1}.zero-variance-chart .axis{stroke:#9da8b1;stroke-width:1}.zero-variance-chart .tick{fill:#6f7d87;font-size:10px;font-weight:700}.zero-variance-chart .category{fill:#586974;font-size:9px;font-weight:750}.zero-variance-chart .bar{fill:#cf5a58}.zero-variance-chart .value{fill:#a53932;font-size:10px;font-weight:850}.zero-variance-chart .axis-title{fill:#526675;font-size:10px;font-weight:850;letter-spacing:.04em}.zero-variance-chart__insight{margin-top:14px;padding:16px 18px;border-left:4px solid #7653a6;border-radius:8px;background:#f3eff9}.zero-variance-chart__insight h4{margin:0;color:#523777;font-size:13px}.zero-variance-chart__insight p{margin:6px 0 0;color:#566775;font-size:11px;line-height:1.6}.zero-variance-chart__insight strong{color:#a53932}
+</style>
+<script>
+window.addEventListener('load',()=>{
+  const escapeChartText=value=>value.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
+  const buildChart=(paneKey,title,description,insight)=>{
+    const pane=document.querySelector(`[data-integrity-pane="${paneKey}"]`);
+    if(!pane||pane.querySelector(':scope > .zero-variance-chart'))return;
+    const rows=[...pane.querySelectorAll('tr.exception')].map(row=>({label:row.querySelector('.label')?.textContent.trim()||'Exception check',value:Number.parseFloat(row.querySelector('.avg-time-cell')?.textContent)||0}));
+    if(!rows.length)return;
+    const width=Math.max(920,rows.length*112),height=390,margin={top:30,right:24,bottom:145,left:58};
+    const plotWidth=width-margin.left-margin.right,plotHeight=height-margin.top-margin.bottom,max=Math.max(6,Math.ceil(Math.max(...rows.map(row=>row.value))));
+    const step=plotWidth/rows.length,barWidth=Math.min(50,step*.58),y=value=>margin.top+plotHeight-(value/max)*plotHeight;
+    const ticks=Array.from({length:max+1},(_,index)=>index).map(tick=>`<line class="grid" x1="${margin.left}" y1="${y(tick)}" x2="${width-margin.right}" y2="${y(tick)}"/><text class="tick" x="${margin.left-10}" y="${y(tick)+3}" text-anchor="end">${tick}</text>`).join('');
+    const bars=rows.map((row,index)=>{const center=margin.left+step*(index+.5),top=y(row.value),barHeight=Math.max(2,margin.top+plotHeight-top),short=row.label.length>34?row.label.slice(0,32)+'…':row.label;return`<g><title>${escapeChartText(row.label)}: ${row.value.toFixed(1)} days</title><rect class="bar" x="${center-barWidth/2}" y="${top}" width="${barWidth}" height="${barHeight}" rx="5"/><text class="value" x="${center}" y="${top-7}" text-anchor="middle">${row.value.toFixed(1)}</text><text class="category" x="${center}" y="${margin.top+plotHeight+17}" text-anchor="end" transform="rotate(-43 ${center} ${margin.top+plotHeight+17})">${escapeChartText(short)}</text></g>`}).join('');
+    const chart=document.createElement('section');chart.className='zero-variance-chart';
+    chart.innerHTML=`<div class="zero-variance-chart__head"><div><h3>${title}</h3><p>${description}</p></div><span class="zero-variance-chart__legend">Avg time (days)</span></div><div class="zero-variance-chart__scroll"><svg role="img" aria-label="${title}" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">${ticks}<line class="axis" x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${margin.top+plotHeight}"/><line class="axis" x1="${margin.left}" y1="${margin.top+plotHeight}" x2="${width-margin.right}" y2="${margin.top+plotHeight}"/><text class="axis-title" x="15" y="${margin.top+plotHeight/2}" text-anchor="middle" transform="rotate(-90 15 ${margin.top+plotHeight/2})">AVG TIME (DAYS)</text>${bars}</svg></div><aside class="zero-variance-chart__insight"><h4>Areas of improvement</h4><p>${insight}</p></aside>`;
+    pane.prepend(chart);
+  };
+  buildChart('lomn-data','Clinical Workflow exception resolution time','Every red Clinical Workflow check plotted by average days to tie-out.','Start with the <strong>tallest bars</strong>, because they represent clinical exceptions that remain unresolved longest and can delay the next step in care. For similarly aged checks, prioritize the higher-volume exception or the one blocking a downstream LOMN, authorization, or treatment milestone.');
+  buildChart('billing-data','Billing exception resolution time','Every red Billing check plotted by average days to tie-out.','Prioritize the <strong>longest-running billing exceptions</strong> first, especially those that prevent a clean claim, payer response, approval, or payment. When average times are close, address the higher-dollar or higher-volume population first to release the greatest amount of delayed revenue and staff capacity.');
+});
+</script>
+<style>
+.billing-node__clean-claim{border-top:4px solid #7653a6}.billing-node__clean-flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:9px;align-items:stretch;margin:14px 0}.billing-node__clean-stage{display:grid;place-items:center;padding:14px;border-radius:10px;background:#eef4f8;text-align:center}.billing-node__clean-stage.is-good{background:#e8f5ee;color:#2e6d4e}.billing-node__clean-stage.is-exception{background:#fde8e9;color:#a53932}.billing-node__clean-stage b{display:block;font-size:21px}.billing-node__clean-stage span{display:block;margin-top:4px;font-size:9px;font-weight:800}.billing-node__clean-arrow{display:grid;place-items:center;color:#718a99;font-size:20px;font-weight:900}.billing-node__timing{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0 15px}.billing-node__timing span{padding:6px 8px;border-radius:999px;background:#f3eff9;color:#5c437d;font-size:9px;font-weight:800}@media(max-width:680px){.billing-node__clean-flow{grid-template-columns:1fr}.billing-node__clean-arrow{transform:rotate(90deg)}}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const pane=document.querySelector('[data-operations-pane="billing"].billing-node');
+  const kpis=pane?.querySelector('.billing-node__kpis');
+  if(!pane||!kpis||pane.querySelector('.billing-node__clean-claim'))return;
+  const cleanClaim=document.createElement('section');cleanClaim.className='billing-node__panel billing-node__clean-claim';
+  cleanClaim.innerHTML=`<h4>Clean-claim reconciliation carried into the operational node</h4><p>This upstream stage starts with the reconciled billed-encounter population and confirms that each record becomes a clean claim.</p><div class="billing-node__clean-flow"><div class="billing-node__clean-stage"><div><b>1,159</b><span>Billed kept encounters</span></div></div><div class="billing-node__clean-arrow">→</div><div class="billing-node__clean-stage is-good"><div><b>1,159</b><span>Clean claims sent</span></div></div><div class="billing-node__clean-arrow">→</div><div class="billing-node__clean-stage is-exception"><div><b>0</b><span>Rejected or unclean claims</span></div></div></div><div class="billing-node__timing"><span>Billed encounter avg · 0.8 days</span><span>Clean claim avg · 1.3 days</span><span>Correction / resubmission avg · 2.7 days</span><span>Expected-zero tie-out avg · 1.9 days</span></div><table class="billing-node__table"><thead><tr><th>Clean-claim population</th><th>NextGen (API)</th><th>Clearinghouse (API)</th><th>Tie-out</th><th>Avg time (days)</th></tr></thead><tbody><tr><td>Reported appointments kept with encounters billed</td><td class="value">1,159</td><td class="value">1,159</td><td class="value">0</td><td class="value">0.8</td></tr><tr><td>Clean claims sent</td><td class="value">1,159</td><td class="value">1,159</td><td class="value">0</td><td class="value">1.3</td></tr><tr class="is-risk"><td>Rejected or unclean claims</td><td class="value">0</td><td class="value">0</td><td class="value">0</td><td class="value">2.7</td></tr><tr class="is-total"><td>Clean-claim expected-zero tie-out</td><td class="value">0</td><td class="value">0</td><td class="value">0</td><td class="value">1.9</td></tr></tbody></table>`;
+  kpis.insertAdjacentElement('afterend',cleanClaim);
+});
+</script>
+<style>
+.ppo-classification-detail{border-top:4px solid #7653a6}.ppo-classification-detail .classification-code{display:inline-flex;min-width:70px;padding:3px 7px;border-radius:6px;background:#f0eafa;color:#6040a0;font-size:10px;font-weight:850}.ppo-classification-detail .classification-note{display:block;margin-top:4px;color:#75808a;font-size:9px}.ppo-classification-detail tr.classification-other td{background:#fff8e8}.ppo-classification-detail tr.classification-other .classification-code{background:#fff0cf;color:#8a611c}.ppo-classification-detail tr.classification-total td{background:var(--green-soft);color:var(--green);font-weight:750}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const ppoDetail=[...document.querySelectorAll('.insurance-daughter')].find(section=>section.querySelector('h4')?.textContent.trim()==='PPO insurance detail');
+  if(!ppoDetail||document.querySelector('.ppo-classification-detail'))return;
+  const classifications=[
+    ['MRC1','Primary MRC reimbursement classification',170,'1.2'],
+    ['MRC2','Secondary MRC reimbursement classification',145,'1.6'],
+    ['MNRP','Maximum non-network reimbursement classification',110,'2.4'],
+    ['UCR','Usual, customary, and reasonable methodology',80,'2.1'],
+    ['Contracted Fee Schedule','Negotiated fee schedule methodology',55,'0.9'],
+    ['Percent of Medicare','Allowed amount based on a Medicare fee-schedule percentage',35,'1.8'],
+    ['Case Rate / Bundled Rate','Predetermined case or bundled reimbursement rate',15,'2.7'],
+    ['Other','Other or pending reimbursement classification',10,'3.4']
+  ];
+  const rows=classifications.map(([code,note,count,days])=>`<tr class="${code==='Other'?'classification-other':''}"><td><span class="classification-code">${code}</span><span class="classification-note">${note}</span></td><td class="value brand-source-nextgen">${count}</td><td class="operator">−</td><td class="value brand-source-snowflake">${count}</td><td class="operator">=</td><td class="value"><span class="table-priority-zero" aria-label="${code} classification tie-out">0</span></td><td class="avg-time-cell" aria-label="Average classification time: ${days} days">${days}</td></tr>`).join('');
+  const section=document.createElement('section');section.className='insurance-daughter ppo-classification-detail';
+  section.innerHTML=`<h4>PPO reimbursement classification detail</h4><p>Reimbursement-method classifications reconcile to the PPO insurance population of 620.</p><table data-avg-time-enhanced="true"><thead><tr><th>Classification</th><th><span class="brand-nextgen">NextGen (Direct API)</span></th><th></th><th><span class="brand-snowflake">Snowflake</span></th><th></th><th>Tie-out</th><th class="avg-time-heading">AVG TIME (DAYS)</th></tr></thead><tbody><tr><td><span class="label">PPO insurance</span><span class="classification-note">Total PPO population to be fully classified</span></td><td class="value brand-source-nextgen">620</td><td></td><td class="value brand-source-snowflake">620</td><td></td><td class="value"><span class="table-priority-zero">0</span></td><td class="avg-time-cell">4.0</td></tr>${rows}<tr class="classification-total"><td><span class="label">PPO classification tie-out</span><span class="classification-note">MRC1 + MRC2 + MNRP + UCR + fee schedule + Medicare-based + case rate + other = PPO total</span></td><td class="value brand-source-nextgen">620</td><td class="operator">−</td><td class="value brand-source-snowflake">620</td><td class="operator">=</td><td class="value"><span class="table-priority-zero" aria-label="PPO classification total tie-out">0</span><span class="zero">✓ Tied out</span></td><td class="avg-time-cell">2.0</td></tr></tbody></table>`;
+  ppoDetail.insertAdjacentElement('beforebegin',section);
+});
+</script>
+<style>
+.efficiency-clinical-copy{position:relative;padding-left:44px}
+.efficiency-clinical-connector{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:4}
+.efficiency-clinical-copy tr.efficiency-opportunity td{background:#fde8e9;color:#a53932}
+.efficiency-clinical-copy tr.efficiency-opportunity .label,.efficiency-clinical-copy tr.efficiency-opportunity .value{color:#a53932!important}
+.clinical-efficiency-trend{margin:0 0 18px;padding:20px;border:1px solid #ead5d6;border-radius:14px;background:#fff;box-shadow:0 6px 18px rgba(121,45,42,.08)}
+.clinical-efficiency-trend__head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}.clinical-efficiency-trend__head h3{margin:0;color:#2f2635;font-size:19px}.clinical-efficiency-trend__head p{margin:5px 0 0;color:#697681;font-size:10px}.clinical-efficiency-trend__current{padding:7px 10px;border-radius:999px;background:#fde8e9;color:#a53932;font-size:10px;font-weight:850;white-space:nowrap}.clinical-efficiency-trend svg{display:block;width:100%;height:auto;margin-top:12px;font-family:Inter,ui-sans-serif,sans-serif}.clinical-efficiency-trend .grid{stroke:#e6e8eb;stroke-width:1}.clinical-efficiency-trend .axis-label{fill:#71808a;font-size:9px;font-weight:700}.clinical-efficiency-trend .trend-line{fill:none;stroke:#c8524e;stroke-width:3}.clinical-efficiency-trend .trend-area{fill:#f9dddd;opacity:.55}.clinical-efficiency-trend .point{fill:#c8524e}.clinical-efficiency-trend .current-point{fill:#a53932;stroke:#fff;stroke-width:3}.clinical-month-detail{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 12px;padding:11px 14px;border-left:4px solid #3f8a65;border-radius:8px;background:#eaf6ef;color:#28684a}.clinical-month-detail strong{font-size:12px}.clinical-month-detail span{font-size:10px;font-weight:750}
+</style>
+<script>
+window.addEventListener('load',()=>setTimeout(()=>{
+  const total=document.querySelector('.ppo-classification-detail tr.classification-total');
+  const avg=total?.querySelector('td.avg-time-cell');
+  if(avg){avg.textContent='2.0';avg.setAttribute('aria-label','Average classification time: 2.0 days')}
+  const classification=document.querySelector('.ppo-classification-detail');
+  const ppo=[...document.querySelectorAll('.insurance-daughter')].find(section=>section.querySelector('h4')?.textContent.trim()==='PPO insurance detail');
+  const medicare=document.querySelector('.medicare-daughter');
+  if(classification&&ppo)ppo.insertAdjacentElement('beforebegin',classification);
+  if(medicare&&ppo)ppo.insertAdjacentElement('afterend',medicare);
+},0));
+</script>
+<style>
+.ppo-classification-subtables{display:grid;grid-template-columns:1fr;gap:0;padding:0 18px 18px;background:#faf9fb;border-top:1px solid var(--line)}.ppo-classification-subtable{overflow:hidden;border:1px solid #e3dce9;border-radius:10px;background:#fff}.ppo-classification-subtable header{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;background:#f3eff9}.ppo-classification-subtable h5{margin:0;color:#523777;font-size:12px}.ppo-classification-subtable header span{color:#6a5a7f;font-size:9px;font-weight:800}.ppo-classification-subtable table{margin:0;width:100%}.ppo-classification-subtable th{padding:8px 11px;background:#faf9fb;color:#697681;font-size:8px;text-transform:uppercase}.ppo-classification-subtable td{padding:8px 11px;font-size:9px}.ppo-classification-subtable td.value{text-align:right}.ppo-classification-subtable tr.subtotal td{background:#e8f5ee;color:#2e7651;font-weight:850}.ppo-classification-subtable tr.subtotal td:last-child{white-space:nowrap}.ppo-classification-transition{height:42px;display:grid;place-items:center;position:relative}.ppo-classification-transition::before{content:'';height:26px;border-left:2px solid #7653a6}.ppo-classification-transition::after{content:'';position:absolute;top:27px;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid #7653a6}.ppo-classification-transition:first-child{height:48px}.ppo-classification-transition:first-child::before{height:32px}.ppo-classification-transition:first-child::after{top:33px}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const section=document.querySelector('.ppo-classification-detail');
+  if(!section||section.querySelector('.ppo-classification-subtables'))return;
+  const groups=[
+    {code:'MRC1',total:170,carriers:[['Empire BlueCross BlueShield',50],['UnitedHealthcare PPO',45],['Aetna PPO',35],['Cigna PPO',25],['Oxford PPO',15]]},
+    {code:'MRC2',total:145,carriers:[['Empire BlueCross BlueShield',40],['UnitedHealthcare PPO',35],['Aetna PPO',30],['Cigna PPO',20],['EmblemHealth PPO',20]]},
+    {code:'MNRP',total:110,carriers:[['UnitedHealthcare PPO',35],['Empire BlueCross BlueShield',25],['Aetna PPO',20],['Cigna PPO',15],['Humana PPO',15]]},
+    {code:'UCR',total:80,carriers:[['Empire BlueCross BlueShield',20],['UnitedHealthcare PPO',18],['Aetna PPO',15],['Cigna PPO',12],['Oxford PPO',8],['Other PPO carriers',7]]},
+    {code:'Contracted Fee Schedule',total:55,carriers:[['Empire BlueCross BlueShield',18],['UnitedHealthcare PPO',15],['Aetna PPO',10],['Cigna PPO',7],['Oxford PPO',5]]},
+    {code:'Percent of Medicare',total:35,carriers:[['UnitedHealthcare PPO',10],['Humana PPO',8],['Empire BlueCross BlueShield',7],['Aetna PPO',5],['Cigna PPO',5]]},
+    {code:'Case Rate / Bundled Rate',total:15,carriers:[['Empire BlueCross BlueShield',5],['UnitedHealthcare PPO',4],['Aetna PPO',3],['Cigna PPO',2],['Oxford PPO',1]]},
+    {code:'Other',total:10,carriers:[['EmblemHealth PPO',3],['Humana PPO',2],['Oxford PPO',2],['Anthem PPO',2],['Other PPO carriers',1]]}
+  ];
+  const wrapper=document.createElement('div');wrapper.className='ppo-classification-subtables';
+  wrapper.innerHTML='<div class="ppo-classification-transition" aria-hidden="true"></div>'+groups.map(group=>{const rows=group.carriers.map(([carrier,count])=>`<tr><td>${carrier}</td><td class="value brand-source-nextgen">${count}</td><td class="operator">−</td><td class="value brand-source-snowflake">${count}</td><td class="operator">=</td><td class="value"><span class="table-priority-zero">0</span><span class="zero">✓ Tied out</span></td></tr>`).join('');return`<article class="ppo-classification-subtable" data-ppo-classification="${group.code}"><header><h5>${group.code} insurance detail</h5><span>Classification total · ${group.total}</span></header><table data-avg-time-enhanced="true"><thead><tr><th>PPO insurance carrier</th><th><span class="brand-nextgen">NextGen (API)</span></th><th></th><th><span class="brand-snowflake">Snowflake</span></th><th></th><th>Tie-out</th></tr></thead><tbody>${rows}<tr class="subtotal"><td>${group.code} carrier tie-out</td><td class="value brand-source-nextgen">${group.total}</td><td class="operator">−</td><td class="value brand-source-snowflake">${group.total}</td><td class="operator">=</td><td class="value"><span class="table-priority-zero">0</span><span class="zero">✓ Tied out</span></td></tr></tbody></table></article>`}).join('<div class="ppo-classification-transition" aria-hidden="true"></div>');
+  section.appendChild(wrapper);
+});
+</script>
+<style>
+.ppo-classification-detail{position:relative;padding-left:48px!important;box-sizing:border-box}
+.ppo-classification-transition::before,.ppo-classification-transition::after{display:none!important}
+.ppo-classification-lineage{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:4}
+@media(max-width:680px){.ppo-classification-detail{padding-left:36px!important}}
+</style>
+<script>
+window.addEventListener('load',()=>{
+  const routes=[
+    ['MRC1',10],
+    ['MRC2',14],
+    ['MNRP',18],
+    ['UCR',22],
+    ['Contracted Fee Schedule',26],
+    ['Percent of Medicare',30],
+    ['Case Rate / Bundled Rate',34],
+    ['Other',38]
+  ];
+  const drawPpoClassificationLineage=()=>{
+    const section=document.querySelector('.ppo-classification-detail');
+    if(!section||section.offsetParent===null)return;
+    section.querySelector('.ppo-classification-lineage')?.remove();
+    const sectionBox=section.getBoundingClientRect();
+    if(!sectionBox.width||!sectionBox.height)return;
+    let paths='';
+    routes.forEach(([code,lane])=>{
+      const source=[...section.querySelectorAll('.classification-code')].find(item=>item.textContent.trim()===code)?.closest('tr');
+      const target=section.querySelector(`.ppo-classification-subtable[data-ppo-classification="${code}"]`);
+      if(!source||!target)return;
+      const sourceBox=source.getBoundingClientRect(),targetBox=target.getBoundingClientRect();
+      const sourceX=sourceBox.left-sectionBox.left+2;
+      const sourceY=sourceBox.top-sectionBox.top+sourceBox.height/2;
+      const targetX=targetBox.left-sectionBox.left+2;
+      const targetY=targetBox.top-sectionBox.top+Math.min(28,targetBox.height/2);
+      paths+=`<path d="M ${sourceX} ${sourceY} H ${lane} V ${targetY} H ${targetX}" fill="none" stroke="#7653a6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#ppo-classification-arrow)"/>`;
+    });
+    if(!paths)return;
+    const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    svg.classList.add('ppo-classification-lineage');
+    svg.setAttribute('aria-hidden','true');
+    svg.setAttribute('viewBox',`0 0 ${Math.ceil(sectionBox.width)} ${Math.ceil(sectionBox.height)}`);
+    svg.innerHTML=`<defs><marker id="ppo-classification-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#7653a6"/></marker></defs>${paths}`;
+    section.append(svg);
+  };
+  const schedule=()=>[0,120,350].forEach(delay=>setTimeout(drawPpoClassificationLineage,delay));
+  document.querySelector('[data-integrity-subtab="insurance"]')?.addEventListener('click',schedule);
+  window.addEventListener('resize',schedule,{passive:true});
+  schedule();
+});
+</script>
+<script>
+window.addEventListener('load',()=>setTimeout(()=>{
+  const legacyPpoCarrierTable=[...document.querySelectorAll('.insurance-daughter')].find(section=>section.querySelector(':scope > h4')?.textContent.trim()==='PPO insurance detail');
+  legacyPpoCarrierTable?.remove();
+},20));
+</script>
+<style>
+.audit-block table th.avg-time-heading,.insurance-daughter table th.avg-time-heading{width:124px!important;min-width:124px!important;max-width:124px!important;box-sizing:border-box;padding-left:8px!important;padding-right:8px!important;white-space:normal!important;overflow-wrap:normal;line-height:1.2;font-size:9px!important;text-align:center}.audit-block table td.avg-time-cell,.insurance-daughter table td.avg-time-cell{width:124px!important;min-width:124px!important;max-width:124px!important;box-sizing:border-box;padding-left:8px!important;padding-right:8px!important;text-align:center}.audit-block>table,.insurance-daughter>table{width:100%;table-layout:auto}@media(max-width:680px){.audit-block table th.avg-time-heading,.insurance-daughter table th.avg-time-heading,.audit-block table td.avg-time-cell,.insurance-daughter table td.avg-time-cell{width:104px!important;min-width:104px!important;max-width:104px!important;font-size:8px!important}}
+</style>
+<style>
+[data-audit-panel="appointment"] .integrity-subtab-pane table{font-family:Inter,ui-sans-serif,system-ui,sans-serif}[data-audit-panel="appointment"] .integrity-subtab-pane th{color:#666b73;font-size:9px!important;font-weight:850!important;letter-spacing:.07em;line-height:1.25;text-transform:uppercase}[data-audit-panel="appointment"] .integrity-subtab-pane td{font-size:11px;line-height:1.35}[data-audit-panel="appointment"] .integrity-subtab-pane .label{font-size:11px;font-weight:800;line-height:1.3}[data-audit-panel="appointment"] .integrity-subtab-pane .description,[data-audit-panel="appointment"] .integrity-subtab-pane .formula{font-size:9px;line-height:1.4}[data-audit-panel="appointment"] .integrity-subtab-pane td.avg-time-cell:empty::after{content:''}[data-audit-panel="appointment"] .integrity-subtab-pane tr.exception td.avg-time-cell{color:#ad3f38!important;font-size:12px!important;font-weight:850!important;text-align:center}[data-audit-panel="appointment"] .integrity-subtab-pane tr:not(.exception) td.avg-time-cell{color:transparent!important}[data-audit-panel="appointment"] .integrity-subtab-pane th.avg-time-heading{color:#666b73!important;font-size:9px!important;font-weight:850!important}[data-audit-panel="appointment"] .integrity-subtab-pane table.no-exception-timing th.avg-time-heading,[data-audit-panel="appointment"] .integrity-subtab-pane table.no-exception-timing td.avg-time-cell{display:none!important}
+</style>
+<script>
+window.addEventListener('load',()=>setTimeout(()=>{
+  document.querySelectorAll('[data-audit-panel="appointment"] .integrity-subtab-pane table').forEach(table=>{
+    const hasRedRows=Boolean(table.querySelector('tbody tr.exception'));
+    table.classList.toggle('no-exception-timing',!hasRedRows);
+    const heading=table.querySelector('th.avg-time-heading');
+    if(heading)heading.textContent='AVG TIME (DAYS)';
+    table.querySelectorAll('tbody tr').forEach(row=>{
+      const cell=row.querySelector('td.avg-time-cell');
+      if(!cell)return;
+      if(row.classList.contains('exception')){
+        const numeric=(cell.textContent.match(/\d+(?:\.\d+)?/)||[])[0];
+        if(numeric)cell.textContent=Number(numeric).toFixed(1);
+        cell.setAttribute('aria-label',numeric?`Average resolution time: ${Number(numeric).toFixed(1)} days (representative)`:'Average resolution time unavailable');
+      }else{
+        cell.replaceChildren();
+        cell.setAttribute('aria-label','Average resolution time applies only to red exception rows');
+      }
+    });
+  });
+},0));
+</script>
+<style>
+.control-center-home__section--patient .control-center-home__section-grid{grid-template-columns:1fr}.control-center-home__section--patient .control-center-choice--zero{width:100%}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelector('[data-control-center-card="nodes"]')?.remove();
+  document.querySelector('[data-operations-view="nodes"]')?.remove();
+  document.querySelector('[data-operations-pane="nodes"]')?.remove();
+  const description=document.querySelector('.control-center-home__section--patient .control-center-home__section-head p');
+  if(description)description.textContent='Monthly controls that follow the patient journey across connected systems and must reconcile completely.';
+});
+</script>
+<style>
+.efficiency-opportunities-nav__item{cursor:pointer}
+.efficiency-opportunities-nav__item:hover,.efficiency-opportunities-nav__item.is-active{background:#c5e7d3;color:#1f5f42}
+.efficiency-tab-content[hidden],.integrity-subtab-content[hidden]{display:none!important}
+.efficiency-tab-pane[hidden]{display:none!important}
+</style>
+<script>
+window.addEventListener('load',()=>setTimeout(()=>{
+  const integrity=document.querySelector('[data-audit-panel="appointment"]');
+  const purpleContent=integrity?.querySelector('.integrity-subtab-content');
+  const purpleButtons=[...document.querySelectorAll('.selected-month-shell > .integrity-subtabs .integrity-subtab')];
+  const greenButtons=[...document.querySelectorAll('.efficiency-opportunities-nav__item')];
+  if(!integrity||!purpleContent||!greenButtons.length)return;
+
+  const greenContent=document.createElement('div');
+  greenContent.className='efficiency-tab-content';
+  greenContent.hidden=true;
+  const panes=new Map();
+  greenButtons.forEach((button,index)=>{
+    const key=button.dataset.efficiencySubtab||purpleButtons[index]?.dataset.integritySubtab||`efficiency-${index}`;
+    button.dataset.efficiencySubtab=key;
+    const pane=document.createElement('div');
+    pane.className='efficiency-tab-pane';
+    pane.dataset.efficiencyPane=key;
+    pane.hidden=true;
+    panes.set(key,pane);
+    greenContent.append(pane);
+    button.addEventListener('click',()=>{
+      purpleContent.hidden=true;
+      greenContent.hidden=false;
+      purpleButtons.forEach(item=>item.classList.remove('is-active'));
+      greenButtons.forEach(item=>item.classList.toggle('is-active',item===button));
+      panes.forEach((item,paneKey)=>item.hidden=paneKey!==key);
+    });
+  });
+  integrity.prepend(greenContent);
+
+  purpleButtons.forEach(button=>button.addEventListener('click',()=>{
+    greenContent.hidden=true;
+    purpleContent.hidden=false;
+    greenButtons.forEach(item=>item.classList.remove('is-active'));
+  }));
+
+  const billingEfficiency=panes.get('billing-data');
+  const adjudication=document.querySelector('#claim-adjudication-title')?.closest('.audit-block');
+  if(billingEfficiency&&adjudication){
+    adjudication.closest('[data-integrity-pane="billing-data"]')?.querySelector('.claim-adjudication-connector')?.remove();
+    billingEfficiency.append(adjudication);
+    adjudication.querySelector('.audit-head')?.classList.replace('purple','green');
+    const billingPurple=purpleButtons.find(button=>button.dataset.integritySubtab==='billing-data');
+    const billingPurplePane=purpleContent.querySelector('[data-integrity-pane="billing-data"]');
+    const hasRemainingIssue=Boolean(billingPurplePane?.querySelector('tr.exception .table-priority-zero.is-issue, tr.exception .variance'));
+    billingPurple?.classList.toggle('has-tie-out-issue',hasRemainingIssue);
+  }
+},80));
+</script>
+<style>
+.efficiency-lead-table .efficiency-source-link{display:inline-flex;align-items:center;gap:5px;margin-top:5px;padding:0;border:0;background:transparent;color:#7653a6;font:800 9px/1.2 Inter,ui-sans-serif,sans-serif;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.efficiency-lead-table tr.efficiency-parent td{background:#fff;color:inherit;font-weight:inherit}
+.efficiency-lead-table tr.efficiency-child td:first-child{position:relative;padding-left:18px}
+.efficiency-lead-table tr.efficiency-child td:first-child::before{display:none!important}
+.efficiency-source-highlight{animation:efficiency-source-pulse 1.8s ease}
+.efficiency-appointment-flow{position:relative;padding-left:44px}
+.efficiency-flow-connector{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:4}
+.efficiency-appointment-flow tr.efficiency-opportunity td{background:#fde8e9;color:#a53932}
+.marketing-contacted-lead-coverage-copy tr.efficiency-opportunity td,.marketing-medwork-profile-coverage-copy tr.efficiency-opportunity td{background:#fde8e9;color:#a53932}.marketing-contacted-lead-coverage-copy tr.efficiency-opportunity .label,.marketing-contacted-lead-coverage-copy tr.efficiency-opportunity .value,.marketing-medwork-profile-coverage-copy tr.efficiency-opportunity .label,.marketing-medwork-profile-coverage-copy tr.efficiency-opportunity .value{color:#a53932!important}
+.efficiency-appointment-flow tr.efficiency-opportunity .label,.efficiency-appointment-flow tr.efficiency-opportunity .value{color:#a53932!important}
+.efficiency-appointment-flow th.reimbursement-heading,.efficiency-appointment-flow th.damage-heading{min-width:122px;text-align:center}
+.efficiency-appointment-flow td.reimbursement-value,.efficiency-appointment-flow td.damage-value{text-align:center;font-weight:850}
+.efficiency-appointment-flow tr.efficiency-opportunity td.reimbursement-value,.efficiency-appointment-flow tr.efficiency-opportunity td.damage-value{color:#a53932!important}
+.efficiency-appointment-flow th.efficiency-tieout-heading{min-width:110px;text-align:center}.efficiency-appointment-flow td.efficiency-tieout-cell{text-align:center}.efficiency-appointment-flow td.efficiency-tieout-cell .zero{display:block;margin-top:4px}
+.operations-trends{margin:0 0 20px}.operations-trends__head{margin:0 0 12px;padding:0 2px}.operations-trends__head h3{margin:0;color:#2f2635;font-size:19px}.operations-trends__head p{margin:5px 0 0;color:#697681;font-size:10px}.operations-trends__grid{display:grid;grid-template-columns:1fr;gap:18px}.operations-trend-card{padding:20px;border:1px solid #ead5d6;border-radius:14px;background:#fff;box-shadow:0 6px 18px rgba(121,45,42,.08)}.operations-trend-card__head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}.operations-trend-card h4{margin:0;color:#2f2635;font-size:19px;line-height:1.3}.operations-trend-card__subtitle{display:block;margin-top:5px;color:#697681;font-size:10px}.operations-trend-card__current{padding:7px 10px;border-radius:999px;background:#fde8e9;color:#a53932;font-size:10px;font-weight:850;white-space:nowrap}.operations-trend-card svg{display:block;width:100%;height:auto;margin-top:12px;font-family:Inter,ui-sans-serif,sans-serif}.operations-trend-card .grid{stroke:#e6e8eb;stroke-width:1}.operations-trend-card .axis-label{fill:#71808a;font-size:9px;font-weight:700}.operations-trend-card .trend-area{fill:#f9dddd;opacity:.55}.operations-trend-card .trend-line{fill:none;stroke:#c8524e;stroke-width:3}.operations-trend-card .point{fill:#c8524e}.operations-trend-card .current-point{fill:#a53932;stroke:#fff;stroke-width:3}
+@keyframes efficiency-source-pulse{0%,100%{box-shadow:none}20%,70%{box-shadow:inset 4px 0 #7653a6;background:#f3eff9}}
+</style>
+<script>
+window.addEventListener('load',()=>setTimeout(()=>{
+  const pane=document.querySelector('[data-efficiency-pane="appointment"]');
+  if(!pane||pane.querySelector('.efficiency-lead-table'))return;
+  const block=document.createElement('section');
+  block.className='audit-block efficiency-lead-table';
+  block.innerHTML=`<div class="audit-head green"><h3>HubSpot lead-form booking efficiency</h3><p>Start with the reconciled Total HubSpot Lead Forms population, then separate it into booked and unbooked outcomes.</p></div><table data-avg-time-enhanced="true"><thead><tr><th>HubSpot lead-form population</th><th>Total</th><th>Share of total</th></tr></thead><tbody><tr class="efficiency-parent"><td><span class="label">Total HubSpot Lead Forms</span><span class="description">Reconciled HubSpot lead-form population for the reporting month.</span><button type="button" class="efficiency-source-link">↗ Open zero tie-out source</button></td><td class="value">840</td><td class="value">100.0%</td></tr><tr class="efficiency-child"><td><span class="label">Total HubSpot Lead Forms, booked</span><span class="description">HubSpot lead forms that resulted in a booked appointment.</span></td><td class="value">720</td><td class="value">85.7%</td></tr><tr class="efficiency-child efficiency-opportunity"><td><span class="label">Total HubSpot Lead Forms, unbooked</span><span class="description">HubSpot lead forms without a booked appointment.</span></td><td class="value">120</td><td class="value">14.3%</td></tr><tr class="recon tie-total"><td><span class="label">HubSpot lead-form booking rollup</span><span class="formula">Booked 720 + unbooked 120 = Total HubSpot Lead Forms 840.</span></td><td class="value">840</td><td class="value">100.0%</td></tr></tbody></table>`;
+  pane.classList.add('efficiency-appointment-flow');
+  pane.append(block);
+  {const walker=document.createTreeWalker(block,NodeFilter.SHOW_TEXT);let node;while((node=walker.nextNode()))node.textContent=node.textContent.replaceAll('booking','contact status').replaceAll('booked','contacted').replaceAll('uncontacted','not contacted').replaceAll('unbooked','not contacted');const rows=[...block.querySelectorAll('tbody tr')],contacted=rows.find(row=>row.querySelector('.label')?.textContent.trim()==='Total HubSpot Lead Forms, contacted'),notContacted=rows.find(row=>row.querySelector('.label')?.textContent.trim()==='Total HubSpot Lead Forms, not contacted');if(contacted){contacted.querySelectorAll('td.value')[0].textContent='760';contacted.querySelectorAll('td.value')[1].textContent='90.5%'}if(notContacted){notContacted.querySelectorAll('td.value')[0].textContent='80';notContacted.querySelectorAll('td.value')[1].textContent='9.5%'}const formula=block.querySelector('tr.recon .formula');if(formula)formula.textContent='Contacted 760 + not contacted 80 = Total HubSpot Lead Forms 840.'}
+
+  const coverageBlock=document.createElement('section');
+  coverageBlock.className='audit-block efficiency-coverage-table';
+  coverageBlock.innerHTML=`<div class="audit-head green"><h3>Booked lead coverage efficiency</h3><p>Break the booked HubSpot lead-form population into covered and uncovered outcomes.</p></div><table data-avg-time-enhanced="true"><thead><tr><th>Booked lead coverage population</th><th>Total</th><th>Share of booked</th></tr></thead><tbody><tr class="efficiency-parent"><td><span class="label">Total HubSpot Lead Forms, booked</span><span class="description">Booked population carried forward from the HubSpot lead-form booking table.</span></td><td class="value">720</td><td class="value">100.0%</td></tr><tr class="efficiency-child"><td><span class="label">Covered booked leads</span><span class="description">Booked leads with confirmed insurance coverage.</span></td><td class="value">650</td><td class="value">90.3%</td></tr><tr class="efficiency-child"><td><span class="label">Uncovered booked leads</span><span class="description">Booked leads without confirmed insurance coverage.</span></td><td class="value">70</td><td class="value">9.7%</td></tr><tr class="recon tie-total"><td><span class="label">Booked lead coverage rollup</span><span class="formula">Covered 650 + uncovered 70 = booked HubSpot lead forms 720.</span></td><td class="value">720</td><td class="value">100.0%</td></tr></tbody></table>`;
+  pane.append(coverageBlock);
+  {const walker=document.createTreeWalker(coverageBlock,NodeFilter.SHOW_TEXT);let node;while((node=walker.nextNode()))node.textContent=node.textContent.replaceAll('Booked','Contacted').replaceAll('booked','contacted');const rows=[...coverageBlock.querySelectorAll('tbody tr')],parent=rows[0],covered=rows.find(row=>row.querySelector('.label')?.textContent.trim()==='Covered contacted leads'),uncovered=rows.find(row=>row.querySelector('.label')?.textContent.trim()==='Uncovered contacted leads');if(parent)parent.querySelectorAll('td.value')[0].textContent='760';if(covered){covered.querySelector('.label').textContent='Covered HubSpot leads';covered.querySelectorAll('td.value')[1].textContent='85.5%'}if(uncovered){uncovered.querySelector('.label').textContent='Uncovered HubSpot leads';uncovered.querySelectorAll('td.value')[0].textContent='110';uncovered.querySelectorAll('td.value')[1].textContent='14.5%'}const rollup=coverageBlock.querySelector('tr.recon');if(rollup){rollup.querySelector('.formula').textContent='Covered 650 + uncovered 110 = contacted HubSpot lead forms 760.';rollup.querySelectorAll('td.value')[0].textContent='760'}}
+
+  const initialsBlock=document.createElement('section');
+  initialsBlock.className='audit-block efficiency-created-initials-table';
+  initialsBlock.innerHTML=`<div class="audit-head green"><h3>Covered booked lead created-initial status</h3><p>Split the covered booked population by whether created initials are present.</p></div><table data-avg-time-enhanced="true"><thead><tr><th>Created-initial population</th><th>Total</th><th>Share of covered</th></tr></thead><tbody><tr class="efficiency-parent"><td><span class="label">Covered booked leads</span><span class="description">Covered booked population carried forward from the coverage table.</span></td><td class="value">650</td><td class="value">100.0%</td></tr><tr class="efficiency-child"><td><span class="label">Covered booked leads with created initials</span><span class="description">Covered booked leads where created initials are recorded.</span></td><td class="value">610</td><td class="value">93.8%</td></tr><tr class="efficiency-child efficiency-opportunity"><td><span class="label">Covered booked leads without created initials</span><span class="description">Covered booked leads missing created initials.</span></td><td class="value">40</td><td class="value">6.2%</td></tr><tr class="recon tie-total"><td><span class="label">Created-initial status rollup</span><span class="formula">With created initials 610 + without created initials 40 = covered booked leads 650.</span></td><td class="value">650</td><td class="value">100.0%</td></tr></tbody></table>`;
+  pane.append(initialsBlock);
+  [coverageBlock,initialsBlock].forEach(root=>{const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let node;while((node=walker.nextNode()))node.textContent=node.textContent.replaceAll('Covered booked leads','Covered HubSpot leads').replaceAll('covered booked leads','covered HubSpot leads').replaceAll('Covered booked lead','Covered HubSpot lead').replaceAll('covered booked lead','covered HubSpot lead').replaceAll('Created-initial status rollup','HubSpot Leads, Created-Initial Status Rollup')});
+  {const coverageRows=[...coverageBlock.querySelectorAll('tbody tr')],initialRows=[...initialsBlock.querySelectorAll('tbody tr')];const coverageParent=coverageRows[0],covered=coverageRows.find(row=>row.querySelector('.label')?.textContent.includes('Covered')),uncovered=coverageRows.find(row=>row.querySelector('.label')?.textContent.includes('Uncovered')),initialParent=initialRows[0];if(coverageParent)coverageParent.querySelector('.label').textContent='Total HubSpot Lead Forms, contacted';if(covered)covered.querySelector('.label').textContent='Covered HubSpot contacted leads';if(uncovered)uncovered.querySelector('.label').textContent='Uncovered HubSpot contacted leads';if(initialParent)initialParent.querySelector('.label').textContent='Covered HubSpot contacted leads'}
+
+  const medworkProfilesBlock=document.createElement('section');
+  medworkProfilesBlock.className='audit-block efficiency-medwork-profiles-table';
+  medworkProfilesBlock.innerHTML=`<div class="audit-head green"><h3>Medwork created profile coverage</h3><p>Independent Medwork-created profile population. This table does not originate from or reconcile to the lead workflow above.</p></div><table data-avg-time-enhanced="true"><thead><tr><th>Medwork created profile population</th><th>Total</th><th>Share of profiles</th></tr></thead><tbody><tr class="efficiency-parent"><td><span class="label">Total Medwork created profiles</span><span class="description">All patient profiles created directly in Medwork during the reporting month.</span></td><td class="value">900</td><td class="value">100.0%</td></tr><tr class="efficiency-child"><td><span class="label">Covered Medwork created profiles</span><span class="description">Created profiles with confirmed insurance coverage.</span></td><td class="value">820</td><td class="value">91.1%</td></tr><tr class="efficiency-child efficiency-opportunity"><td><span class="label">Uncovered Medwork created profiles</span><span class="description">Created profiles without confirmed insurance coverage.</span></td><td class="value">80</td><td class="value">8.9%</td></tr><tr class="recon tie-total"><td><span class="label">Medwork created profile coverage rollup</span><span class="formula">Covered 820 + uncovered 80 = total Medwork created profiles 900.</span></td><td class="value">900</td><td class="value">100.0%</td></tr></tbody></table>`;
+  pane.append(medworkProfilesBlock);
+  [...medworkProfilesBlock.querySelectorAll('tbody tr')].find(row=>row.querySelector('.label')?.textContent.trim()==='Uncovered Medwork created profiles')?.classList.remove('efficiency-opportunity');
+
+  const medworkInitialsBlock=document.createElement('section');
+  medworkInitialsBlock.className='audit-block efficiency-medwork-initials-table';
+  medworkInitialsBlock.innerHTML=`<div class="audit-head green"><h3>Medwork created profile created-initial status</h3><p>Break down the total Medwork-created profile population by whether created initials are present.</p></div><table data-avg-time-enhanced="true"><thead><tr><th>Medwork created-initial population</th><th>Total</th><th>Share of profiles</th></tr></thead><tbody><tr class="efficiency-parent"><td><span class="label">Total Medwork created profiles</span><span class="description">Created-profile population carried forward from Medwork profile coverage.</span></td><td class="value">900</td><td class="value">100.0%</td></tr><tr class="efficiency-child"><td><span class="label">Medwork created profiles with created initials</span><span class="description">Created profiles where created initials are recorded.</span></td><td class="value">850</td><td class="value">94.4%</td></tr><tr class="efficiency-child efficiency-opportunity"><td><span class="label">Medwork created profiles without created initials</span><span class="description">Created profiles missing created initials.</span></td><td class="value">50</td><td class="value">5.6%</td></tr><tr class="recon tie-total"><td><span class="label">Medwork Profiles, Created-Initial Status Rollup</span><span class="formula">With created initials 850 + without created initials 50 = total Medwork created profiles 900.</span></td><td class="value">900</td><td class="value">100.0%</td></tr></tbody></table>`;
+  pane.append(medworkInitialsBlock);
+
+  const totalInitialsBlock=document.createElement('section');
+  totalInitialsBlock.className='audit-block efficiency-total-initials-table';
+  totalInitialsBlock.innerHTML=`<div class="audit-head green"><h3>Total created initials</h3><p>Combine the created-initial populations from covered HubSpot leads and Medwork-created profiles.</p></div><table data-avg-time-enhanced="true"><thead><tr><th>Created-initial source population</th><th>Total</th><th>Share of total</th></tr></thead><tbody><tr class="efficiency-parent"><td><span class="label">Total created initials</span><span class="description">All created initials across the two connected source populations.</span></td><td class="value">1,460</td><td class="value">100.0%</td></tr><tr class="efficiency-child"><td><span class="label">Covered HubSpot leads with created initials</span><span class="description">Created initials originating from covered HubSpot leads.</span></td><td class="value">610</td><td class="value">41.8%</td></tr><tr class="efficiency-child"><td><span class="label">Medwork created profiles with created initials</span><span class="description">Created initials originating from Medwork-created profiles.</span></td><td class="value">850</td><td class="value">58.2%</td></tr><tr class="recon tie-total"><td><span class="label">Total created initials rollup</span><span class="formula">Covered HubSpot leads 610 + Medwork created profiles 850 = total created initials 1,460.</span></td><td class="value">1,460</td><td class="value">100.0%</td></tr></tbody></table>`;
+  pane.append(totalInitialsBlock);
+
+  const appointmentFulfillmentBlock=document.createElement('section');
+  appointmentFulfillmentBlock.className='audit-block efficiency-initial-appointment-table';
+  appointmentFulfillmentBlock.innerHTML=`<div class="audit-head green"><h3>Initial appointment fulfillment</h3><p>Break down the Total Created Initials population by initial-appointment outcome.</p></div><table data-avg-time-enhanced="true"><thead><tr><th>Initial appointment population</th><th>Total</th><th>Share of created initials</th></tr></thead><tbody><tr class="efficiency-parent"><td><span class="label">Total created initials</span><span class="description">Created-initial population carried forward into appointment fulfillment.</span></td><td class="value">1,460</td><td class="value">100.0%</td></tr><tr class="efficiency-child"><td><span class="label">Initial appointment fulfilled</span><span class="description">Created initials that reached a fulfilled initial appointment.</span></td><td class="value">1,250</td><td class="value">85.6%</td></tr><tr class="efficiency-child efficiency-opportunity"><td><span class="label">Initial appointment not fulfilled</span><span class="description">Created initials that did not reach a fulfilled initial appointment.</span></td><td class="value">210</td><td class="value">14.4%</td></tr><tr class="recon tie-total"><td><span class="label">Initial appointment fulfillment rollup</span><span class="formula">Fulfilled 1,250 + not fulfilled 210 = total created initials 1,460.</span></td><td class="value">1,460</td><td class="value">100.0%</td></tr></tbody></table>`;
+  pane.append(appointmentFulfillmentBlock);
+  [totalInitialsBlock,appointmentFulfillmentBlock].forEach(root=>{const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let node;while((node=walker.nextNode()))node.textContent=node.textContent.replaceAll('Total created initials','Total Covered Created Initials').replaceAll('total created initials','total covered created initials').replaceAll('Initial appointment fulfillment','Initial appointment outcome').replaceAll('initial-appointment outcome','initial-appointment outcome').replaceAll('Initial appointment fulfilled','Initial appointment, out').replaceAll('Initial appointment not fulfilled','Initial appointment, no show').replaceAll('Created initials that reached a fulfilled initial appointment.','Created initials with an initial appointment marked out.').replaceAll('Created initials that did not reach a fulfilled initial appointment.','Created initials with an initial appointment marked no show.').replaceAll('Fulfilled 1,250 + not fulfilled 210','Out 1,250 + no show 210')});
+  const noShowRow=[...appointmentFulfillmentBlock.querySelectorAll('tbody tr')].find(row=>row.querySelector('.label')?.textContent.trim()==='Initial appointment, no show');
+  if(noShowRow){
+    const values=noShowRow.querySelectorAll('td.value');
+    if(values[0])values[0].textContent='150';
+    if(values[1])values[1].textContent='10.3%';
+    const canceledRow=document.createElement('tr');
+    canceledRow.className='efficiency-child efficiency-opportunity';
+    canceledRow.innerHTML='<td><span class="label">Initial appointment, canceled</span><span class="description">Created initials with an initial appointment marked canceled.</span></td><td class="value">60</td><td class="value">4.1%</td>';
+    noShowRow.insertAdjacentElement('afterend',canceledRow);
+    const formula=appointmentFulfillmentBlock.querySelector('tr.recon .formula');
+    if(formula)formula.textContent='Out 1,250 + no show 150 + canceled 60 = total covered created initials 1,460.';
+  }
+  {const walker=document.createTreeWalker(appointmentFulfillmentBlock,NodeFilter.SHOW_TEXT);let node;while((node=walker.nextNode()))node.textContent=node.textContent.replaceAll('Initial appointment','V-Consult').replaceAll('initial appointment','V-Consult').replaceAll('initial-appointment','V-Consult')}
+
+  const reviewOutcomeBlock=document.createElement('section');
+  reviewOutcomeBlock.className='audit-block efficiency-review-outcome-table';
+  reviewOutcomeBlock.innerHTML=`<div class="audit-head green"><h3>V-Review outcome</h3><p>Break down the V-Consult out population by V-Review outcome.</p></div><table data-avg-time-enhanced="true"><thead><tr><th>V-Review population</th><th>Total</th><th>Share of V-Consult out</th></tr></thead><tbody><tr class="efficiency-parent"><td><span class="label">V-Consult, out</span><span class="description">V-Consult out population carried forward into V-Review.</span></td><td class="value">1,250</td><td class="value">100.0%</td></tr><tr class="efficiency-child"><td><span class="label">V-Review, out</span><span class="description">V-Review appointments marked out.</span></td><td class="value">1,080</td><td class="value">86.4%</td></tr><tr class="efficiency-child efficiency-opportunity"><td><span class="label">V-Review, no show</span><span class="description">V-Review appointments marked no show.</span></td><td class="value">110</td><td class="value">8.8%</td></tr><tr class="efficiency-child efficiency-opportunity"><td><span class="label">V-Review, canceled</span><span class="description">V-Review appointments marked canceled.</span></td><td class="value">60</td><td class="value">4.8%</td></tr><tr class="recon tie-total"><td><span class="label">V-Review outcome rollup</span><span class="formula">Out 1,080 + no show 110 + canceled 60 = V-Consult out 1,250.</span></td><td class="value">1,250</td><td class="value">100.0%</td></tr></tbody></table>`;
+  pane.append(reviewOutcomeBlock);
+
+  const ablationOutcomeBlock=document.createElement('section');
+  ablationOutcomeBlock.className='audit-block efficiency-ablation-outcome-table';
+  ablationOutcomeBlock.innerHTML=`<div class="audit-head green"><h3>V-Ablation outcome</h3><p>Break down the V-Review out population by V-Ablation outcome.</p></div><table data-avg-time-enhanced="true"><thead><tr><th>V-Ablation population</th><th>Total</th><th>Share of V-Review out</th></tr></thead><tbody><tr class="efficiency-parent"><td><span class="label">V-Review, out</span><span class="description">V-Review out population carried forward into V-Ablation.</span></td><td class="value">1,080</td><td class="value">100.0%</td></tr><tr class="efficiency-child"><td><span class="label">V-Ablation, out</span><span class="description">V-Ablation appointments marked out.</span></td><td class="value">920</td><td class="value">85.2%</td></tr><tr class="efficiency-child efficiency-opportunity"><td><span class="label">V-Ablation, no show</span><span class="description">V-Ablation appointments marked no show.</span></td><td class="value">100</td><td class="value">9.3%</td></tr><tr class="efficiency-child efficiency-opportunity"><td><span class="label">V-Ablation, canceled</span><span class="description">V-Ablation appointments marked canceled.</span></td><td class="value">60</td><td class="value">5.5%</td></tr><tr class="recon tie-total"><td><span class="label">V-Ablation outcome rollup</span><span class="formula">Out 920 + no show 100 + canceled 60 = V-Review out 1,080.</span></td><td class="value">1,080</td><td class="value">100.0%</td></tr></tbody></table>`;
+  pane.append(ablationOutcomeBlock);
+
+  const setEfficiencyRow=(root,label,total,share)=>{const row=[...root.querySelectorAll('tbody tr')].find(item=>item.querySelector('.label')?.textContent.trim()===label);if(!row)return null;const values=row.querySelectorAll('td.value');if(values[0])values[0].textContent=total;if(values[1])values[1].textContent=share;return row};
+  const medworkInitialParent=medworkInitialsBlock.querySelector('tbody tr.efficiency-parent');if(medworkInitialParent){medworkInitialParent.querySelector('.label').textContent='Covered Medwork created profiles';medworkInitialParent.querySelector('.description').textContent='Covered Medwork-created profile population carried forward from profile coverage.'}
+  setEfficiencyRow(medworkInitialsBlock,'Covered Medwork created profiles','820','100.0%');setEfficiencyRow(medworkInitialsBlock,'Medwork created profiles with created initials','780','95.1%');setEfficiencyRow(medworkInitialsBlock,'Medwork created profiles without created initials','40','4.9%');setEfficiencyRow(medworkInitialsBlock,'Medwork Profiles, Created-Initial Status Rollup','820','100.0%');medworkInitialsBlock.querySelector('tr.recon .formula').textContent='With created initials 780 + without created initials 40 = covered Medwork created profiles 820.';
+  setEfficiencyRow(totalInitialsBlock,'Total Covered Created Initials','1,390','100.0%');setEfficiencyRow(totalInitialsBlock,'Covered HubSpot leads with created initials','610','43.9%');setEfficiencyRow(totalInitialsBlock,'Medwork created profiles with created initials','780','56.1%');setEfficiencyRow(totalInitialsBlock,'Total Covered Created Initials rollup','1,390','100.0%');totalInitialsBlock.querySelector('tr.recon .formula').textContent='Covered HubSpot leads 610 + Medwork created profiles 780 = total covered created initials 1,390.';
+  setEfficiencyRow(appointmentFulfillmentBlock,'Total Covered Created Initials','1,390','100.0%');setEfficiencyRow(appointmentFulfillmentBlock,'V-Consult, out','1,180','84.9%');setEfficiencyRow(appointmentFulfillmentBlock,'V-Consult, no show','150','10.8%');setEfficiencyRow(appointmentFulfillmentBlock,'V-Consult, canceled','60','4.3%');setEfficiencyRow(appointmentFulfillmentBlock,'V-Consult outcome rollup','1,390','100.0%');appointmentFulfillmentBlock.querySelector('tr.recon .formula').textContent='Out 1,180 + no show 150 + canceled 60 = total covered created initials 1,390.';
+  setEfficiencyRow(reviewOutcomeBlock,'V-Consult, out','1,180','100.0%');setEfficiencyRow(reviewOutcomeBlock,'V-Review, out','1,010','85.6%');setEfficiencyRow(reviewOutcomeBlock,'V-Review, no show','110','9.3%');setEfficiencyRow(reviewOutcomeBlock,'V-Review, canceled','60','5.1%');setEfficiencyRow(reviewOutcomeBlock,'V-Review outcome rollup','1,180','100.0%');reviewOutcomeBlock.querySelector('tr.recon .formula').textContent='Out 1,010 + no show 110 + canceled 60 = V-Consult out 1,180.';
+  setEfficiencyRow(ablationOutcomeBlock,'V-Review, out','1,010','100.0%');setEfficiencyRow(ablationOutcomeBlock,'V-Ablation, out','850','84.2%');setEfficiencyRow(ablationOutcomeBlock,'V-Ablation, no show','100','9.9%');setEfficiencyRow(ablationOutcomeBlock,'V-Ablation, canceled','60','5.9%');setEfficiencyRow(ablationOutcomeBlock,'V-Ablation outcome rollup','1,010','100.0%');ablationOutcomeBlock.querySelector('tr.recon .formula').textContent='Out 850 + no show 100 + canceled 60 = V-Review out 1,010.';
+
+  const addReimbursementDamage=(root,average)=>{
+    const table=root.querySelector('table'),header=table?.querySelector('thead tr');if(!table||!header)return;
+    header.insertAdjacentHTML('beforeend','<th class="reimbursement-heading">Average Reimbursement</th><th class="damage-heading">Leak Impact</th>');
+    table.querySelectorAll('tbody tr').forEach(row=>{
+      const count=Number((row.querySelectorAll('td.value')[0]?.textContent||'0').replaceAll(',',''))||0;
+      const isDamage=row.classList.contains('efficiency-opportunity');
+      const reimbursement=document.createElement('td');reimbursement.className='reimbursement-value';reimbursement.textContent=isDamage?`$${average.toLocaleString()}`:'';
+      const damage=document.createElement('td');damage.className='damage-value';damage.textContent=isDamage?`$${(count*average).toLocaleString()}`:'';
+      row.append(reimbursement,damage);
+    });
+  };
+  addReimbursementDamage(appointmentFulfillmentBlock,450);
+  addReimbursementDamage(reviewOutcomeBlock,650);
+  addReimbursementDamage(ablationOutcomeBlock,1200);
+  pane.querySelectorAll('table').forEach(table=>{
+    const header=table.querySelector('thead tr');if(!header||header.querySelector('.efficiency-tieout-heading'))return;
+    header.insertAdjacentHTML('beforeend','<th class="efficiency-tieout-heading">Tie-Out</th>');
+    table.querySelectorAll('tbody tr').forEach(row=>{
+      const cell=document.createElement('td');cell.className='efficiency-tieout-cell';
+      if(row.classList.contains('recon'))cell.innerHTML='<span class="table-priority-zero" aria-label="Parent total minus reconciled rollup equals zero">0</span><span class="zero">✓ Tied out</span>';
+      row.append(cell);
+    });
+  });
+  const marketingLeadsPane=document.querySelector('[data-efficiency-pane="marketing-data"]');
+  if(marketingLeadsPane&&!marketingLeadsPane.querySelector('.marketing-contacted-lead-coverage-copy')){
+    const marketingCoverageCopy=coverageBlock.cloneNode(true);
+    marketingCoverageCopy.classList.add('marketing-contacted-lead-coverage-copy');
+    marketingCoverageCopy.querySelectorAll('[id]').forEach(element=>element.removeAttribute('id'));
+    [...marketingCoverageCopy.querySelectorAll('tbody tr')].find(row=>row.querySelector('.label')?.textContent.trim()==='Uncovered HubSpot contacted leads')?.classList.add('efficiency-opportunity');
+    marketingLeadsPane.append(marketingCoverageCopy);
+  }
+  if(marketingLeadsPane&&!marketingLeadsPane.querySelector('.marketing-medwork-profile-coverage-copy')){
+    const marketingMedworkCopy=medworkProfilesBlock.cloneNode(true);
+    marketingMedworkCopy.classList.add('marketing-medwork-profile-coverage-copy');
+    marketingMedworkCopy.querySelectorAll('[id]').forEach(element=>element.removeAttribute('id'));
+    [...marketingMedworkCopy.querySelectorAll('tbody tr')].find(row=>row.querySelector('.label')?.textContent.trim()==='Uncovered Medwork created profiles')?.classList.add('efficiency-opportunity');
+    marketingLeadsPane.append(marketingMedworkCopy);
+  }
+  if(marketingLeadsPane&&!marketingLeadsPane.querySelector('.marketing-leads-trends')){
+    const trendMonth=()=>document.documentElement.dataset.reportingMonth||document.querySelector('.selected-month-shell .reporting-period-context strong')?.textContent.replace('Reporting period:','').trim()||'May 2026';
+    const months=['Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May'];
+    const series=[['Uncovered HubSpot contacted leads',[142,138,135,130,127,124,120,118,116,114,112,110]],['Uncovered Medwork created profiles',[108,104,101,98,95,92,90,88,86,84,82,80]]];
+    const makeTrendCard=([label,values])=>{const width=1000,height=280,margin={left:48,right:24,top:18,bottom:42},maxValue=Math.max(...values),step=Math.max(5,Math.ceil(maxValue/3/5)*5),axisMax=step*3,plotWidth=width-margin.left-margin.right,plotHeight=height-margin.top-margin.bottom,x=index=>margin.left+(plotWidth/(values.length-1))*index,y=value=>margin.top+plotHeight-(value/axisMax)*plotHeight,points=values.map((value,index)=>`${x(index)},${y(value)}`).join(' '),area=`${margin.left},${margin.top+plotHeight} ${points} ${width-margin.right},${margin.top+plotHeight}`,grid=[0,step,step*2,axisMax].map(value=>`<line class="grid" x1="${margin.left}" y1="${y(value)}" x2="${width-margin.right}" y2="${y(value)}"/><text class="axis-label" x="${margin.left-9}" y="${y(value)+3}" text-anchor="end">${value}</text>`).join(''),labels=months.map((month,index)=>`<text class="axis-label" x="${x(index)}" y="${height-16}" text-anchor="middle">${month}</text>`).join(''),circles=values.map((value,index)=>`<circle class="${index===values.length-1?'current-point':'point'}" cx="${x(index)}" cy="${y(value)}" r="${index===values.length-1?6:3.5}"/>`).join(''),current=values.at(-1);return`<article class="operations-trend-card"><div class="operations-trend-card__head"><div><h4>${label}</h4><span class="operations-trend-card__subtitle">Rolling 12-month trend of this red Marketing Leads opportunity.</span></div><span class="operations-trend-card__current" data-current-value="${current}">${trendMonth()} · ${current}</span></div><svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Twelve-month trend for ${label}, June through May">${grid}<polygon class="trend-area" points="${area}"/><polyline class="trend-line" points="${points}"/>${circles}${labels}</svg></article>`};
+    const marketingTrends=document.createElement('section');marketingTrends.className='operations-trends marketing-leads-trends';marketingTrends.innerHTML=`<div class="operations-trends__head"><h3>Marketing Leads opportunity trends</h3><p>Rolling 12-month view of every red opportunity row in the selected Marketing Leads workflow.</p></div><div class="operations-trends__grid">${series.map(makeTrendCard).join('')}</div>`;
+    marketingLeadsPane.prepend(marketingTrends);
+    const syncMarketingTrendMonth=()=>marketingTrends.querySelectorAll('.operations-trend-card__current').forEach(badge=>badge.textContent=`${trendMonth()} · ${badge.dataset.currentValue}`);
+    document.querySelectorAll('.monthly-control-list tbody tr').forEach(row=>row.addEventListener('click',()=>setTimeout(syncMarketingTrendMonth,20)));
+    document.querySelector('[data-efficiency-subtab="marketing-data"]')?.addEventListener('click',syncMarketingTrendMonth);
+  }
+  const redRows=[...pane.querySelectorAll('tr.efficiency-opportunity')];
+  if(redRows.length){
+    const trendSection=document.createElement('section');trendSection.className='operations-trends';
+    const selectedMonth=()=>document.documentElement.dataset.reportingMonth||document.querySelector('.selected-month-shell .reporting-period-context strong')?.textContent.replace('Reporting period:','').trim()||'May 2026';
+    const cards=redRows.map((row,index)=>{const label=row.querySelector('.label')?.textContent.trim()||'Opportunity';const current=Number((row.querySelector('td.value')?.textContent||'0').replaceAll(',',''))||0;const months=['Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May'],multipliers=[1.34,1.29,1.25,1.22,1.18,1.16,1.13,1.11,1.08,1.06,1.03,1],values=multipliers.map((factor,monthIndex)=>Math.max(0,Math.round(current*factor+(index%3)*(11-monthIndex)/5))),width=1000,height=280,margin={left:48,right:24,top:18,bottom:42},maxValue=Math.max(...values,1),step=Math.max(5,Math.ceil(maxValue/3/5)*5),axisMax=step*3,plotWidth=width-margin.left-margin.right,plotHeight=height-margin.top-margin.bottom,x=monthIndex=>margin.left+(plotWidth/(values.length-1))*monthIndex,y=value=>margin.top+plotHeight-(value/axisMax)*plotHeight,points=values.map((value,monthIndex)=>`${x(monthIndex)},${y(value)}`).join(' '),area=`${margin.left},${margin.top+plotHeight} ${points} ${width-margin.right},${margin.top+plotHeight}`,grid=[0,step,step*2,axisMax].map(value=>`<line class="grid" x1="${margin.left}" y1="${y(value)}" x2="${width-margin.right}" y2="${y(value)}"/><text class="axis-label" x="${margin.left-9}" y="${y(value)+3}" text-anchor="end">${value}</text>`).join(''),monthLabels=months.map((month,monthIndex)=>`<text class="axis-label" x="${x(monthIndex)}" y="${height-16}" text-anchor="middle">${month}</text>`).join(''),circles=values.map((value,monthIndex)=>`<circle class="${monthIndex===values.length-1?'current-point':'point'}" cx="${x(monthIndex)}" cy="${y(value)}" r="${monthIndex===values.length-1?6:3.5}"/>`).join('');return`<article class="operations-trend-card"><div class="operations-trend-card__head"><div><h4>${label}</h4><span class="operations-trend-card__subtitle">Rolling 12-month trend of this red Operations + Marketing opportunity.</span></div><span class="operations-trend-card__current">${selectedMonth()} · ${current.toLocaleString()}</span></div><svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Twelve-month trend for ${label}, June through May">${grid}<polygon class="trend-area" points="${area}"/><polyline class="trend-line" points="${points}"/>${circles}${monthLabels}</svg></article>`}).join('');
+    trendSection.innerHTML=`<div class="operations-trends__head"><div><h3>Operations opportunity trends</h3><p>Rolling 12-month view of every red opportunity row in the selected Operations workflow.</p></div></div><div class="operations-trends__grid">${cards}</div>`;
+    pane.prepend(trendSection);
+    const monthDetail=document.createElement('div');monthDetail.className='clinical-month-detail operations-month-detail';monthDetail.innerHTML=`<strong>Monthly operations detail</strong><span>Reporting month · ${selectedMonth()}</span>`;trendSection.insertAdjacentElement('afterend',monthDetail);
+    const syncPeriod=()=>{const month=selectedMonth();const detail=monthDetail.querySelector('span');if(detail)detail.textContent=`Reporting month · ${month}`;trendSection.querySelectorAll('.operations-trend-card__current').forEach((badge,index)=>{const current=Number((redRows[index]?.querySelector('td.value')?.textContent||'0').replaceAll(',',''))||0;badge.textContent=`${month} · ${current.toLocaleString()}`})};document.querySelectorAll('.monthly-control-list tbody tr').forEach(row=>row.addEventListener('click',()=>setTimeout(syncPeriod,20)));document.querySelector('[data-efficiency-subtab="appointment"]')?.addEventListener('click',syncPeriod);
+  }
+
+  const classificationBlock=document.createElement('section');
+  classificationBlock.className='audit-block efficiency-coverage-classification-table';
+  classificationBlock.innerHTML=`<div class="audit-head green"><h3>Covered lead insurance classification</h3><p>Account for covered booked leads with created initials by insurance classification.</p></div><table data-avg-time-enhanced="true"><thead><tr><th>Insurance classification</th><th>Covered leads</th><th>Share classified</th></tr></thead><tbody><tr class="efficiency-parent"><td><span class="label">Covered booked leads with created initials</span><span class="description">Created-initial population carried forward for insurance classification.</span></td><td class="value">610</td><td class="value">100.0%</td></tr><tr class="efficiency-child"><td><span class="label">PPO</span><span class="description">Covered booked leads classified as PPO.</span></td><td class="value">300</td><td class="value">49.2%</td></tr><tr class="efficiency-child"><td><span class="label">Medicare</span><span class="description">Covered booked leads classified as Medicare.</span></td><td class="value">190</td><td class="value">31.1%</td></tr><tr class="efficiency-child"><td><span class="label">INN</span><span class="description">Covered booked leads classified as in-network.</span></td><td class="value">120</td><td class="value">19.7%</td></tr><tr class="recon tie-total"><td><span class="label">Covered lead classification tie-out</span><span class="formula">PPO 300 + Medicare 190 + INN 120 − covered booked leads with created initials 610.</span></td><td class="value">610</td><td class="value"><span class="table-priority-zero">0</span><span class="zero">✓ Tied out</span></td></tr></tbody></table>`;
+
+  const drawCoverageConnector=()=>{
+    if(pane.hidden||!block.isConnected||!coverageBlock.isConnected||!initialsBlock.isConnected||!medworkProfilesBlock.isConnected||!medworkInitialsBlock.isConnected||!totalInitialsBlock.isConnected||!appointmentFulfillmentBlock.isConnected||!reviewOutcomeBlock.isConnected||!ablationOutcomeBlock.isConnected)return;
+    pane.querySelector('.efficiency-flow-connector')?.remove();
+    const paneBox=pane.getBoundingClientRect();if(!paneBox.width)return;
+    const links=[
+      [[...block.querySelectorAll('tbody tr')].find(row=>row.querySelector('.label')?.textContent.trim()==='Total HubSpot Lead Forms, contacted'),coverageBlock.querySelector('tbody tr'),24],
+      [[...coverageBlock.querySelectorAll('tbody tr')].find(row=>row.querySelector('.label')?.textContent.trim()==='Covered HubSpot contacted leads'),initialsBlock.querySelector('tbody tr'),16],
+      [[...medworkProfilesBlock.querySelectorAll('tbody tr')].find(row=>row.querySelector('.label')?.textContent.trim()==='Covered Medwork created profiles'),medworkInitialsBlock.querySelector('tbody tr'),24],
+      [[...initialsBlock.querySelectorAll('tbody tr')].find(row=>row.querySelector('.label')?.textContent.trim()==='Covered HubSpot leads with created initials'),[...totalInitialsBlock.querySelectorAll('tbody tr')].find(row=>row.querySelector('.label')?.textContent.trim()==='Covered HubSpot leads with created initials'),8],
+      [[...medworkInitialsBlock.querySelectorAll('tbody tr')].find(row=>row.querySelector('.label')?.textContent.trim()==='Medwork created profiles with created initials'),[...totalInitialsBlock.querySelectorAll('tbody tr')].find(row=>row.querySelector('.label')?.textContent.trim()==='Medwork created profiles with created initials'),32],
+      [[...totalInitialsBlock.querySelectorAll('tbody tr')].find(row=>row.querySelector('.label')?.textContent.trim()==='Total Covered Created Initials'),appointmentFulfillmentBlock.querySelector('tbody tr'),24],
+      [[...appointmentFulfillmentBlock.querySelectorAll('tbody tr')].find(row=>row.querySelector('.label')?.textContent.trim()==='V-Consult, out'),reviewOutcomeBlock.querySelector('tbody tr'),16],
+      [[...reviewOutcomeBlock.querySelectorAll('tbody tr')].find(row=>row.querySelector('.label')?.textContent.trim()==='V-Review, out'),ablationOutcomeBlock.querySelector('tbody tr'),8]
+    ];
+    let paths='';
+    links.forEach(([source,target,lane])=>{if(!source||!target)return;const sourceBox=source.getBoundingClientRect(),targetBox=target.getBoundingClientRect();const sourceX=sourceBox.left-paneBox.left-3,sourceY=sourceBox.top-paneBox.top+sourceBox.height/2,targetX=targetBox.left-paneBox.left-3,targetY=targetBox.top-paneBox.top+targetBox.height/2;paths+=`<path d="M ${sourceX} ${sourceY} H ${lane} V ${targetY} H ${targetX}" fill="none" stroke="#3f8a65" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#efficiency-coverage-arrow)"/>`});
+    if(!paths)return;
+    const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    svg.classList.add('efficiency-flow-connector');svg.setAttribute('aria-hidden','true');svg.setAttribute('viewBox',`0 0 ${Math.ceil(paneBox.width)} ${Math.ceil(paneBox.height)}`);
+    svg.innerHTML=`<defs><marker id="efficiency-coverage-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#3f8a65"/></marker></defs>${paths}`;
+    pane.append(svg);
+  };
+  [0,150,400].forEach(delay=>setTimeout(drawCoverageConnector,delay));
+  document.querySelector('[data-efficiency-subtab="appointment"]')?.addEventListener('click',()=>[0,120].forEach(delay=>setTimeout(drawCoverageConnector,delay)));
+  window.addEventListener('resize',drawCoverageConnector,{passive:true});
+
+  block.querySelector('.efficiency-source-link')?.addEventListener('click',()=>{
+    const purpleButton=document.querySelector('[data-integrity-subtab="marketing-overview"]')||document.querySelector('[data-integrity-subtab="marketing-lead-forms"]');
+    purpleButton?.click();
+    setTimeout(()=>{
+      const sourceBlock=document.querySelector('#total-form-leads-title')?.closest('.audit-block');
+      const sourceRow=[...sourceBlock?.querySelectorAll('tbody tr')||[]].find(row=>row.querySelector('.label')?.textContent.trim()==='Total HubSpot Lead Forms')||sourceBlock?.querySelector('tbody tr');
+      sourceRow?.classList.add('efficiency-source-highlight');
+      sourceRow?.scrollIntoView({behavior:'smooth',block:'center'});
+      setTimeout(()=>sourceRow?.classList.remove('efficiency-source-highlight'),1900);
+    },80);
+  });
+},140));
+</script>
+<script>
+window.addEventListener('load',()=>setTimeout(()=>{
+  const pane=document.querySelector('[data-efficiency-pane="lomn-data"]');
+  if(!pane||pane.querySelector('.efficiency-clinical-copy'))return;
+  const wanted=['Encounter disease-classification reconciliation','Disease treatment decision reconciliation'];
+  const sourceBlocks=wanted.map(title=>[...document.querySelectorAll('[data-integrity-pane="lomn-data"] .audit-block')].find(block=>block.querySelector('h3')?.textContent.trim()===title)).filter(Boolean);
+  if(!sourceBlocks.length)return;
+  const wrapper=document.createElement('div');wrapper.className='efficiency-clinical-copy';
+  sourceBlocks.forEach((source,index)=>{
+    const clone=source.cloneNode(true);
+    clone.querySelectorAll('[id]').forEach(element=>element.id=`efficiency-clinical-${index}-${element.id}`);
+    clone.querySelectorAll('[aria-labelledby]').forEach(element=>element.removeAttribute('aria-labelledby'));
+    clone.querySelectorAll('.audit-head').forEach(head=>{head.classList.remove('purple','blue');head.classList.add('green')});
+    const table=clone.querySelector('table');
+    if(table&&index===0)table.innerHTML='<thead><tr><th>Signed-note disease population</th><th>Total</th><th>Share of total</th></tr></thead><tbody><tr class="efficiency-parent"><td><span class="label">Signed note</span><span class="description">Signed-note population used to derive the disease-classification flow.</span></td><td class="value">1,240</td><td class="value">100.0%</td></tr><tr class="efficiency-child"><td><span class="label">Signed note with disease</span><span class="description">Signed notes classified with a documented disease finding.</span></td><td class="value">1,016</td><td class="value">81.9%</td></tr><tr class="efficiency-child"><td><span class="label">Signed note without disease</span><span class="description">Signed notes classified without a documented disease finding.</span></td><td class="value">224</td><td class="value">18.1%</td></tr><tr class="recon tie-total"><td><span class="label">Disease-classification rollup</span><span class="formula">With disease 1,016 + without disease 224 = signed notes 1,240.</span></td><td class="value">1,240</td><td class="value">100.0%</td></tr></tbody>';
+    if(table&&index===1)table.innerHTML='<thead><tr><th>Disease treatment-decision population</th><th>Total</th><th>Share of total</th></tr></thead><tbody><tr class="efficiency-parent"><td><span class="label">Signed note with disease</span><span class="description">Monthly signed-note population with a documented disease finding.</span></td><td class="value">1,016</td><td class="value">100.0%</td></tr><tr class="efficiency-child"><td><span class="label">Signed note with disease, wants treatment</span><span class="description">Patients with disease who elected treatment.</span></td><td class="value">842</td><td class="value">82.9%</td></tr><tr class="efficiency-child efficiency-opportunity"><td><span class="label">Signed note with disease, does not want treatment</span><span class="description">Patients with disease who did not elect treatment.</span></td><td class="value">174</td><td class="value">17.1%</td></tr><tr class="recon tie-total"><td><span class="label">Disease treatment decision rollup</span><span class="formula">Wants treatment 842 + does not want treatment 174 = signed notes with disease 1,016.</span></td><td class="value">1,016</td><td class="value">100.0%</td></tr></tbody>';
+    table?.setAttribute('data-avg-time-enhanced','true');
+    wrapper.append(clone);
+  });
+  [...wrapper.querySelectorAll('tbody tr')].find(row=>row.querySelector('.label')?.textContent.trim()==='Signed note with disease, does not want treatment')?.classList.add('efficiency-opportunity');
+  const months=['Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May'];
+  const values=[210,205,198,192,188,185,181,179,177,176,175,174];
+  const width=1000,height=280,margin={left:48,right:24,top:18,bottom:42},min=160,max=220,plotWidth=width-margin.left-margin.right,plotHeight=height-margin.top-margin.bottom;
+  const x=index=>margin.left+(plotWidth/(values.length-1))*index,y=value=>margin.top+plotHeight-((value-min)/(max-min))*plotHeight;
+  const points=values.map((value,index)=>`${x(index)},${y(value)}`).join(' '),area=`${margin.left},${margin.top+plotHeight} ${points} ${width-margin.right},${margin.top+plotHeight}`;
+  const grid=[160,180,200,220].map(value=>`<line class="grid" x1="${margin.left}" y1="${y(value)}" x2="${width-margin.right}" y2="${y(value)}"/><text class="axis-label" x="${margin.left-9}" y="${y(value)+3}" text-anchor="end">${value}</text>`).join('');
+  const labels=months.map((month,index)=>`<text class="axis-label" x="${x(index)}" y="${height-16}" text-anchor="middle">${month}</text>`).join('');
+  const circles=values.map((value,index)=>`<circle class="${index===values.length-1?'current-point':'point'}" cx="${x(index)}" cy="${y(value)}" r="${index===values.length-1?6:3.5}"/>`).join('');
+  const selectedMonth=document.querySelector('.selected-month-shell .reporting-period-context strong')?.textContent.replace('Reporting period:','').trim()||'May 2026';
+  const trend=document.createElement('section');trend.className='clinical-efficiency-trend';trend.innerHTML=`<div class="clinical-efficiency-trend__head"><div><h3>Signed note with disease, does not want treatment</h3><p>Rolling 12-month trend of the red clinical-workflow opportunity population.</p></div><span class="clinical-efficiency-trend__current">${selectedMonth} · 174</span></div><svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Twelve-month trend of signed notes with disease where the patient does not want treatment">${grid}<polygon class="trend-area" points="${area}"/><polyline class="trend-line" points="${points}"/>${circles}${labels}</svg>`;
+  const monthDetail=document.createElement('div');monthDetail.className='clinical-month-detail';monthDetail.innerHTML=`<strong>Monthly reconciliation detail</strong><span>Reporting month · ${selectedMonth}</span>`;
+  pane.append(trend,monthDetail,wrapper);
+  const syncClinicalReportingMonth=()=>{
+    const month=document.documentElement.dataset.reportingMonth||document.querySelector('.selected-month-shell .reporting-period-context strong')?.textContent.replace('Reporting period:','').trim()||'May 2026';
+    const badge=trend.querySelector('.clinical-efficiency-trend__current');if(badge)badge.textContent=`${month} · 174`;
+    const detail=monthDetail.querySelector('span');if(detail)detail.textContent=`Reporting month · ${month}`;
+  };
+  document.querySelectorAll('.monthly-control-list tbody tr').forEach(row=>row.addEventListener('click',()=>setTimeout(syncClinicalReportingMonth,20)));
+  document.querySelector('[data-efficiency-subtab="lomn-data"]')?.addEventListener('click',syncClinicalReportingMonth);
+  syncClinicalReportingMonth();
+  const drawClinicalConnector=()=>{
+    if(pane.hidden||!wrapper.isConnected)return;
+    wrapper.querySelector('.efficiency-clinical-connector')?.remove();
+    const blocks=[...wrapper.querySelectorAll(':scope > .audit-block')];
+    const findRow=block=>[...block?.querySelectorAll('tbody tr')||[]].find(row=>row.querySelector('.label')?.textContent.trim()==='Signed note with disease');
+    const source=findRow(blocks[0]),target=findRow(blocks[1]);if(!source||!target)return;
+    const wrapperBox=wrapper.getBoundingClientRect(),sourceBox=source.getBoundingClientRect(),targetBox=target.getBoundingClientRect();if(!wrapperBox.width)return;
+    const sourceX=sourceBox.left-wrapperBox.left-3,sourceY=sourceBox.top-wrapperBox.top+sourceBox.height/2,targetX=targetBox.left-wrapperBox.left-3,targetY=targetBox.top-wrapperBox.top+targetBox.height/2;
+    const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.classList.add('efficiency-clinical-connector');svg.setAttribute('aria-hidden','true');svg.setAttribute('viewBox',`0 0 ${Math.ceil(wrapperBox.width)} ${Math.ceil(wrapperBox.height)}`);
+    svg.innerHTML=`<defs><marker id="efficiency-clinical-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#3f8a65"/></marker></defs><path d="M ${sourceX} ${sourceY} H 24 V ${targetY} H ${targetX}" fill="none" stroke="#3f8a65" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#efficiency-clinical-arrow)"/>`;
+    wrapper.append(svg);
+  };
+  const schedule=()=>[0,120,320].forEach(delay=>setTimeout(drawClinicalConnector,delay));
+  document.querySelector('[data-efficiency-subtab="lomn-data"]')?.addEventListener('click',schedule);
+  window.addEventListener('resize',schedule,{passive:true});
+  schedule();
+},240));
 </script>
 </html>
