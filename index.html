@@ -325,6 +325,7 @@ tr.exception .label,tr.exception .value{color:var(--alert)}
   <button class="audit-tab" type="button" data-audit-tab="special-ops" data-issues="36" hidden>Special Ops</button>
   <button class="audit-tab" type="button" data-audit-tab="billing-reconciliation-2" data-issues="41">Billing</button>
   <button class="audit-tab" type="button" data-audit-tab="northstar-call-center" data-issues="0">Northstar Call Center</button>
+  <a class="audit-tab" data-audit-tab="northstar-outbound-calls" data-issues="0" href="#northstar-outbound-calls-panel">Northstar Outbound Calls</a>
 </nav>
 
 <section class="audit-directory" aria-label="Audit log directory">
@@ -1056,46 +1057,391 @@ tr.exception .label,tr.exception .value{color:var(--alert)}
 
 <div class="audit-tab-panel" data-audit-panel="northstar-call-center" hidden>
   <div class="northstar-callcenter-flow">
+    <section class="northstar-director-summary" aria-labelledby="northstar-director-title">
+      <div class="northstar-director-summary__head">
+        <div>
+          <span class="northstar-director-summary__eyebrow">Call Center Director view · Representative mock data</span>
+          <h2 id="northstar-director-title">Working-hours call flow</h2>
+          <p>What happened to every inbound call initiated from 8:00 AM through 8:00 PM America/New_York.</p>
+        </div>
+        <div class="northstar-director-summary__period"><strong>8 AM–8 PM ET</strong><span>Office hours · holidays pending confirmation</span></div>
+      </div>
+
+      <div class="northstar-kpi-grid" aria-label="Working-hours headline metrics">
+        <article><span>Inbound calls</span><strong>3,010</strong><small>100% of office-hours demand</small></article>
+        <article class="is-healthy"><span>Connected to agent</span><strong>2,865</strong><small>95.2% connection rate</small></article>
+        <article class="is-alert"><span>Not connected</span><strong>145</strong><small>4.8% of inbound calls</small></article>
+        <article class="is-warning"><span>Agent non-response</span><strong>180</strong><small>5.8% of agent offers · not unique calls</small></article>
+      </div>
+
+      <div class="northstar-flow-map" aria-label="Office-hours inbound call outcome flow">
+        <div class="northstar-flow-map__parent"><span>Office-hours inbound calls</span><strong>3,010</strong></div>
+        <b aria-hidden="true">→</b>
+        <div class="northstar-flow-map__branch is-healthy"><span>Connected</span><strong>2,865 · 95.2%</strong></div>
+        <div class="northstar-flow-map__branch is-alert"><span>Not connected</span><strong>145 · 4.8%</strong></div>
+      </div>
+
+      <div class="northstar-outcome-strip" aria-label="Office-hours not-connected outcome detail">
+        <article><span>Abandoned in queue</span><strong>82</strong><small>56.6% of not connected</small></article>
+        <article><span>Pre-queue disconnect</span><strong>22</strong><small>15.2%</small></article>
+        <article><span>Callback selected</span><strong>16</strong><small>11.0%</small></article>
+        <article><span>Queue transfer</span><strong>8</strong><small>5.5%</small></article>
+        <article><span>Flow disconnect</span><strong>7</strong><small>4.8%</small></article>
+        <article><span>System/routing</span><strong>5</strong><small>3.4%</small></article>
+        <article class="is-alert"><span>Unmapped</span><strong>5</strong><small>3.4% · must reach zero</small></article>
+      </div>
+
+      <div class="northstar-director-insight">
+        <div>
+          <span class="northstar-director-insight__label">Primary operational finding</span>
+          <h3>After-hours calls are 3.3× more likely not to connect.</h3>
+          <p>Non-office hours represent 17.8% of inbound volume but 41.5% of all not-connected calls: 103 of 650 calls did not connect (15.8%), compared with 145 of 3,010 during office hours (4.8%).</p>
+        </div>
+        <table aria-label="Office-hours comparison">
+          <thead><tr><th>Time band</th><th>Inbound</th><th>Connected</th><th>Not connected</th></tr></thead>
+          <tbody>
+            <tr><td><span class="label">8 AM–8 PM ET</span></td><td class="value">3,010</td><td class="value">95.2%</td><td class="value">4.8%</td></tr>
+            <tr class="exception"><td><span class="label">Non-office hours</span></td><td class="value">650</td><td class="value">84.2%</td><td class="value">15.8%</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="northstar-director-actions">
+        <h3>Director actions</h3>
+        <ol>
+          <li><strong>Explain the after-hours connection gap.</strong><span>Break the 103 not-connected contacts down by queue, weekday, 30-minute interval, and duration band before changing coverage or routing.</span></li>
+          <li><strong>Investigate agent availability separately.</strong><span>Analyze the 180 office-hours non-responses and 40 offer errors by agent, routing profile, queue, and interval; these are offer attempts, not unique calls.</span></li>
+          <li><strong>Drive classification gaps to zero.</strong><span>Assign the six unclassified contacts to documented terminal-path rules and confirm the short-abandon threshold while retaining every contact in the audit.</span></li>
+        </ol>
+      </div>
+    </section>
+
     <section class="audit-block" aria-labelledby="northstar-call-volume-title">
       <div class="audit-head green">
-        <h3 id="northstar-call-volume-title">Northstar call volume reconciliation</h3>
-        <p>Every inbound call is either answered or missed. Total answered calls plus total missed calls must equal total calls with no remainder.</p>
-        <div class="audit-note">Representative mock data — not a live feed. IAM access to Amazon Connect is currently denied, so these call counts are illustrative placeholders.</div>
+        <h3 id="northstar-call-volume-title">1. Inbound call population reconciliation</h3>
+        <p>Every eligible inbound voice contact is classified once as connected to an agent or not connected. This is the parent population for every control below.</p>
+        <div class="audit-note">Representative mock data — not a live feed. Connect API and Snowflake columns currently use illustrative values for control design. Replace both sides with independently retrieved source values after the instance, warehouse objects, reporting period, and timezone are approved.</div>
         <span class="owner-badge owner-badge--operational">Call Center responsibility</span>
       </div>
       <table data-avg-time-enhanced="true">
         <colgroup><col><col><col><col><col><col></colgroup>
-        <thead><tr><th>Call population</th><th>Reported count</th><th></th><th>Expected count</th><th></th><th>Tie-out</th></tr></thead>
+        <thead><tr><th>Unique inbound population</th><th>Observed</th><th></th><th>Expected</th><th></th><th>Tie-out</th></tr></thead>
         <tbody>
-          <tr><td><span class="label">Total calls</span><span class="description">All inbound calls presented to the Northstar call center in the reporting period.</span></td><td class="value">3,660</td><td class="operator">−</td><td class="value">3,660</td><td class="operator">=</td><td class="value">0 <span class="zero">✓ Tied out</span></td></tr>
-          <tr><td><span class="label">Total answered calls</span><span class="description">Inbound calls connected to a call center agent.</span></td><td class="value">3,412</td><td class="operator">−</td><td class="value">3,412</td><td class="operator">=</td><td class="value">0 <span class="zero">✓ Tied out</span></td></tr>
-          <tr data-northstar-link="missed"><td><span class="label">Total missed calls</span><span class="description">Inbound calls that dropped before an agent connected. Carried forward into the drop-duration reconciliation below.</span></td><td class="value">248</td><td class="operator">−</td><td class="value">248</td><td class="operator">=</td><td class="value">0 <span class="zero">✓ Tied out</span></td></tr>
-          <tr class="recon tie-total" data-northstar-link="tieout"><td><span class="label">Call volume roll-up</span><span class="description">Total answered calls 3,412 + total missed calls 248 − total calls 3,660</span></td><td class="value">3,660</td><td class="operator">−</td><td class="value">3,660</td><td class="operator">=</td><td class="value"><span class="table-priority-zero" aria-label="Northstar call volume roll-up tie-out">0</span><span class="zero">✓ Tied out</span></td></tr>
+          <tr><td><span class="label">Total eligible inbound calls</span><span class="description">Unique inbound voice contacts in scope after test/simulated contacts and non-voice channels are excluded.</span></td><td class="value">3,660</td><td class="operator">−</td><td class="value">3,660</td><td class="operator">=</td><td class="value">0 <span class="zero">✓ Tied out</span></td></tr>
+          <tr data-northstar-link="handled"><td><span class="label">Connected to an agent</span><span class="description">Connect metric: Contacts handled. A connected timestamp exists for the contact leg.</span></td><td class="value">3,412</td><td class="operator">−</td><td class="value">3,412</td><td class="operator">=</td><td class="value">0 <span class="zero">✓ Tied out</span></td></tr>
+          <tr data-northstar-link="not-connected"><td><span class="label">Not connected to an agent</span><span class="description">Internal audit population carried forward and classified by mutually exclusive terminal path below.</span></td><td class="value">248</td><td class="operator">−</td><td class="value">248</td><td class="operator">=</td><td class="value">0 <span class="zero">✓ Tied out</span></td></tr>
+          <tr class="recon tie-total" data-northstar-link="tieout"><td><span class="label">Inbound population roll-up</span><span class="formula">Connected 3,412 + not connected 248 = total eligible inbound calls 3,660.</span></td><td class="value">3,660</td><td class="operator">−</td><td class="value">3,660</td><td class="operator">=</td><td class="value"><span class="table-priority-zero" aria-label="Inbound call population tie-out">0</span><span class="zero">✓ Tied out</span></td></tr>
         </tbody>
       </table>
     </section>
 
-    <section class="audit-block" aria-labelledby="northstar-missed-duration-title">
+    <section class="audit-block" aria-labelledby="northstar-not-connected-title">
       <div class="audit-head green">
-        <h3 id="northstar-missed-duration-title">Missed call drop-duration reconciliation</h3>
-        <p>Carry the total missed calls forward and split it across mutually exclusive Amazon Connect call-drop duration buckets. Every missed call belongs to exactly one bucket, so the buckets must sum back to the carried-forward total.</p>
-        <div class="audit-note">Representative mock Amazon Connect data — not a live feed. IAM access to Amazon Connect is currently denied, so these drop-duration bucket counts are illustrative placeholders.</div>
+        <h3 id="northstar-not-connected-title">2. Not-connected outcome reconciliation</h3>
+        <p>“Unanswered” is an internal parent population, not one standard Connect metric. It is partitioned by terminal path so queue abandons are not mixed with callback exits, flow exits, or errors.</p>
+        <div class="audit-note">Agent non-response is intentionally excluded here: it measures an agent offer attempt and may occur multiple times for one call before that call is ultimately handled.</div>
         <span class="owner-badge owner-badge--operational">Call Center responsibility</span>
       </div>
       <table data-avg-time-enhanced="true">
         <colgroup><col><col><col><col><col><col></colgroup>
-        <thead><tr><th>Missed-call drop duration</th><th>Reported count</th><th></th><th>Expected count</th><th></th><th>Tie-out</th></tr></thead>
+        <thead><tr><th>Not-connected terminal path</th><th>Observed</th><th></th><th>Expected</th><th></th><th>Tie-out</th></tr></thead>
         <tbody>
-          <tr data-northstar-link="missed"><td><span class="label">Total missed calls</span><span class="description">Missed-call population carried forward from the call volume reconciliation.</span></td><td class="value">248</td><td class="operator">−</td><td class="value">248</td><td class="operator">=</td><td class="value">0 <span class="zero">✓ Tied out</span></td></tr>
-          <tr><td><span class="label">Dropped under 1 second</span><span class="description">Call ended before 1 second of queue time.</span></td><td class="value">61</td><td class="operator">−</td><td class="value">61</td><td class="operator">=</td><td class="value">0 <span class="zero">✓ Tied out</span></td></tr>
-          <tr><td><span class="label">Dropped 1 to under 2 seconds</span><span class="description">Call ended at or after 1 second and before 2 seconds.</span></td><td class="value">48</td><td class="operator">−</td><td class="value">48</td><td class="operator">=</td><td class="value">0 <span class="zero">✓ Tied out</span></td></tr>
-          <tr><td><span class="label">Dropped 2 to under 3 seconds</span><span class="description">Call ended at or after 2 seconds and before 3 seconds.</span></td><td class="value">39</td><td class="operator">−</td><td class="value">39</td><td class="operator">=</td><td class="value">0 <span class="zero">✓ Tied out</span></td></tr>
-          <tr><td><span class="label">Dropped 3 to under 4 seconds</span><span class="description">Call ended at or after 3 seconds and before 4 seconds.</span></td><td class="value">31</td><td class="operator">−</td><td class="value">31</td><td class="operator">=</td><td class="value">0 <span class="zero">✓ Tied out</span></td></tr>
-          <tr><td><span class="label">Dropped 4 to 5 seconds</span><span class="description">Call ended at or after 4 seconds and at or before 5 seconds.</span></td><td class="value">27</td><td class="operator">−</td><td class="value">27</td><td class="operator">=</td><td class="value">0 <span class="zero">✓ Tied out</span></td></tr>
-          <tr><td><span class="label">Dropped over 5 seconds</span><span class="description">Call ended more than 5 seconds after entering the queue.</span></td><td class="value">42</td><td class="operator">−</td><td class="value">42</td><td class="operator">=</td><td class="value">0 <span class="zero">✓ Tied out</span></td></tr>
-          <tr class="recon tie-total" data-northstar-link="tieout"><td><span class="label">Drop-duration roll-up</span><span class="description">Under 1s 61 + 1–2s 48 + 2–3s 39 + 3–4s 31 + 4–5s 27 + over 5s 42 − total missed calls 248</span></td><td class="value">248</td><td class="operator">−</td><td class="value">248</td><td class="operator">=</td><td class="value"><span class="table-priority-zero" aria-label="Missed call drop-duration roll-up tie-out">0</span><span class="zero">✓ Tied out</span></td></tr>
+          <tr data-northstar-link="not-connected"><td><span class="label">Not connected to an agent</span><span class="description">Parent population carried forward from the inbound call reconciliation.</span></td><td class="value">248</td><td class="operator">−</td><td class="value">248</td><td class="operator">=</td><td class="value">0 <span class="zero">✓ Tied out</span></td></tr>
+          <tr data-northstar-link="abandoned"><td><span class="label">Contacts abandoned in queue</span><span class="description">Customer disconnected while waiting in queue; callback requests are excluded.</span></td><td class="value">158</td><td class="operator">−</td><td class="value">158</td><td class="operator">=</td><td class="value">0 <span class="zero">✓ Tied out</span></td></tr>
+          <tr><td><span class="label">Caller disconnected before queue</span><span class="description">Customer disconnected in the IVR/contact flow before an enqueue timestamp was created.</span></td><td class="value">34</td><td class="operator">−</td><td class="value">34</td><td class="operator">=</td><td class="value">0 <span class="zero">✓ Tied out</span></td></tr>
+          <tr><td><span class="label">Callback selected / removed from queue</span><span class="description">Inbound contact exited the live queue through the approved callback path; not counted as abandoned.</span></td><td class="value">20</td><td class="operator">−</td><td class="value">20</td><td class="operator">=</td><td class="value">0 <span class="zero">✓ Tied out</span></td></tr>
+          <tr><td><span class="label">Transferred from queue</span><span class="description">Queue episode exited into a successor contact leg; not counted as abandoned.</span></td><td class="value">12</td><td class="operator">−</td><td class="value">12</td><td class="operator">=</td><td class="value">0 <span class="zero">✓ Tied out</span></td></tr>
+          <tr><td><span class="label">Contact-flow disconnect</span><span class="description">The configured flow terminated the contact without an agent connection.</span></td><td class="value">10</td><td class="operator">−</td><td class="value">10</td><td class="operator">=</td><td class="value">0 <span class="zero">✓ Tied out</span></td></tr>
+          <tr><td><span class="label">System or routing disconnect</span><span class="description">Contact ended because of a system, telecom, routing, or capacity failure.</span></td><td class="value">8</td><td class="operator">−</td><td class="value">8</td><td class="operator">=</td><td class="value">0 <span class="zero">✓ Tied out</span></td></tr>
+          <tr class="exception"><td><span class="label">Other / unmapped not-connected outcome</span><span class="description">Temporary completeness bucket. The production control target is zero after disconnect-reason mapping is finalized.</span></td><td class="value">6</td><td class="operator">−</td><td class="value">0</td><td class="operator">=</td><td class="value">6 <span class="variance">⚠ Mapping required</span></td></tr>
+          <tr class="recon tie-total" data-northstar-link="tieout"><td><span class="label">Not-connected outcome roll-up</span><span class="formula">158 abandoned + 34 pre-queue + 20 callback + 12 queue transfer + 10 flow + 8 system/routing + 6 unmapped = 248.</span></td><td class="value">248</td><td class="operator">−</td><td class="value">248</td><td class="operator">=</td><td class="value"><span class="table-priority-zero" aria-label="Not-connected outcome tie-out">0</span><span class="zero">✓ Tied out</span></td></tr>
         </tbody>
       </table>
+    </section>
+
+    <section class="audit-block" aria-labelledby="northstar-abandon-duration-title">
+      <div class="audit-head green">
+        <h3 id="northstar-abandon-duration-title">3. Queue-abandon duration reconciliation</h3>
+        <p>All Contacts abandoned are assigned to one non-overlapping queue-wait band. The bands separate short abandons from actionable service-level and severe-wait failures. Connect’s “abandoned in X seconds” metric is cumulative, so exclusive bands require contact-record logic or differences between cumulative thresholds.</p>
+        <div class="audit-note">Recommended director bands: under 5s, 5–15s, 15–30s, 30–60s, 60–120s, and 120s+. Keep under 5s visible; only exclude it from an adjusted KPI after leadership approves and documents the short-abandon rule.</div>
+        <span class="owner-badge owner-badge--operational">Call Center responsibility</span>
+      </div>
+      <table data-avg-time-enhanced="true">
+        <colgroup><col><col><col><col><col><col></colgroup>
+        <thead><tr><th>Queue-abandon duration</th><th>Observed</th><th></th><th>Expected</th><th></th><th>Tie-out</th></tr></thead>
+        <tbody>
+          <tr data-northstar-link="abandoned"><td><span class="label">Contacts abandoned in queue</span><span class="description">Parent population carried forward from the not-connected outcome reconciliation.</span></td><td class="value">158</td><td class="operator">−</td><td class="value">158</td><td class="operator">=</td><td class="value">0 <span class="zero">✓ Tied out</span></td></tr>
+          <tr><td><span class="label">Short abandon: under 5 seconds</span><span class="description">Queue duration is at least 0 and less than 5 seconds.</span></td><td class="value">61</td><td class="operator">−</td><td class="value">61</td><td class="operator">=</td><td class="value">0 <span class="zero">✓ Tied out</span></td></tr>
+          <tr><td><span class="label">5 to under 15 seconds</span><span class="description">Queue duration is at least 5 and less than 15 seconds.</span></td><td class="value">38</td><td class="operator">−</td><td class="value">38</td><td class="operator">=</td><td class="value">0 <span class="zero">✓ Tied out</span></td></tr>
+          <tr><td><span class="label">15 to under 30 seconds</span><span class="description">Queue duration is at least 15 and less than 30 seconds.</span></td><td class="value">27</td><td class="operator">−</td><td class="value">27</td><td class="operator">=</td><td class="value">0 <span class="zero">✓ Tied out</span></td></tr>
+          <tr><td><span class="label">30 to under 60 seconds</span><span class="description">Queue duration is at least 30 and less than 60 seconds.</span></td><td class="value">18</td><td class="operator">−</td><td class="value">18</td><td class="operator">=</td><td class="value">0 <span class="zero">✓ Tied out</span></td></tr>
+          <tr><td><span class="label">60 to under 120 seconds</span><span class="description">Severe wait: queue duration is at least 60 and less than 120 seconds.</span></td><td class="value">9</td><td class="operator">−</td><td class="value">9</td><td class="operator">=</td><td class="value">0 <span class="zero">✓ Tied out</span></td></tr>
+          <tr class="exception"><td><span class="label">120 seconds or longer</span><span class="description">Critical wait: customer remained queued for at least two minutes before abandoning.</span></td><td class="value">5</td><td class="operator">−</td><td class="value">5</td><td class="operator">=</td><td class="value">0 <span class="zero">✓ Tied out</span></td></tr>
+          <tr class="recon tie-total"><td><span class="label">Queue-abandon duration roll-up</span><span class="formula">61 + 38 + 27 + 18 + 9 + 5 = 158 Contacts abandoned.</span></td><td class="value">158</td><td class="operator">−</td><td class="value">158</td><td class="operator">=</td><td class="value"><span class="table-priority-zero" aria-label="Queue-abandon duration tie-out">0</span><span class="zero">✓ Tied out</span></td></tr>
+        </tbody>
+      </table>
+      <table class="northstar-split-table" data-avg-time-enhanced="true" aria-label="Abandoned contacts by missed-offer relationship">
+        <thead><tr><th>Abandoned-contact population</th><th>Total</th><th>8 AM–8 PM ET</th><th>Non-office hours</th><th>Formula</th><th>Tie-out</th></tr></thead>
+        <tbody>
+          <tr><td><span class="label">Contacts abandoned in queue</span><span class="description">Parent population: unique contacts that disconnected in queue before connecting to an agent.</span></td><td class="value">158</td><td class="value">82</td><td class="value">76</td><td class="formula">82 + 76</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr><td><span class="label">Abandoned without a missed agent offer</span><span class="description">Abandoned contacts with no associated agent non-response event before disconnect.</span></td><td class="value">116</td><td class="value">43</td><td class="value">73</td><td class="formula">43 + 73</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr><td><span class="label">Abandoned after a missed agent offer</span><span class="description">Distinct abandoned contacts linked by ContactId to at least one agent non-response event.</span></td><td class="value">42</td><td class="value">39</td><td class="value">3</td><td class="formula">39 + 3</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr class="recon tie-total"><td><span class="label">Abandoned-contact roll-up</span><span class="description">Confirms every abandoned contact belongs to exactly one missed-offer relationship category.</span><span class="formula">116 without a missed offer + 42 after a missed offer = 158 abandoned contacts.</span></td><td class="value">158</td><td class="value">82</td><td class="value">76</td><td class="formula">82 + 76</td><td class="value"><span class="table-priority-zero">0</span></td></tr>
+        </tbody>
+      </table>
+      <div class="source-note">The 42-contact overlap must be calculated as a distinct ContactId population. Do not infer it by subtracting aggregate metrics when one contact can generate multiple missed offers.</div>
+    </section>
+
+    <section class="audit-block" aria-labelledby="northstar-hours-title">
+      <div class="audit-head green">
+        <h3 id="northstar-hours-title">4. Office-hours versus non-office-hours reconciliation</h3>
+        <p>Every metric is split using the contact initiation timestamp converted to America/New_York. Office hours are 8:00 AM inclusive through 8:00 PM exclusive; all other times are non-office hours.</p>
+        <div class="audit-note">Use an IANA timezone, not a fixed EST offset, so daylight-saving transitions are handled correctly. Confirm holiday treatment separately.</div>
+        <span class="owner-badge owner-badge--operational">Special Ops data control</span>
+      </div>
+      <table class="northstar-split-table" data-avg-time-enhanced="true">
+        <thead><tr><th>Audit population</th><th>Total</th><th>8 AM–8 PM ET</th><th>Non-office hours</th><th>Formula</th><th>Tie-out</th></tr></thead>
+        <tbody>
+          <tr><td><span class="label">Total eligible inbound calls</span></td><td class="value">3,660</td><td class="value">3,010</td><td class="value">650</td><td class="formula">3,010 + 650</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr><td><span class="label">Connected to an agent</span></td><td class="value">3,412</td><td class="value">2,865</td><td class="value">547</td><td class="formula">2,865 + 547</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr><td><span class="label">Not connected to an agent</span></td><td class="value">248</td><td class="value">145</td><td class="value">103</td><td class="formula">145 + 103</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr><td><span class="label">Contacts abandoned in queue</span></td><td class="value">158</td><td class="value">82</td><td class="value">76</td><td class="formula">82 + 76</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr><td><span class="label">Short abandon: under 5 seconds</span></td><td class="value">61</td><td class="value">29</td><td class="value">32</td><td class="formula">29 + 32</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr><td><span class="label">Abandoned 5 to under 15 seconds</span></td><td class="value">38</td><td class="value">20</td><td class="value">18</td><td class="formula">20 + 18</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr><td><span class="label">Abandoned 15 to under 30 seconds</span></td><td class="value">27</td><td class="value">15</td><td class="value">12</td><td class="formula">15 + 12</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr><td><span class="label">Abandoned 30 to under 60 seconds</span></td><td class="value">18</td><td class="value">10</td><td class="value">8</td><td class="formula">10 + 8</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr><td><span class="label">Abandoned 60 to under 120 seconds</span><span class="description">Severe-wait abandons split between office and non-office hours.</span></td><td class="value">9</td><td class="value">5</td><td class="value">4</td><td class="formula">5 + 4</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr class="exception"><td><span class="label">Abandoned 120 seconds or longer</span><span class="description">Critical-wait abandons split between office and non-office hours.</span></td><td class="value">5</td><td class="value">3</td><td class="value">2</td><td class="formula">3 + 2</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr><td><span class="label">Caller disconnected before queue</span></td><td class="value">34</td><td class="value">22</td><td class="value">12</td><td class="formula">22 + 12</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr><td><span class="label">Callback selected</span></td><td class="value">20</td><td class="value">16</td><td class="value">4</td><td class="formula">16 + 4</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr><td><span class="label">Transferred from queue</span></td><td class="value">12</td><td class="value">8</td><td class="value">4</td><td class="formula">8 + 4</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr><td><span class="label">Contact-flow disconnect</span></td><td class="value">10</td><td class="value">7</td><td class="value">3</td><td class="formula">7 + 3</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr><td><span class="label">System/routing disconnect</span></td><td class="value">8</td><td class="value">5</td><td class="value">3</td><td class="formula">5 + 3</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr class="exception"><td><span class="label">Other / unmapped outcome</span></td><td class="value">6</td><td class="value">5</td><td class="value">1</td><td class="formula">5 + 1</td><td class="value">0 <span class="zero">✓ Split</span></td></tr>
+          <tr class="recon tie-total"><td><span class="label">Time-band completeness</span><span class="formula">All inbound calls are assigned to exactly one reporting-time band.</span></td><td class="value">3,660</td><td class="value">3,010</td><td class="value">650</td><td class="formula">3,010 + 650</td><td class="value"><span class="table-priority-zero">0</span></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="audit-block" aria-labelledby="northstar-handled-title">
+      <div class="audit-head green">
+        <h3 id="northstar-handled-title">5. Connected-contact terminal reason reconciliation</h3>
+        <p>Handled contact legs are classified by terminal disconnect reason. Transfers are contact-leg outcomes and must not be interpreted as unique customer journeys without root-contact lineage.</p>
+        <span class="owner-badge owner-badge--operational">Call Center responsibility</span>
+      </div>
+      <table class="northstar-split-table" data-avg-time-enhanced="true">
+        <thead><tr><th>Handled terminal reason</th><th>Total</th><th>8 AM–8 PM ET</th><th>Non-office hours</th><th>Formula</th><th>Tie-out</th></tr></thead>
+        <tbody>
+          <tr data-northstar-link="handled"><td><span class="label">Contacts handled</span><span class="description">Parent handled population carried forward from the inbound reconciliation.</span></td><td class="value">3,412</td><td class="value">2,865</td><td class="value">547</td><td class="formula">2,865 + 547</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr><td><span class="label">Customer disconnect</span></td><td class="value">1,880</td><td class="value">1,640</td><td class="value">240</td><td class="formula">1,640 + 240</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr><td><span class="label">Agent disconnect</span></td><td class="value">1,046</td><td class="value">930</td><td class="value">116</td><td class="formula">930 + 116</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr><td><span class="label">Transfer / next contact leg</span></td><td class="value">354</td><td class="value">245</td><td class="value">109</td><td class="formula">245 + 109</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr><td><span class="label">Other handled terminal reason</span></td><td class="value">132</td><td class="value">50</td><td class="value">82</td><td class="formula">50 + 82</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr class="recon tie-total"><td><span class="label">Handled terminal-reason roll-up</span><span class="formula">1,880 + 1,046 + 354 + 132 = 3,412 handled contact legs.</span></td><td class="value">3,412</td><td class="value">2,865</td><td class="value">547</td><td class="formula">2,865 + 547</td><td class="value"><span class="table-priority-zero">0</span></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="audit-block" aria-labelledby="northstar-hold-title">
+      <div class="audit-head green">
+        <h3 id="northstar-hold-title">6. Handled-contact hold reconciliation</h3>
+        <p>Hold outcomes are subsets of handled contacts. They must never be counted as unanswered because an agent connection already occurred.</p>
+        <span class="owner-badge owner-badge--operational">Call Center responsibility</span>
+      </div>
+      <table class="northstar-split-table" data-avg-time-enhanced="true">
+        <thead><tr><th>Handled hold outcome</th><th>Total</th><th>8 AM–8 PM ET</th><th>Non-office hours</th><th>Formula</th><th>Tie-out</th></tr></thead>
+        <tbody>
+          <tr><td><span class="label">Contacts put on hold</span><span class="description">Handled contacts placed on hold at least once; counted once per contact leg.</span></td><td class="value">620</td><td class="value">540</td><td class="value">80</td><td class="formula">540 + 80</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr><td><span class="label">Resumed and completed after hold</span></td><td class="value">536</td><td class="value">469</td><td class="value">67</td><td class="formula">469 + 67</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr><td><span class="label">Contacts disconnected while on hold</span></td><td class="value">84</td><td class="value">71</td><td class="value">13</td><td class="formula">71 + 13</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr><td><span class="label">Customer hold disconnect</span></td><td class="value">49</td><td class="value">40</td><td class="value">9</td><td class="formula">40 + 9</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr><td><span class="label">Agent hold disconnect</span></td><td class="value">35</td><td class="value">31</td><td class="value">4</td><td class="formula">31 + 4</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr class="recon tie-total"><td><span class="label">Hold population roll-up</span><span class="formula">536 resumed/completed + 84 hold disconnects = 620 put on hold; 49 customer + 35 agent = 84 hold disconnects.</span></td><td class="value">620</td><td class="value">540</td><td class="value">80</td><td class="formula">540 + 80</td><td class="value"><span class="table-priority-zero">0</span></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="audit-block" aria-labelledby="northstar-agent-offer-title">
+      <div class="audit-head green">
+        <h3 id="northstar-agent-offer-title">7. Agent-offer activity reconciliation</h3>
+        <p>This table audits all agent routing attempts. Missed offers remain visible as agent non-response events, but are not presented as a separate call population.</p>
+        <div class="audit-note">Agent non-response is an offer-attempt metric and may count one contact more than once. Never add it to abandoned contacts or use it as the unanswered-call total.</div>
+        <span class="owner-badge owner-badge--operational">Call Center management</span>
+      </div>
+      <table class="northstar-split-table" data-avg-time-enhanced="true" aria-label="Agent offer outcome reconciliation">
+        <thead><tr><th>Agent-offer outcome</th><th>Total offers</th><th>8 AM–8 PM ET</th><th>Non-office hours</th><th>Formula</th><th>Tie-out</th></tr></thead>
+        <tbody>
+          <tr><td><span class="label">Total agent offers</span><span class="description">Parent offer-attempt population. Reroutes can create more than one offer per contact.</span></td><td class="value">3,640</td><td class="value">3,085</td><td class="value">555</td><td class="formula">3,085 + 555</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr><td><span class="label">Accepted / connected offers</span><span class="description">Offers accepted by an agent and connected to the customer.</span></td><td class="value">3,412</td><td class="value">2,865</td><td class="value">547</td><td class="formula">2,865 + 547</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr><td><span class="label">Missed offers / agent non-response</span><span class="description">Parent missed-event total carried forward from the missed-call reconciliation above.</span></td><td class="value">188</td><td class="value">180</td><td class="value">8</td><td class="formula">180 + 8</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr><td><span class="label">Agent or routing error</span><span class="description">Offer attempt failed because of an agent endpoint, routing, or system error.</span></td><td class="value">40</td><td class="value">40</td><td class="value">0</td><td class="formula">40 + 0</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr class="recon tie-total"><td><span class="label">Agent-offer roll-up</span><span class="formula">3,412 accepted + 188 non-response + 40 error = 3,640 offers.</span></td><td class="value">3,640</td><td class="value">3,085</td><td class="value">555</td><td class="formula">3,085 + 555</td><td class="value"><span class="table-priority-zero">0</span></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="audit-block" aria-labelledby="northstar-lineage-title">
+      <div class="audit-head green">
+        <h3 id="northstar-lineage-title">8. Contact-chain lineage integrity</h3>
+        <p>Transfers and callbacks create successor contact records. These controls prove that every leg maps to one root inbound journey and that every declared relationship resolves.</p>
+        <span class="owner-badge owner-badge--operational">Special Ops data control</span>
+      </div>
+      <table data-avg-time-enhanced="true">
+        <colgroup><col><col><col><col><col><col></colgroup>
+        <thead><tr><th>Contact-chain control</th><th>Observed</th><th></th><th>Expected</th><th></th><th>Tie-out</th></tr></thead>
+        <tbody>
+          <tr><td><span class="label">Total contact legs</span><span class="description">Inbound roots plus transfer, queue-transfer, and callback successor records.</span></td><td class="value">4,028</td><td class="operator">−</td><td class="value">4,028</td><td class="operator">=</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr><td><span class="label">Contact legs mapped to one root journey</span></td><td class="value">4,028</td><td class="operator">−</td><td class="value">4,028</td><td class="operator">=</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr><td><span class="label">Duplicate ContactId records</span></td><td class="value">0</td><td class="operator">−</td><td class="value">0</td><td class="operator">=</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr><td><span class="label">Orphan PreviousContactId references</span></td><td class="value">0</td><td class="operator">−</td><td class="value">0</td><td class="operator">=</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr><td><span class="label">Unresolved NextContactId references</span></td><td class="value">0</td><td class="operator">−</td><td class="value">0</td><td class="operator">=</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr><td><span class="label">Contact legs mapped to multiple roots</span></td><td class="value">0</td><td class="operator">−</td><td class="value">0</td><td class="operator">=</td><td class="value">0 <span class="zero">✓</span></td></tr>
+          <tr class="recon tie-total"><td><span class="label">Lineage completeness</span><span class="formula">All 4,028 contact legs resolve to exactly one inbound root with no broken links.</span></td><td class="value">4,028</td><td class="operator">−</td><td class="value">4,028</td><td class="operator">=</td><td class="value"><span class="table-priority-zero">0</span></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="audit-block northstar-data-model" aria-labelledby="northstar-data-model-title">
+      <div class="audit-head green">
+        <h3 id="northstar-data-model-title">9. Amazon Connect audit data model and lineage map</h3>
+        <p>The audit separates unique customer journeys, Connect contact legs, queue segments, and agent-offer attempts before aggregation.</p>
+        <span class="owner-badge owner-badge--operational">Special Ops data control</span>
+      </div>
+      <table>
+        <thead><tr><th>Layer / table</th><th>Grain and join key</th><th>Required fields</th><th>Feeds</th></tr></thead>
+        <tbody>
+          <tr><td><span class="label">Connect contact record</span><span class="description">Authoritative source object</span></td><td><code>ContactId</code> per contact leg; lineage through initial/previous/next contact IDs</td><td>Channel, initiation method, initiation/disconnect timestamps, disconnect reason, attributes</td><td>Normalized contact-leg fact</td></tr>
+          <tr><td><span class="label">Queue segment fact</span></td><td><code>ContactId + QueueId</code></td><td>Enqueue timestamp, dequeue timestamp/duration, queue, callback path, connected timestamp</td><td>Queued, handled, abandoned, wait-band controls</td></tr>
+          <tr><td><span class="label">Agent-offer fact</span></td><td><code>ContactId + AgentId + offer timestamp</code></td><td>Offer, connected, non-response/error, routing profile, agent status</td><td>Agent-offer and non-response controls</td></tr>
+          <tr><td><span class="label">Normalized contact-leg fact</span></td><td>One row per <code>ContactId</code></td><td>Terminal outcome, handled flag, abandoned flag, transfer flag, local reporting timestamp</td><td>Contact-leg outcome reconciliations</td></tr>
+          <tr><td><span class="label">Root inbound journey fact</span></td><td>One row per root inbound contact lineage</td><td>Root contact ID, first initiation timestamp, final outcome, number of legs/transfers</td><td>Unique inbound call population</td></tr>
+          <tr><td><span class="label">Audit control aggregate</span></td><td>Reporting period + queue + office-hours band + metric/control ID</td><td>Observed, expected, variance, tolerance, source version, owner, status</td><td>Northstar tables and monthly sign-off</td></tr>
+        </tbody>
+      </table>
+      <div class="northstar-lineage" aria-label="Amazon Connect audit lineage">
+        <span>Contact records</span><b>→</b><span>Contact legs + queue segments + agent offers</span><b>→</b><span>Root inbound journeys</span><b>→</b><span>Office-hours bands</span><b>→</b><span>Zero-variance controls</span>
+      </div>
+      <div class="source-note"><strong>HIPAA boundary:</strong> keep this audit aggregate and de-identified. Do not surface phone numbers, names, recordings, transcripts, or patient-context attributes. Source mapping references: Connect Customer contact records and GetMetricDataV2 metric definitions.</div>
+    </section>
+  </div>
+</div>
+
+<div class="audit-tab-panel" id="northstar-outbound-calls-panel" data-audit-panel="northstar-outbound-calls" hidden>
+  <section class="hero northstar-outbound-hero">
+    <h1>Northstar Outbound Campaign Audit</h1>
+    <p>Reconcile every agent-assisted voice campaign recipient from targeting through delivery, answering-machine detection, human answer, agent connection, and final contact outcome.</p>
+  </section>
+
+  <div class="northstar-callcenter-flow northstar-outbound-flow">
+    <section class="northstar-director-summary" aria-labelledby="northstar-outbound-director-title">
+      <div class="northstar-director-summary__head">
+        <div><span class="northstar-director-summary__eyebrow">Call Center Director view · Representative mock data</span><h2 id="northstar-outbound-director-title">Outbound campaign performance</h2><p>Agent-assisted voice campaigns, separated by office hours and reconciled between Amazon Connect and Snowflake.</p></div>
+        <div class="northstar-director-summary__period"><strong>8 AM–8 PM ET</strong><span>Recipient-local compliance window requires separate validation</span></div>
+      </div>
+      <div class="northstar-kpi-grid" aria-label="Outbound campaign headline metrics">
+        <article><span>Targeted recipients</span><strong>12,000</strong><small>Campaign audience population</small></article>
+        <article class="is-healthy"><span>Delivery attempts</span><strong>11,300</strong><small>94.2% of targeted recipients</small></article>
+        <article class="is-healthy"><span>Human answered</span><strong>4,520</strong><small>40.0% of delivery attempts</small></article>
+        <article class="is-alert"><span>Campaign abandoned</span><strong>180</strong><small>4.0% of human-answered calls</small></article>
+      </div>
+      <div class="northstar-director-insight"><div><span class="northstar-director-insight__label">Campaign control boundary</span><h3>Keep agent-assisted and automated voice separate</h3><p>These tables audit agent-assisted voice with answering-machine detection enabled. Automated voice, preview dialing, SMS, email, WhatsApp, and web notification require separate cohorts because their expected delivery and agent-connection paths differ.</p></div><div><span class="northstar-director-insight__label">Primary operating question</span><h3>Where do human answers fail to reach an agent?</h3><p>Review campaign abandons by campaign, queue, routing profile, recipient-local time, and time from system connection to agent connection.</p></div></div>
+    </section>
+
+    <section class="audit-block" aria-labelledby="outbound-target-title">
+      <div class="audit-head green"><h3 id="outbound-target-title">1. Targeted-recipient and send-attempt reconciliation</h3><p>Every targeted recipient is either submitted as a campaign send attempt or excluded with one documented reason.</p><div class="audit-note">Representative mock data. API and Snowflake columns must be populated independently from GetMetricDataV2/outbound campaign events and warehouse transformations.</div><span class="owner-badge owner-badge--operational">Campaign operations</span></div>
+      <table class="northstar-split-table" data-avg-time-enhanced="true"><thead><tr><th>Campaign targeting population</th><th>Total</th><th>8 AM–8 PM ET</th><th>Non-office hours</th><th>Formula</th><th>Tie-out</th></tr></thead><tbody>
+        <tr><td><span class="label">Recipients targeted</span><span class="description">Unique recipients identified for the in-scope agent-assisted voice campaigns.</span></td><td class="value">12,000</td><td class="value">9,600</td><td class="value">2,400</td><td class="formula">9,600 + 2,400</td><td class="value">0</td></tr>
+        <tr><td><span class="label">Campaign send attempts</span><span class="description">Send requests submitted by Connect for campaign delivery.</span></td><td class="value">11,520</td><td class="value">9,300</td><td class="value">2,220</td><td class="formula">9,300 + 2,220</td><td class="value">0</td></tr>
+        <tr><td><span class="label">Campaign send exclusions</span><span class="description">Targeted recipients excluded before delivery because required campaign or channel criteria were not met.</span></td><td class="value">480</td><td class="value">300</td><td class="value">180</td><td class="formula">300 + 180</td><td class="value">0</td></tr>
+        <tr><td><span class="label">Missing recipient timezone</span><span class="description">Excluded because Connect could not determine the recipient timezone required for campaign controls.</span></td><td class="value">210</td><td class="value">110</td><td class="value">100</td><td class="formula">110 + 100</td><td class="value">0</td></tr>
+        <tr><td><span class="label">Missing or invalid voice channel</span><span class="description">Excluded because no eligible telephony channel or destination was available.</span></td><td class="value">120</td><td class="value">80</td><td class="value">40</td><td class="formula">80 + 40</td><td class="value">0</td></tr>
+        <tr><td><span class="label">Consent or suppression exclusion</span><span class="description">Excluded by the approved opt-out, suppression, or communication-permission rule.</span></td><td class="value">90</td><td class="value">60</td><td class="value">30</td><td class="formula">60 + 30</td><td class="value">0</td></tr>
+        <tr><td><span class="label">Other documented exclusion</span><span class="description">All other mapped campaign exclusion events; production taxonomy should avoid an unclassified remainder.</span></td><td class="value">60</td><td class="value">50</td><td class="value">10</td><td class="formula">50 + 10</td><td class="value">0</td></tr>
+        <tr class="recon tie-total"><td><span class="label">Targeting roll-up</span><span class="description">Confirms send attempts plus exclusions equal all targeted recipients.</span><span class="formula">11,520 attempts + 480 exclusions = 12,000 targeted.</span></td><td class="value">12,000</td><td class="value">9,600</td><td class="value">2,400</td><td class="formula">9,600 + 2,400</td><td class="value"><span class="table-priority-zero">0</span></td></tr>
+      </tbody></table>
+      <div class="source-note">Connect metrics: <code>RECIPIENTS_TARGETED</code>, <code>CAMPAIGN_SEND_ATTEMPTS</code>, <code>CAMPAIGN_SEND_EXCLUSIONS</code>. Exclusion detail comes from <code>outbound_campaign_events.campaign_event_type</code>.</div>
+    </section>
+
+    <section class="audit-block" aria-labelledby="outbound-delivery-title">
+      <div class="audit-head green"><h3 id="outbound-delivery-title">2. Campaign send-attempt disposition reconciliation</h3><p>Every send attempt becomes a telephony delivery attempt, expires for later retry, or ends in a permanent campaign failure.</p><span class="owner-badge owner-badge--operational">Campaign operations</span></div>
+      <table class="northstar-split-table" data-avg-time-enhanced="true"><thead><tr><th>Send-attempt disposition</th><th>Total</th><th>8 AM–8 PM ET</th><th>Non-office hours</th><th>Formula</th><th>Tie-out</th></tr></thead><tbody>
+        <tr><td><span class="label">Campaign send attempts</span><span class="description">Parent send-attempt population carried forward from targeting.</span></td><td class="value">11,520</td><td class="value">9,300</td><td class="value">2,220</td><td class="formula">9,300 + 2,220</td><td class="value">0</td></tr>
+        <tr><td><span class="label">Voice delivery attempts</span><span class="description">Agent-assisted telephony attempts executed by the Connect outbound dialer.</span></td><td class="value">11,300</td><td class="value">9,120</td><td class="value">2,180</td><td class="formula">9,120 + 2,180</td><td class="value">0</td></tr>
+        <tr><td><span class="label">Campaign attempt expired / retry pending</span><span class="description">Attempt expired because resources were unavailable; Connect may retry according to campaign behavior.</span></td><td class="value">140</td><td class="value">120</td><td class="value">20</td><td class="formula">120 + 20</td><td class="value">0</td></tr>
+        <tr><td><span class="label">Permanent campaign failure</span><span class="description">Attempt ended with an invalid parameter, permission, configuration, or other non-retryable failure.</span></td><td class="value">80</td><td class="value">60</td><td class="value">20</td><td class="formula">60 + 20</td><td class="value">0</td></tr>
+        <tr class="recon tie-total"><td><span class="label">Send-attempt disposition roll-up</span><span class="description">Confirms every campaign send attempt has one delivery-system disposition.</span><span class="formula">11,300 delivery + 140 expired + 80 permanent failure = 11,520.</span></td><td class="value">11,520</td><td class="value">9,300</td><td class="value">2,220</td><td class="formula">9,300 + 2,220</td><td class="value"><span class="table-priority-zero">0</span></td></tr>
+      </tbody></table>
+      <div class="source-note">Connect metric: <code>DELIVERY_ATTEMPTS</code>. Event outcomes: <code>CAMPAIGN_SUCCESS</code>, <code>CAMPAIGN_EXPIRED</code>, and <code>CAMPAIGN_FAILURE_PERMANENT</code>.</div>
+    </section>
+
+    <section class="audit-block" aria-labelledby="outbound-amd-title">
+      <div class="audit-head green"><h3 id="outbound-amd-title">3. Answering-machine detection disposition reconciliation</h3><p>Every executed voice attempt is assigned to one Amazon Connect AMD or telephony disposition.</p><div class="audit-note">AMD is probabilistic. Keep unresolved and silence outcomes visible, and never combine voicemail with human answered.</div><span class="owner-badge owner-badge--operational">Campaign operations</span></div>
+      <table class="northstar-split-table" data-avg-time-enhanced="true"><thead><tr><th>AMD / telephony disposition</th><th>Total</th><th>8 AM–8 PM ET</th><th>Non-office hours</th><th>Formula</th><th>Tie-out</th></tr></thead><tbody>
+        <tr><td><span class="label">Voice delivery attempts</span><span class="description">Parent dial-attempt population requiring one AMD or telephony disposition.</span></td><td class="value">11,300</td><td class="value">9,120</td><td class="value">2,180</td><td class="formula">9,120 + 2,180</td><td class="value">0</td></tr>
+        <tr><td><span class="label">Human answered</span><span class="description">AMD classified the connected destination as a live person.</span></td><td class="value">4,520</td><td class="value">3,900</td><td class="value">620</td><td class="formula">3,900 + 620</td><td class="value">0</td></tr>
+        <tr><td><span class="label">Voicemail with beep</span><span class="description">AMD detected voicemail and a message-recording beep.</span></td><td class="value">3,100</td><td class="value">2,450</td><td class="value">650</td><td class="formula">2,450 + 650</td><td class="value">0</td></tr>
+        <tr><td><span class="label">Voicemail without beep</span><span class="description">AMD detected voicemail without a beep.</span></td><td class="value">1,880</td><td class="value">1,450</td><td class="value">430</td><td class="formula">1,450 + 430</td><td class="value">0</td></tr>
+        <tr><td><span class="label">Unanswered / continued ringing</span><span class="description">The destination kept ringing without being answered.</span></td><td class="value">1,050</td><td class="value">700</td><td class="value">350</td><td class="formula">700 + 350</td><td class="value">0</td></tr>
+        <tr><td><span class="label">AMD unresolved</span><span class="description">Media connected but AMD could not determine human versus voicemail.</span></td><td class="value">310</td><td class="value">260</td><td class="value">50</td><td class="formula">260 + 50</td><td class="value">0</td></tr>
+        <tr><td><span class="label">AMD unresolved silence</span><span class="description">Media connected but AMD observed silence and could not classify the answer.</span></td><td class="value">160</td><td class="value">130</td><td class="value">30</td><td class="formula">130 + 30</td><td class="value">0</td></tr>
+        <tr><td><span class="label">Busy / SIT tone</span><span class="description">Telephony disposition indicates a busy destination or special-information tone.</span></td><td class="value">180</td><td class="value">150</td><td class="value">30</td><td class="formula">150 + 30</td><td class="value">0</td></tr>
+        <tr><td><span class="label">Invalid number</span><span class="description">Telephony disposition indicates the destination number is invalid.</span></td><td class="value">70</td><td class="value">60</td><td class="value">10</td><td class="formula">60 + 10</td><td class="value">0</td></tr>
+        <tr><td><span class="label">AMD not applicable</span><span class="description">Call disconnected before ringing or before media was available for detection.</span></td><td class="value">30</td><td class="value">20</td><td class="value">10</td><td class="formula">20 + 10</td><td class="value">0</td></tr>
+        <tr class="recon tie-total"><td><span class="label">AMD disposition roll-up</span><span class="description">Confirms every executed voice attempt has exactly one AMD or telephony disposition.</span><span class="formula">All nine dispositions sum to 11,300 voice delivery attempts.</span></td><td class="value">11,300</td><td class="value">9,120</td><td class="value">2,180</td><td class="formula">9,120 + 2,180</td><td class="value"><span class="table-priority-zero">0</span></td></tr>
+      </tbody></table>
+      <div class="source-note">Contact-record field: <code>answering_machine_detection_status</code>. Values include <code>HUMAN_ANSWERED</code>, voicemail, unanswered, unresolved, silence, busy/SIT, invalid, and not-applicable classifications.</div>
+    </section>
+
+    <section class="audit-block" aria-labelledby="outbound-human-title">
+      <div class="audit-head green"><h3 id="outbound-human-title">4. Human-answer to agent-connection reconciliation</h3><p>Every human-answered agent-assisted campaign call is connected to an agent, abandoned before that connection, or terminated through another documented flow/system path.</p><span class="owner-badge owner-badge--operational">Call Center responsibility</span></div>
+      <table class="northstar-split-table" data-avg-time-enhanced="true"><thead><tr><th>Human-answer outcome</th><th>Total</th><th>8 AM–8 PM ET</th><th>Non-office hours</th><th>Formula</th><th>Tie-out</th></tr></thead><tbody>
+        <tr><td><span class="label">Human answered</span><span class="description">Parent live-customer population carried forward from AMD classification.</span></td><td class="value">4,520</td><td class="value">3,900</td><td class="value">620</td><td class="formula">3,900 + 620</td><td class="value">0</td></tr>
+        <tr><td><span class="label">Connected to campaign agent</span><span class="description">Human-answered campaign calls that reached an agent connection timestamp.</span></td><td class="value">4,260</td><td class="value">3,710</td><td class="value">550</td><td class="formula">3,710 + 550</td><td class="value">0</td></tr>
+        <tr class="exception"><td><span class="label">Campaign contact abandoned before agent</span><span class="description">Human answered, but the customer disconnected before the campaign connected them to an agent.</span></td><td class="value">180</td><td class="value">130</td><td class="value">50</td><td class="formula">130 + 50</td><td class="value">0</td></tr>
+        <tr><td><span class="label">Flow or system disconnect before agent</span><span class="description">Human-answered contact terminated through flow logic, system failure, or another mapped non-abandon path.</span></td><td class="value">80</td><td class="value">60</td><td class="value">20</td><td class="formula">60 + 20</td><td class="value">0</td></tr>
+        <tr class="recon tie-total"><td><span class="label">Human-answer outcome roll-up</span><span class="description">Confirms every human-answered contact has one pre-agent terminal outcome.</span><span class="formula">4,260 connected + 180 abandoned + 80 other disconnect = 4,520.</span></td><td class="value">4,520</td><td class="value">3,900</td><td class="value">620</td><td class="formula">3,900 + 620</td><td class="value"><span class="table-priority-zero">0</span></td></tr>
+      </tbody></table>
+      <div class="source-note">Use campaign-contact-abandoned metrics only for the agent-assisted, human-answered cohort. Automated voice should not expect an agent connection.</div>
+    </section>
+
+    <section class="audit-block" aria-labelledby="outbound-abandon-title">
+      <div class="audit-head green"><h3 id="outbound-abandon-title">5. Campaign-abandon duration reconciliation</h3><p>Campaign abandons are split into non-overlapping time-to-agent bands measured from system connection. Preserve additional greeting-start and greeting-end versions when those experiences are configured.</p><span class="owner-badge owner-badge--operational">Call Center responsibility</span></div>
+      <table class="northstar-split-table" data-avg-time-enhanced="true"><thead><tr><th>Campaign abandon wait</th><th>Total</th><th>8 AM–8 PM ET</th><th>Non-office hours</th><th>Formula</th><th>Tie-out</th></tr></thead><tbody>
+        <tr><td><span class="label">Campaign contact abandoned before agent</span><span class="description">Parent human-answered population that disconnected before agent connection.</span></td><td class="value">180</td><td class="value">130</td><td class="value">50</td><td class="formula">130 + 50</td><td class="value">0</td></tr>
+        <tr><td><span class="label">Campaign abandon under 5 seconds</span><span class="description">Customer disconnected less than five seconds after system connection.</span></td><td class="value">24</td><td class="value">18</td><td class="value">6</td><td class="formula">18 + 6</td><td class="value">0</td></tr>
+        <tr><td><span class="label">Campaign abandon 5 to under 15 seconds</span><span class="description">Customer disconnected from five to under fifteen seconds after system connection.</span></td><td class="value">36</td><td class="value">26</td><td class="value">10</td><td class="formula">26 + 10</td><td class="value">0</td></tr>
+        <tr><td><span class="label">Campaign abandon 15 to under 30 seconds</span><span class="description">Customer disconnected from fifteen to under thirty seconds after system connection.</span></td><td class="value">42</td><td class="value">30</td><td class="value">12</td><td class="formula">30 + 12</td><td class="value">0</td></tr>
+        <tr><td><span class="label">Campaign abandon 30 to under 60 seconds</span><span class="description">Customer disconnected from thirty to under sixty seconds after system connection.</span></td><td class="value">38</td><td class="value">28</td><td class="value">10</td><td class="formula">28 + 10</td><td class="value">0</td></tr>
+        <tr><td><span class="label">Campaign abandon 60 to under 120 seconds</span><span class="description">Customer waited at least one but less than two minutes after system connection.</span></td><td class="value">24</td><td class="value">16</td><td class="value">8</td><td class="formula">16 + 8</td><td class="value">0</td></tr>
+        <tr class="exception"><td><span class="label">Campaign abandon 120 seconds or longer</span><span class="description">Critical failure: customer waited at least two minutes after system connection.</span></td><td class="value">16</td><td class="value">12</td><td class="value">4</td><td class="formula">12 + 4</td><td class="value">0</td></tr>
+        <tr class="recon tie-total"><td><span class="label">Campaign-abandon duration roll-up</span><span class="description">Confirms every campaign abandon belongs to one exclusive time-to-agent band.</span><span class="formula">24 + 36 + 42 + 38 + 24 + 16 = 180.</span></td><td class="value">180</td><td class="value">130</td><td class="value">50</td><td class="formula">130 + 50</td><td class="value"><span class="table-priority-zero">0</span></td></tr>
+      </tbody></table>
+      <div class="source-note">GetMetricDataV2 provides cumulative campaign-abandon-after-X metrics. Exclusive bands require contact-level timestamps or subtraction between cumulative thresholds.</div>
+    </section>
+
+    <section class="audit-block" aria-labelledby="outbound-handled-title">
+      <div class="audit-head green"><h3 id="outbound-handled-title">6. Agent-connected outbound terminal-reason reconciliation</h3><p>Every agent-connected campaign contact is classified by one final contact-leg outcome.</p><span class="owner-badge owner-badge--operational">Call Center responsibility</span></div>
+      <table class="northstar-split-table" data-avg-time-enhanced="true"><thead><tr><th>Agent-connected terminal reason</th><th>Total</th><th>8 AM–8 PM ET</th><th>Non-office hours</th><th>Formula</th><th>Tie-out</th></tr></thead><tbody>
+        <tr><td><span class="label">Connected to campaign agent</span><span class="description">Parent agent-connected population carried forward from the human-answer flow.</span></td><td class="value">4,260</td><td class="value">3,710</td><td class="value">550</td><td class="formula">3,710 + 550</td><td class="value">0</td></tr>
+        <tr><td><span class="label">Outbound customer disconnect</span><span class="description">Agent-connected contact ended by the customer.</span></td><td class="value">2,350</td><td class="value">2,100</td><td class="value">250</td><td class="formula">2,100 + 250</td><td class="value">0</td></tr>
+        <tr><td><span class="label">Outbound agent disconnect</span><span class="description">Agent-connected contact ended by the agent.</span></td><td class="value">1,210</td><td class="value">1,080</td><td class="value">130</td><td class="formula">1,080 + 130</td><td class="value">0</td></tr>
+        <tr><td><span class="label">Outbound transfer / next contact leg</span><span class="description">Agent-connected contact created a linked transfer or successor contact leg.</span></td><td class="value">520</td><td class="value">410</td><td class="value">110</td><td class="formula">410 + 110</td><td class="value">0</td></tr>
+        <tr><td><span class="label">Other outbound terminal reason</span><span class="description">All remaining documented agent-connected terminal outcomes.</span></td><td class="value">180</td><td class="value">120</td><td class="value">60</td><td class="formula">120 + 60</td><td class="value">0</td></tr>
+        <tr class="recon tie-total"><td><span class="label">Outbound terminal-reason roll-up</span><span class="description">Confirms every agent-connected contact leg has one terminal reason.</span><span class="formula">2,350 + 1,210 + 520 + 180 = 4,260.</span></td><td class="value">4,260</td><td class="value">3,710</td><td class="value">550</td><td class="formula">3,710 + 550</td><td class="value"><span class="table-priority-zero">0</span></td></tr>
+      </tbody></table>
+    </section>
+
+    <section class="audit-block northstar-data-model" aria-labelledby="outbound-model-title">
+      <div class="audit-head green"><h3 id="outbound-model-title">7. Outbound campaign data model and source map</h3><p>Campaign events establish targeting and delivery lifecycle; contact records establish telephony, AMD, agent, queue, and disconnect outcomes.</p><span class="owner-badge owner-badge--operational">Special Ops data control</span></div>
+      <table><thead><tr><th>Source / table</th><th>Grain and join keys</th><th>Required outbound fields</th><th>Audit use</th></tr></thead><tbody>
+        <tr><td><span class="label">Outbound campaign events</span><span class="description">Amazon Connect data-lake lifecycle source for targeting, exclusions, sends, delivery, and recipient interaction.</span></td><td><code>campaign_event_id + instance_id</code>; join through <code>campaign_id</code> and optional <code>profile_id</code></td><td>campaign_event_timestamp, campaign_event_type, subtype, channel, campaign_id, profile_id</td><td>Recipients, send attempts, exclusions, delivery lifecycle</td></tr>
+        <tr><td><span class="label">Connect contact record</span><span class="description">Authoritative telephony contact-leg source.</span></td><td><code>contact_id + instance_id</code>; campaign join through <code>campaign_id</code></td><td>initiation method, campaign_id, AMD status, timestamps, queue, agent, disconnect reason, lineage IDs</td><td>Dial, AMD, human answer, agent connection, abandon, terminal outcomes</td></tr>
+        <tr><td><span class="label">Campaign-recipient fact</span><span class="description">Snowflake model at one recipient per campaign execution.</span></td><td><code>campaign_id + execution_id + recipient_key</code></td><td>targeted flag, exclusion reason, recipient timezone, consent/suppression status</td><td>Unique targeted-recipient reconciliation</td></tr>
+        <tr><td><span class="label">Campaign-attempt fact</span><span class="description">Snowflake model at one outbound voice delivery attempt.</span></td><td><code>campaign_id + contact_id</code></td><td>send event, delivery event, AMD status, system connection, greeting and agent timestamps</td><td>Attempt disposition and campaign-abandon timing</td></tr>
+        <tr><td><span class="label">Outbound audit aggregate</span><span class="description">Period, campaign, queue, delivery mode, and office-hours control output.</span></td><td>period + campaign + mode + time band + metric ID</td><td>Connect API value, Snowflake value, variance, source version, owner, status</td><td>All outbound zero-variance tables</td></tr>
+      </tbody></table>
+      <div class="northstar-lineage"><span>Outbound campaign events</span><b>→</b><span>Recipients + sends + exclusions</span><b>→</b><span>Contact records + AMD</span><b>→</b><span>Human/agent outcomes</span><b>→</b><span>API ↔ Snowflake controls</span></div>
+      <div class="source-note"><strong>HIPAA/compliance boundary:</strong> keep the dashboard aggregate. Do not expose phone numbers, names, patient context, recordings, or transcripts. Validate recipient-local calling windows, consent, suppression lists, campaign mode, and jurisdictional requirements outside this mock audit before production use.</div>
     </section>
   </div>
 </div>
@@ -4425,19 +4771,38 @@ window.addEventListener('load',()=>setTimeout(()=>{
 },240));
 </script>
 <style>
-.audit-tab[data-audit-tab="northstar-call-center"]{background:#e3f1e8!important;color:#2f6a4f!important}
-.audit-tab[data-audit-tab="northstar-call-center"].is-active{background:#4c8b69!important;color:#fff!important}
+.audit-tab[data-audit-tab="northstar-call-center"]{background:#f9dfdc!important;color:#8a302b!important}
+.audit-tab[data-audit-tab="northstar-call-center"].is-active{background:#b85c58!important;color:#fff!important}
+.audit-tab[data-audit-tab="northstar-outbound-calls"]{background:#fde8c9!important;color:#7a4c0d!important;text-decoration:none}
+.audit-tab[data-audit-tab="northstar-outbound-calls"].is-active{background:#b9822d!important;color:#fff!important}
+body:has(#northstar-outbound-calls-panel:target) [data-audit-panel]{display:none!important}
+body:has(#northstar-outbound-calls-panel:target) #northstar-outbound-calls-panel{display:block!important}
+body:has(#northstar-outbound-calls-panel:target) [data-audit-tab="northstar-outbound-calls"]{background:#b9822d!important;color:#fff!important}
+.northstar-outbound-hero{background:linear-gradient(135deg,#6f4915,#b9822d)}
 .northstar-callcenter-flow{position:relative}
 .northstar-callcenter-connector{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:4}
+.northstar-split-table th:first-child{width:34%}.northstar-split-table th:nth-child(2),.northstar-split-table th:nth-child(3),.northstar-split-table th:nth-child(4),.northstar-split-table th:nth-child(6){width:12%}.northstar-split-table th:nth-child(5){width:18%}
+.northstar-split-table th,.northstar-split-table td{padding-left:13px;padding-right:13px}.northstar-split-table th:nth-child(n+2),.northstar-split-table td:nth-child(n+2){text-align:right}.northstar-split-table .formula{color:var(--muted);font-size:11px;font-weight:650}
+.northstar-data-model table{table-layout:auto}.northstar-data-model th,.northstar-data-model td{text-align:left!important;vertical-align:top}.northstar-data-model th:nth-child(1){width:22%}.northstar-data-model th:nth-child(2){width:27%}.northstar-data-model th:nth-child(3){width:31%}.northstar-data-model th:nth-child(4){width:20%}.northstar-data-model code{padding:2px 5px;border-radius:4px;background:#f0f3f5;color:#31556b;font-size:11px}
+.northstar-lineage{display:grid;grid-template-columns:1fr auto 1.45fr auto 1fr auto 1fr auto 1fr;align-items:center;gap:8px;padding:16px 20px;background:#f5faf7;border-top:1px solid var(--line);color:#345f4d;font-size:11px;font-weight:800;text-align:center}.northstar-lineage span{padding:9px;border:1px solid #cfe2d8;border-radius:8px;background:#fff}.northstar-lineage b{color:#3f8a65;font-size:16px}
+.northstar-director-summary{margin-top:18px;padding:22px;border:1px solid #d7dee5;border-radius:16px;background:#fff;box-shadow:0 2px 8px rgba(22,22,20,.04)}.northstar-director-summary__head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding:3px 3px 18px}.northstar-director-summary__eyebrow{display:block;margin-bottom:5px;color:#8a302b;font-size:10px;font-weight:850;letter-spacing:.08em;text-transform:uppercase}.northstar-director-summary__head h2{margin:0;color:#163b58;font-size:25px;letter-spacing:-.03em}.northstar-director-summary__head p{margin:5px 0 0;color:var(--muted)}.northstar-director-summary__period{flex:none;padding:10px 13px;border-radius:10px;background:#edf3f7;color:#254d69;text-align:right}.northstar-director-summary__period strong,.northstar-director-summary__period span{display:block}.northstar-director-summary__period span{margin-top:2px;color:#607484;font-size:10px}
+.northstar-kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.northstar-kpi-grid article{padding:14px;border:1px solid #dce2e6;border-top:3px solid #4c789b;border-radius:11px;background:#f9fbfc}.northstar-kpi-grid article.is-healthy{border-top-color:#3f8a65;background:#f3faf6}.northstar-kpi-grid article.is-alert{border-top-color:#b85c58;background:#fdf5f4}.northstar-kpi-grid article.is-warning{border-top-color:#b9822d;background:#fffaf0}.northstar-kpi-grid span,.northstar-kpi-grid small,.northstar-kpi-grid strong{display:block}.northstar-kpi-grid span{color:#536575;font-size:10px;font-weight:800;text-transform:uppercase}.northstar-kpi-grid strong{margin-top:5px;color:#173d59;font-size:24px}.northstar-kpi-grid small{margin-top:2px;color:#687581;font-size:10px}
+.northstar-metric-pair{margin-top:12px;padding:13px;border:1px solid #ead9c1;border-radius:11px;background:#fffbf5}.northstar-metric-pair__head{display:flex;align-items:center;justify-content:space-between;gap:12px}.northstar-metric-pair__head span,.northstar-metric-pair__head strong{display:block}.northstar-metric-pair__head span{color:#806a4b;font-size:9px;font-weight:850;letter-spacing:.06em;text-transform:uppercase}.northstar-metric-pair__head strong{margin-top:2px;color:#5f4a2d;font-size:11px}.northstar-metric-pair__head b{padding:5px 8px;border-radius:99px;background:#f9dfdc;color:#8a302b;font-size:9px;white-space:nowrap}.northstar-metric-pair__grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.northstar-metric-pair article{padding:11px;border:1px solid #e4d9c8;border-left:4px solid #b9822d;border-radius:9px;background:#fff}.northstar-metric-pair article.is-alert{border-left-color:#b85c58}.northstar-metric-pair article span,.northstar-metric-pair article strong,.northstar-metric-pair article small,.northstar-metric-pair article code{display:block}.northstar-metric-pair article span{color:#52616c;font-size:10px;font-weight:850}.northstar-metric-pair article strong{margin-top:2px;color:#173d59;font-size:22px}.northstar-metric-pair article small{margin-top:3px;color:#6d747a;font-size:9px;line-height:1.35}.northstar-metric-pair article code{margin-top:7px;color:#6f4915;font-size:9px;font-weight:800}.northstar-definition-table{table-layout:auto}.northstar-definition-table th,.northstar-definition-table td{padding-left:11px;padding-right:11px;vertical-align:top}.northstar-definition-table th:first-child{width:25%}.northstar-definition-table th:nth-child(2),.northstar-definition-table th:nth-child(3),.northstar-definition-table th:nth-child(4){width:8%}.northstar-definition-table th:nth-child(5){width:30%}.northstar-definition-table th:nth-child(6){width:21%}.northstar-definition-table td:nth-child(2),.northstar-definition-table td:nth-child(3),.northstar-definition-table td:nth-child(4){text-align:right}.northstar-definition-table td:nth-child(5),.northstar-definition-table td:nth-child(6){font-size:10px;line-height:1.4}.northstar-definition-table code{display:block;overflow-wrap:anywhere;color:#31556b;font-size:9px;font-weight:800}.northstar-definition-table small{display:block;margin-top:3px;color:var(--muted);font-size:8px}
+.northstar-flow-map{display:grid;grid-template-columns:1.25fr auto 1fr 1fr;align-items:stretch;gap:9px;margin-top:14px}.northstar-flow-map>div{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 15px;border:1px solid #cfdce5;border-radius:10px;background:#edf4f8;color:#204761}.northstar-flow-map>div.is-healthy{border-color:#c6dfd2;background:#edf8f2;color:#28664b}.northstar-flow-map>div.is-alert{border-color:#efcbc7;background:#fdf0ef;color:#8a302b}.northstar-flow-map b{align-self:center;color:#668196;font-size:18px}.northstar-flow-map span{font-size:11px;font-weight:800}.northstar-flow-map strong{font-size:15px}
+.northstar-outcome-strip{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:7px;margin-top:9px}.northstar-outcome-strip article{padding:10px;border:1px solid #e2e2df;border-radius:9px;background:#fafaf8}.northstar-outcome-strip article.is-alert{border-color:#efcbc7;background:#fdf0ef}.northstar-outcome-strip span,.northstar-outcome-strip strong,.northstar-outcome-strip small{display:block}.northstar-outcome-strip span{min-height:27px;color:#53616d;font-size:9px;font-weight:800}.northstar-outcome-strip strong{margin-top:4px;color:#173d59;font-size:17px}.northstar-outcome-strip small{margin-top:2px;color:#747b82;font-size:9px}
+.northstar-director-insight{display:grid;grid-template-columns:1.35fr 1fr;gap:16px;margin-top:16px;padding:16px;border-radius:12px;background:#fff4df;border:1px solid #eed6a8}.northstar-director-insight__label{color:#8b5f1e;font-size:10px;font-weight:850;letter-spacing:.07em;text-transform:uppercase}.northstar-director-insight h3{margin:4px 0 5px;color:#6f4915;font-size:17px}.northstar-director-insight p{margin:0;color:#705a3b;font-size:11px}.northstar-director-insight table{border:1px solid #e6d3ad;border-radius:8px;overflow:hidden;background:#fff}.northstar-director-insight th,.northstar-director-insight td{padding:8px 9px!important;font-size:9px}.northstar-director-insight th:nth-child(n),.northstar-director-insight td:nth-child(n){text-align:right}.northstar-director-insight th:first-child,.northstar-director-insight td:first-child{text-align:left}
+.northstar-director-actions{margin-top:16px}.northstar-director-actions h3{margin:0 0 8px;color:#173d59;font-size:15px}.northstar-director-actions ol{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:0;padding:0;list-style:none;counter-reset:director-action}.northstar-director-actions li{position:relative;padding:12px 12px 12px 38px;border:1px solid #dce2e6;border-radius:10px;background:#f8fafb;counter-increment:director-action}.northstar-director-actions li::before{content:counter(director-action);position:absolute;left:12px;top:12px;display:grid;place-items:center;width:18px;height:18px;border-radius:99px;background:#173d59;color:#fff;font-size:10px;font-weight:900}.northstar-director-actions strong,.northstar-director-actions span{display:block}.northstar-director-actions strong{color:#243f54;font-size:11px}.northstar-director-actions span{margin-top:4px;color:#687581;font-size:10px;line-height:1.35}
+@media(max-width:900px){.northstar-kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.northstar-metric-pair__head{display:block}.northstar-metric-pair__head b{display:inline-block;margin-top:6px}.northstar-metric-pair__grid{grid-template-columns:1fr}.northstar-flow-map{grid-template-columns:1fr}.northstar-flow-map b{transform:rotate(90deg);justify-self:center}.northstar-outcome-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.northstar-director-insight{grid-template-columns:1fr}.northstar-director-actions ol{grid-template-columns:1fr}}
+@media(max-width:800px){.northstar-director-summary__head{display:block}.northstar-director-summary__period{margin-top:12px;text-align:left}.northstar-split-table{min-width:760px}.northstar-data-model{overflow-x:auto}.northstar-data-model table{min-width:760px}.northstar-lineage{grid-template-columns:1fr}.northstar-lineage b{transform:rotate(90deg)}}
 </style>
 <script>
-/* Northstar Call Center: green carry-forward connectors linking the total
-   missed calls rows and the bottom zero tie-out rows across both tables. */
+/* Northstar Call Center: carry-forward connectors link parent populations
+   to their detailed reconciliation tables without changing audit grain. */
 document.addEventListener('DOMContentLoaded',()=>{
   const panel=document.querySelector('[data-audit-panel="northstar-call-center"]');
   const flow=panel?.querySelector('.northstar-callcenter-flow');
   if(!flow)return;
-  const lanes={missed:26,tieout:13};
+  const lanes={'not-connected':28,abandoned:20,handled:12,tieout:4};
   const draw=()=>{
     if(panel.hidden)return;
     flow.querySelector('.northstar-callcenter-connector')?.remove();
@@ -4465,6 +4830,169 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.querySelector('[data-audit-tab="northstar-call-center"]')?.addEventListener('click',schedule);
   window.addEventListener('resize',schedule,{passive:true});
   window.addEventListener('load',schedule);
+});
+</script>
+<script>
+/* Northstar row glossary: keep a concise operational definition directly
+   beneath every audit item without duplicating already-authored descriptions. */
+document.addEventListener('DOMContentLoaded',()=>{
+  const descriptions={
+    'Inbound population roll-up':'Confirms connected and not-connected populations sum to every eligible inbound call.',
+    'Not-connected outcome roll-up':'Confirms every contact without an agent connection has exactly one terminal-path classification.',
+    'Queue-abandon duration roll-up':'Confirms every abandoned queue contact is assigned to exactly one wait-time band.',
+    'Total eligible inbound calls':'All in-scope inbound voice journeys after channel and test-contact exclusions.',
+    'Connected to an agent':'Inbound contacts with an agent connection timestamp.',
+    'Not connected to an agent':'Inbound contacts that ended or exited routing without an agent connection.',
+    'Contacts abandoned in queue':'Customers who disconnected while queued before an agent connection; callbacks are excluded.',
+    'Short abandon: under 5 seconds':'Abandoned queue contacts with less than five seconds of queue wait time.',
+    'Abandoned 5 to under 15 seconds':'Abandoned queue contacts waiting at least five but less than fifteen seconds.',
+    'Abandoned 15 to under 30 seconds':'Abandoned queue contacts waiting at least fifteen but less than thirty seconds.',
+    'Abandoned 30 to under 60 seconds':'Abandoned queue contacts waiting at least thirty but less than sixty seconds.',
+    'Abandoned 60 seconds or longer':'Abandoned queue contacts waiting at least sixty seconds before disconnecting.',
+    'Caller disconnected before queue':'Calls ending in the IVR or contact flow before entering a queue.',
+    'Callback selected':'Contacts removed from the live queue through the approved callback path.',
+    'Transferred from queue':'Queue episodes that created a successor transfer contact instead of connecting or abandoning.',
+    'Contact-flow disconnect':'Contacts terminated by configured flow logic before an agent connection.',
+    'System/routing disconnect':'Contacts terminated by system, telecom, capacity, or routing failure.',
+    'Other / unmapped outcome':'Temporary completeness bucket for outcomes that still require a formal mapping rule.',
+    'Time-band completeness':'Confirms office-hours and non-office-hours populations sum to the full inbound population.',
+    '8 AM–8 PM ET':'Calls initiated during the defined office-hours window in America/New_York.',
+    'Non-office hours':'Calls initiated before 8:00 AM or at/after 8:00 PM in America/New_York.',
+    'Customer disconnect':'Handled contact legs where the customer ended the interaction.',
+    'Agent disconnect':'Handled contact legs where the agent ended the interaction.',
+    'Transfer / next contact leg':'Handled contact legs ending through a transfer into a linked successor record.',
+    'Other handled terminal reason':'Handled contacts ending through another documented terminal reason.',
+    'Handled terminal-reason roll-up':'Confirms every handled contact leg has exactly one terminal-reason classification.',
+    'Resumed and completed after hold':'Contacts removed from hold and completed without disconnecting while held.',
+    'Contacts disconnected while on hold':'Handled contacts ending while the customer remained in the on-hold state.',
+    'Customer hold disconnect':'On-hold contacts ended by the customer.',
+    'Agent hold disconnect':'On-hold contacts ended by the agent.',
+    'Hold population roll-up':'Confirms resumed contacts plus hold disconnects equal all contacts placed on hold.',
+    'Accepted / connected offers':'Agent routing offers accepted and connected to an agent.',
+    'Agent or routing error':'Offer attempts failing because of an agent endpoint or routing error.',
+    'Agent-offer roll-up':'Confirms accepted, non-response, and error outcomes equal all agent offer attempts.',
+    'Contact legs mapped to one root journey':'Contact records resolving through lineage fields to one original inbound journey.',
+    'Duplicate ContactId records':'Repeated source identifiers that would break one-row-per-contact-leg grain.',
+    'Orphan PreviousContactId references':'Contact legs pointing to a predecessor record that is absent from the source population.',
+    'Unresolved NextContactId references':'Contact legs declaring a successor record that cannot be found.',
+    'Contact legs mapped to multiple roots':'Invalid lineage cases where one contact leg resolves to more than one inbound journey.',
+    'Lineage completeness':'Confirms all contact legs resolve to one root with no duplicate or broken relationships.',
+    'Queue segment fact':'One queue episode per contact and queue, containing enqueue, duration, and exit information.',
+    'Agent-offer fact':'One routing offer attempt per contact, agent, and offer timestamp.',
+    'Normalized contact-leg fact':'One standardized row per Connect ContactId with derived outcome and reporting fields.',
+    'Root inbound journey fact':'One deduplicated customer-call journey assembled from all linked contact legs.',
+    'Audit control aggregate':'Period-level control results containing observed, expected, variance, ownership, and status.'
+  };
+  document.querySelectorAll('[data-audit-panel="northstar-call-center"] tbody tr').forEach(row=>{
+    const label=row.querySelector('.label');
+    if(!label||row.querySelector('.description'))return;
+    const copy=descriptions[label.textContent.trim()];
+    if(!copy)return;
+    const description=document.createElement('span');
+    description.className='description';
+    description.textContent=copy;
+    label.insertAdjacentElement('afterend',description);
+  });
+});
+</script>
+<style>
+.northstar-table-scroll{width:100%;overflow-x:auto;border-top:1px solid var(--line)}
+.northstar-table-scroll>table.northstar-source-recon{width:100%;min-width:1180px;table-layout:fixed;border-top:0}
+.northstar-source-recon th,.northstar-source-recon td{padding-left:9px!important;padding-right:9px!important;text-align:right!important;vertical-align:top}
+.northstar-source-recon th:first-child,.northstar-source-recon td:first-child{width:270px;text-align:left!important}
+.northstar-source-recon thead tr:first-child th{background:#eef4f7;color:#264c66;font-size:9px;border-bottom:1px solid #d6e0e6}
+.northstar-source-recon thead tr:first-child th:nth-child(2){background:#edf5fb;color:#24587b}
+.northstar-source-recon thead tr:first-child th:nth-child(3){background:#eff8f3;color:#2b654c}
+.northstar-source-recon thead tr:first-child th:nth-child(4){background:#f7f4ee;color:#765b31}
+.northstar-source-recon thead tr:nth-child(2) th{font-size:8px;line-height:1.25;white-space:normal}
+.northstar-source-recon .source-api{color:#24587b;font-weight:800}
+.northstar-source-recon .source-snowflake{color:#2b654c;font-weight:800}
+.northstar-source-recon .source-variance{color:#3f8a65;font-weight:900}
+.northstar-source-recon .source-variance.has-variance{color:#ad3f38}
+.northstar-source-recon .source-variance small{display:block;margin-top:2px;font-size:8px;font-weight:750}
+@media(max-width:800px){.northstar-table-scroll>table.northstar-source-recon{min-width:1080px}.northstar-source-recon th:first-child,.northstar-source-recon td:first-child{width:230px}}
+</style>
+<script>
+/* Northstar source reconciliation: normalize every numeric audit table to
+   Connect API vs Snowflake, split into office and non-office populations. */
+document.addEventListener('DOMContentLoaded',()=>{
+  const panels=document.querySelectorAll('[data-audit-panel="northstar-call-center"],[data-audit-panel="northstar-outbound-calls"]');
+  if(!panels.length)return;
+  const outboundButton=document.querySelector('[data-audit-tab="northstar-outbound-calls"]');
+  outboundButton?.addEventListener('click',()=>{
+    document.querySelectorAll('[data-audit-panel]').forEach(panel=>panel.hidden=panel.dataset.auditPanel!=='northstar-outbound-calls');
+    document.querySelectorAll('[data-audit-tab]').forEach(tab=>{
+      const active=tab.dataset.auditTab==='northstar-outbound-calls';
+      tab.classList.toggle('is-active',active);
+      if(active)tab.setAttribute('aria-current','page');else tab.removeAttribute('aria-current');
+    });
+  });
+  const timeBands={
+    'Total eligible inbound calls':[3010,650],
+    'Connected to an agent':[2865,547],
+    'Not connected to an agent':[145,103],
+    'Inbound population roll-up':[3010,650],
+    'Contacts abandoned in queue':[82,76],
+    'Caller disconnected before queue':[22,12],
+    'Callback selected / removed from queue':[16,4],
+    'Transferred from queue':[8,4],
+    'Contact-flow disconnect':[7,3],
+    'System or routing disconnect':[5,3],
+    'Other / unmapped not-connected outcome':[5,1,0,0],
+    'Not-connected outcome roll-up':[145,103],
+    'Short abandon: under 5 seconds':[29,32],
+    '5 to under 15 seconds':[20,18],
+    '15 to under 30 seconds':[15,12],
+    '30 to under 60 seconds':[10,8],
+    '60 to under 120 seconds':[5,4],
+    '120 seconds or longer':[3,2],
+    'Queue-abandon duration roll-up':[82,76],
+    'Total contact legs':[3350,678],
+    'Contact legs mapped to one root journey':[3350,678],
+    'Duplicate ContactId records':[0,0],
+    'Orphan PreviousContactId references':[0,0],
+    'Unresolved NextContactId references':[0,0],
+    'Contact legs mapped to multiple roots':[0,0],
+    'Lineage completeness':[3350,678]
+  };
+  const number=value=>Number.parseFloat(String(value||'0').replace(/[^0-9.-]/g,''))||0;
+  const format=value=>Number(value).toLocaleString('en-US');
+  const variance=(api,snowflake)=>api-snowflake;
+  const varianceCell=value=>`<td class="source-variance${value?' has-variance':''}">${format(value)}<small>${value?'⚠ Investigate':'✓ Tied out'}</small></td>`;
+  panels.forEach(panel=>panel.querySelectorAll('table[data-avg-time-enhanced="true"]').forEach(table=>{
+    if(table.closest('.northstar-data-model')||table.dataset.sourceReconciled==='true')return;
+    const wasSplit=table.classList.contains('northstar-split-table');
+    table.querySelectorAll('tbody tr').forEach(row=>{
+      const cells=[...row.children];
+      const label=row.querySelector('.label')?.textContent.trim()||'';
+      const first=cells[0]?.innerHTML||'';
+      let apiTotal,snowflakeTotal,apiOffice,snowflakeOffice,apiNonOffice,snowflakeNonOffice;
+      if(wasSplit){
+        apiTotal=number(cells[1]?.textContent);
+        snowflakeTotal=apiTotal;
+        apiOffice=number(cells[2]?.textContent);
+        snowflakeOffice=apiOffice;
+        apiNonOffice=number(cells[3]?.textContent);
+        snowflakeNonOffice=apiNonOffice;
+      }else{
+        apiTotal=number(cells[1]?.textContent);
+        snowflakeTotal=number(cells[3]?.textContent);
+        const split=timeBands[label]||[apiTotal,0];
+        apiOffice=split[0];apiNonOffice=split[1];
+        snowflakeOffice=split[2]??apiOffice;snowflakeNonOffice=split[3]??apiNonOffice;
+      }
+      row.innerHTML=`<td>${first}</td><td class="source-api">${format(apiTotal)}</td><td class="source-snowflake">${format(snowflakeTotal)}</td>${varianceCell(variance(apiTotal,snowflakeTotal))}<td class="source-api">${format(apiOffice)}</td><td class="source-snowflake">${format(snowflakeOffice)}</td>${varianceCell(variance(apiOffice,snowflakeOffice))}<td class="source-api">${format(apiNonOffice)}</td><td class="source-snowflake">${format(snowflakeNonOffice)}</td>${varianceCell(variance(apiNonOffice,snowflakeNonOffice))}`;
+    });
+    table.querySelector('thead').innerHTML='<tr><th rowspan="2">Audit population</th><th colspan="3">Full reporting period</th><th colspan="3">Office hours · 8 AM–8 PM ET</th><th colspan="3">Non-office hours</th></tr><tr><th>Connect API</th><th>Snowflake</th><th>Variance</th><th>Connect API</th><th>Snowflake</th><th>Variance</th><th>Connect API</th><th>Snowflake</th><th>Variance</th></tr>';
+    table.querySelector('colgroup')?.remove();
+    table.querySelectorAll('.avg-time-heading,.avg-time-cell').forEach(cell=>cell.remove());
+    table.classList.add('northstar-source-recon');
+    table.dataset.sourceReconciled='true';
+    const wrapper=document.createElement('div');
+    wrapper.className='northstar-table-scroll';
+    table.parentNode.insertBefore(wrapper,table);
+    wrapper.append(table);
+  }));
 });
 </script>
 </html>
