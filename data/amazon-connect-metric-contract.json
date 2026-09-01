@@ -1,0 +1,2513 @@
+{
+  "contract_version": 2,
+  "governance_playbook": "docs/call-center-metric-governance-playbook.md",
+  "governance_rule": "Every call-center metric change must compare the director question, Connect Assistant interpretation and value, reproducible Amazon API result, Snowflake semantic result, and dashboard display for an identical request envelope; update the playbook when the process or learned rules change.",
+  "dictionary_concept": {
+    "centerwide": {
+      "dashboard": "Call Center Metrics",
+      "dictionary": "Call Center Metrics Dictionary"
+    },
+    "inbound": {
+      "dashboard": "Inbound Dashboard",
+      "dictionary": "Inbound Data Dictionary"
+    },
+    "outbound": {
+      "dashboard": "Outbound Dashboard",
+      "dictionary": "Outbound Data Dictionary"
+    },
+    "agent": {
+      "dashboard": "Agent Performance Dashboard",
+      "dictionary": "Agent Data Dictionary"
+    },
+    "purpose": "Pair each action-oriented dashboard with a verified data dictionary that shows exactly how every value is sourced or derived and records verification against Amazon Connect Assistant and a reproducible Amazon API request.",
+    "required_dashboard_fields": [
+      "owner",
+      "exception",
+      "next_action",
+      "verified_definition_link"
+    ],
+    "required_definition_fields": [
+      "source_field",
+      "plain_english_meaning",
+      "classification",
+      "formula",
+      "connect_assistant_verification",
+      "api_verification",
+      "reconciliation_lineage"
+    ],
+    "classification_presentation": "basic_text_no_icon"
+  },
+  "call_center_metrics": {
+    "version": "2026-08-29b",
+    "purpose": "A centerwide director page containing only high-impact metrics whose exact definitions live in the paired Call Center Metrics Dictionary.",
+    "api_reproduced_at_utc": "2026-08-29T19:00:51Z",
+    "assistant_comparison_rule": "Publish Assistant verified only when the label, value, window, timezone, queue scope, channel, initiation-method scope, threshold, and metric grain match the reproducible API envelope.",
+    "metrics": [
+      {
+        "id": "contacts_abandoned",
+        "display_value": 6904,
+        "display_window": "2026-08-01T04:00:00Z/2026-08-27T04:00:00Z",
+        "classification": "AMAZON_PROVIDED",
+        "verification": "API_VERIFIED_ASSISTANT_SCOPE_DIFFERENT",
+        "assistant_comparison": {
+          "value": 106034,
+          "scope": "all VOICE initiation methods",
+          "result": "NOT_COMPARABLE_FILTER_NOT_APPLIED"
+        },
+        "amazon": {
+          "api": "GetMetricDataV2",
+          "metric": "CONTACTS_ABANDONED",
+          "filters": {
+            "QUEUE": "all_standard_queues",
+            "CHANNEL": [
+              "VOICE"
+            ]
+          },
+          "timezone": "America/New_York",
+          "interval": "TOTAL",
+          "grain": "queue_contact_leg_aggregate",
+          "event_time": "disconnect",
+          "historical_request_grain": "TOTAL over 2026-08-01/2026-08-27 ET. Month points use one TOTAL request per ET month; hour-of-week uses HOUR."
+        },
+        "snowflake": {
+          "target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+          "semantic": "contacts_abandoned",
+          "tests": [
+            "assistant_api_dashboard_values_equal_for_same_envelope",
+            "interval_sum_reconciles_to_total_for_same_envelope"
+          ],
+          "column": "CONTACTS_ABANDONED",
+          "grain": "queue x interval",
+          "primary_key": "(instance_id, queue_id, channel, interval_start_ts, interval_period)",
+          "additive_across_intervals": true
+        }
+      },
+      {
+        "id": "contacts_incoming",
+        "display_value": 17844,
+        "display_window": "2026-08-01T04:00:00Z/2026-08-27T04:00:00Z",
+        "classification": "AMAZON_PROVIDED",
+        "verification": "API_VERIFIED_ASSISTANT_SCOPE_DIFFERENT",
+        "assistant_comparison": {
+          "value": 33149,
+          "scope": "all VOICE initiation methods",
+          "result": "NOT_COMPARABLE_FILTER_NOT_APPLIED"
+        },
+        "amazon": {
+          "api": "GetMetricDataV2",
+          "metric": "CONTACTS_CREATED",
+          "metric_filters": {
+            "INITIATION_METHOD": [
+              "INBOUND",
+              "TRANSFER",
+              "QUEUE_TRANSFER"
+            ]
+          },
+          "filters": {
+            "QUEUE": "all_standard_queues",
+            "CHANNEL": [
+              "VOICE"
+            ]
+          },
+          "timezone": "America/New_York",
+          "interval": "TOTAL",
+          "grain": "contact_leg_aggregate",
+          "event_time": "creation",
+          "historical_request_grain": "TOTAL over 2026-08-01/2026-08-27 ET. The three initiation methods are applied inside the metric filter, not after aggregation."
+        },
+        "snowflake": {
+          "target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+          "semantic": "contacts_incoming",
+          "tests": [
+            "INBOUND_plus_TRANSFER_plus_QUEUE_TRANSFER_equals_parent",
+            "interval_sum_reconciles_to_total_for_same_envelope"
+          ],
+          "column": "CONTACTS_INCOMING",
+          "grain": "queue x initiation_method x interval",
+          "primary_key": "(instance_id, queue_id, channel, initiation_method, interval_start_ts, interval_period)",
+          "additive_across_intervals": true
+        }
+      },
+      {
+        "id": "contacts_handled_incoming",
+        "display_value": 11205,
+        "display_window": "2026-08-01T04:00:00Z/2026-08-27T04:00:00Z",
+        "classification": "AMAZON_PROVIDED",
+        "verification": "API_AND_CONNECT_ASSISTANT_VERIFIED",
+        "amazon": {
+          "api": "GetMetricDataV2",
+          "metric": "CONTACTS_HANDLED",
+          "metric_filters": {
+            "INITIATION_METHOD": [
+              "INBOUND",
+              "TRANSFER",
+              "QUEUE_TRANSFER"
+            ]
+          },
+          "filters": {
+            "QUEUE": "all_standard_queues",
+            "CHANNEL": [
+              "VOICE"
+            ]
+          },
+          "timezone": "America/New_York",
+          "interval": "TOTAL",
+          "grain": "handled_contact_leg_aggregate",
+          "event_time": "completion_disconnect",
+          "historical_request_grain": "TOTAL over 2026-08-01/2026-08-27 ET on the same initiation-method filter as the created parent."
+        },
+        "snowflake": {
+          "target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+          "semantic": "contacts_handled_incoming",
+          "tests": [
+            "INBOUND_plus_TRANSFER_plus_QUEUE_TRANSFER_equals_parent",
+            "interval_sum_reconciles_to_total_for_same_envelope"
+          ],
+          "column": "CONTACTS_HANDLED_INCOMING",
+          "grain": "queue x initiation_method x interval",
+          "primary_key": "(instance_id, queue_id, channel, initiation_method, interval_start_ts, interval_period)",
+          "additive_across_intervals": true
+        }
+      },
+      {
+        "id": "queue_abandonment_rate",
+        "display_value": 27.5608782435,
+        "display_window": "2026-08-01T04:00:00Z/2026-08-27T04:00:00Z",
+        "classification": "AMAZON_PROVIDED",
+        "verification": "API_AND_CONNECT_ASSISTANT_VERIFIED",
+        "amazon": {
+          "api": "GetMetricDataV2",
+          "metric": "ABANDONMENT_RATE",
+          "filters": {
+            "QUEUE": "all_standard_queues",
+            "CHANNEL": [
+              "VOICE"
+            ]
+          },
+          "timezone": "America/New_York",
+          "interval": "TOTAL",
+          "grain": "metric_filter_set",
+          "historical_request_grain": "TOTAL over 2026-08-01/2026-08-27 ET. A rate is NOT additive across intervals; store the native value with its window and carry numerator/denominator to re-derive."
+        },
+        "snowflake": {
+          "target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+          "semantic": "queue_abandonment_rate",
+          "tests": [
+            "preserve_native_rate",
+            "do_not_replace_with_silent_arithmetic",
+            "non_additive_metric_stored_with_its_window_not_re_aggregated"
+          ],
+          "column": "QUEUE_ABANDONMENT_RATE",
+          "grain": "queue x interval",
+          "primary_key": "(instance_id, queue_id, channel, interval_start_ts, interval_period)",
+          "additive_across_intervals": false
+        }
+      },
+      {
+        "id": "service_level_lt_30_seconds",
+        "display_value": 59.4491017964,
+        "display_window": "2026-08-01T04:00:00Z/2026-08-27T04:00:00Z",
+        "classification": "AMAZON_PROVIDED",
+        "verification": "API_AND_CONNECT_ASSISTANT_VERIFIED",
+        "amazon": {
+          "api": "GetMetricDataV2",
+          "metric": "SERVICE_LEVEL",
+          "threshold": [
+            {
+              "Comparison": "LT",
+              "ThresholdValue": 30
+            }
+          ],
+          "filters": {
+            "QUEUE": "all_standard_queues",
+            "CHANNEL": [
+              "VOICE"
+            ]
+          },
+          "timezone": "America/New_York",
+          "interval": "TOTAL",
+          "grain": "metric_filter_threshold_set",
+          "historical_request_grain": "TOTAL over 2026-08-01/2026-08-27 ET. The LT 30 threshold is part of the request key; a different threshold is a different column, not a re-aggregation."
+        },
+        "snowflake": {
+          "target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+          "semantic": "service_level_lt_30_seconds",
+          "tests": [
+            "threshold_is_part_of_primary_key",
+            "non_additive_metric_stored_with_its_window_not_re_aggregated"
+          ],
+          "column": "SERVICE_LEVEL_LT_30_SECONDS",
+          "grain": "queue x interval x threshold",
+          "primary_key": "(instance_id, queue_id, channel, interval_start_ts, interval_period, threshold_comparison, threshold_value)",
+          "additive_across_intervals": false
+        }
+      },
+      {
+        "id": "outbound_calls_answered",
+        "display_value": 8980,
+        "display_window": "2026-08-01T04:00:00Z/2026-08-16T04:00:00Z",
+        "classification": "AMAZON_PROVIDED",
+        "verification": "API_AND_CONNECT_ASSISTANT_VALUE_VERIFIED",
+        "assistant_comparison": {
+          "value": 8980,
+          "label": "CONTACTS_HANDLED_OUTBOUND",
+          "result": "VALUE_MATCH_LABEL_REJECTED_BY_LIVE_API"
+        },
+        "amazon": {
+          "api": "GetMetricDataV2",
+          "metric": "CONTACTS_HANDLED_CONNECTED_TO_AGENT_TIME",
+          "metric_filters": {
+            "INITIATION_METHOD": [
+              "OUTBOUND"
+            ]
+          },
+          "filters": {
+            "CHANNEL": [
+              "VOICE"
+            ]
+          },
+          "timezone": "America/New_York",
+          "grain": "direct_outbound_contact_leg_aggregate",
+          "historical_request_grain": "TOTAL over 2026-08-01/2026-08-16 ET. A DIFFERENT window from the inbound cards; never added to Aug 1-26 values."
+        },
+        "snowflake": {
+          "target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+          "semantic": "outbound_calls_answered",
+          "tests": [
+            "never_mix_direct_outbound_with_campaign_recipient_grain",
+            "interval_sum_reconciles_to_total_for_same_envelope"
+          ],
+          "column": "OUTBOUND_CALLS_ANSWERED",
+          "grain": "queue x initiation_method x interval",
+          "primary_key": "(instance_id, queue_id, channel, initiation_method, interval_start_ts, interval_period)",
+          "additive_across_intervals": true
+        }
+      },
+      {
+        "id": "available_voice_agents_current",
+        "display_value": 8,
+        "status_available_users_context": 13,
+        "returned_users_context": 17,
+        "observed_at_utc": "2026-08-29T19:13:19.031Z",
+        "classification": "AMAZON_PROVIDED",
+        "verification": "API_AND_CONNECT_ASSISTANT_VERIFIED",
+        "assistant_comparison": {
+          "available_voice_agents": 8,
+          "result": "VERIFIED_EQUAL"
+        },
+        "amazon": {
+          "api": "GetCurrentMetricData",
+          "metric": "AGENTS_AVAILABLE",
+          "unit": "COUNT",
+          "filters": {
+            "QUEUE": "all_standard_queues",
+            "CHANNEL": [
+              "VOICE"
+            ]
+          },
+          "grain": "current_metric_snapshot",
+          "historical_request_grain": "Point-in-time snapshot, not an interval. GetCurrentMetricData has no interval grain; the snapshot timestamp IS the grain and snapshots must never be summed."
+        },
+        "diagnostic_context": {
+          "api": "GetCurrentUserData",
+          "fields": [
+            "User.Id",
+            "Status.StatusName",
+            "AvailableSlotsByChannel.VOICE"
+          ],
+          "status_available_users": 13,
+          "returned_users": 17,
+          "rule": "Do not substitute status-label headcount for open voice capacity."
+        },
+        "snowflake": {
+          "target": "ANALYTICS_CONNECT.FCT_CONNECT_CURRENT_METRIC_SNAPSHOT",
+          "primary_key": "(instance_id, metric_name, filter_hash, snapshot_ts)",
+          "tests": [
+            "snapshot_timestamp_present",
+            "metric_value_nonnegative",
+            "dashboard_uses_AGENTS_AVAILABLE_not_status_headcount",
+            "non_additive_metric_stored_with_its_window_not_re_aggregated"
+          ],
+          "column": "AGENTS_AVAILABLE",
+          "grain": "snapshot",
+          "additive_across_intervals": false
+        }
+      },
+      {
+        "id": "campaign_reach_rate",
+        "display_name": "Campaign connection rate",
+        "display_value": 15.9,
+        "classification": "DERIVED",
+        "verification": "API_VERIFIED",
+        "display_window": "2026-08-27/2026-08-29 America/New_York",
+        "meaning": "Share of campaign send attempts that produced a connected campaign contact. This is attempt-based, not recipient-based reach.",
+        "amazon": {
+          "apis": ["connectcampaignsv2:ListCampaigns", "connect:GetMetricDataV2"],
+          "campaign_id": "3bdfe7c6-f1f8-4cdb-b63c-cd15b32cbf2f",
+          "campaign_name": "NY-NL-1-1032-v2-08-27",
+          "metrics": {"CAMPAIGN_SEND_ATTEMPTS": 44, "CAMPAIGN_CONTACTS_CONNECTED": 7, "RECIPIENTS_TARGETED": 85, "CAMPAIGN_PROGRESS_RATE": 100},
+          "grain": "campaign_metric_interval",
+          "historical_request_grain": "TOTAL over Aug 27-28 ET at campaign scope"
+        },
+        "formula": "CAMPAIGN_CONTACTS_CONNECTED / CAMPAIGN_SEND_ATTEMPTS * 100 = 7 / 44 * 100 = 15.9%. RECIPIENTS_TARGETED is not the denominator.",
+        "snowflake": {
+          "target": "ANALYTICS_CONNECT.FCT_CAMPAIGN_METRIC_INTERVAL",
+          "semantic": "campaign_connection_rate",
+          "tests": [
+            "connected_contacts_lte_send_attempts",
+            "display_rate_equals_connected_divided_by_attempts"
+          ],
+          "columns": ["CAMPAIGN_CONTACTS_CONNECTED", "CAMPAIGN_SEND_ATTEMPTS", "CAMPAIGN_CONNECTION_RATE"],
+          "grain": "campaign x interval",
+          "primary_key": "(campaign_id, interval_start_ts, interval_period)",
+          "additive_across_intervals": false
+        }
+      },
+      {
+        "id": "contacts_abandoned_trend_12m",
+        "display_name": "Contacts abandoned - 12-month trend",
+        "display_value": null,
+        "display_window": "2025-09-01T04:00:00Z/2026-09-01T04:00:00Z",
+        "classification": "DERIVED",
+        "verification": "PARTIAL_API_HISTORY",
+        "meaning": "Month-by-month view of the same queued abandoned population. Jun-Aug 2026 are API totals; Sep 2025-May 2026 are provisional archive placeholders.",
+        "api_verified_points": {"2026-06": 10889, "2026-07": 11864, "2026-08": 6904},
+        "provisional_archive_points": {"2025-09": 5210, "2025-10": 5480, "2025-11": 6120, "2025-12": 6640, "2026-01": 7180, "2026-02": 6260, "2026-03": 6015, "2026-04": 5740, "2026-05": 5905},
+        "assistant_comparison": {
+          "result": "NOT_APPLICABLE_SHAPE_NOT_PUBLISHED_BY_ASSISTANT"
+        },
+        "amazon": {
+          "api": "GetMetricDataV2",
+          "metric": "CONTACTS_ABANDONED",
+          "filters": {
+            "QUEUE": "all_standard_queues",
+            "CHANNEL": [
+              "VOICE"
+            ]
+          },
+          "timezone": "America/New_York",
+          "interval": "TOTAL",
+          "grain": "queue_contact_leg_aggregate",
+          "event_time": "disconnect",
+          "historical_request_grain": "One TOTAL request per ET month; GetMetricDataV2 recent-history limit prevents a full 12-month pull",
+          "acquired": true,
+          "acquired_months": ["2026-06", "2026-07", "2026-08"]
+        },
+        "formula": "For each verified month, sum CONTACTS_ABANDONED returned for all standard queues by one TOTAL request covering that ET calendar month. Older points require the durable archive.",
+        "snowflake": {
+          "target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+          "semantic": "contacts_abandoned",
+          "column": "CONTACTS_ABANDONED",
+          "grain": "queue x requested month",
+          "primary_key": "(instance_id, queue_id, channel, window_start_ts, interval_period='TOTAL')",
+          "aggregation": "SUM queue values for each requested ET month",
+          "additive_across_intervals": true,
+          "tests": [
+            "monthly_sum_reconciles_to_TOTAL_for_same_window",
+            "jun_jul_aug_match_api_artifact",
+            "provisional_months_never_labelled_api_verified"
+          ]
+        }
+      },
+      {
+        "id": "contacts_abandoned_heatmap_dow_hour",
+        "display_name": "Contacts abandoned - 24-hour Mon-Sun heat map",
+        "display_value": null,
+        "display_window": "2026-08-01T04:00:00Z/2026-08-27T04:00:00Z",
+        "classification": "DERIVED",
+        "verification": "API_VERIFIED",
+        "meaning": "The same queued abandoned population across all 24 ET hours and all seven weekdays, at 1 week, 2 week, and 1 month windows.",
+        "verified_window_totals": {"1_week": 1805, "2_weeks": 3740, "1_month": 6904},
+        "assistant_comparison": {
+          "result": "NOT_APPLICABLE_SHAPE_NOT_PUBLISHED_BY_ASSISTANT"
+        },
+        "amazon": {
+          "api": "GetMetricDataV2",
+          "metric": "CONTACTS_ABANDONED",
+          "filters": {
+            "QUEUE": "all_standard_queues",
+            "CHANNEL": [
+              "VOICE"
+            ]
+          },
+          "timezone": "America/New_York",
+          "interval": "HOUR",
+          "grain": "queue_contact_leg_aggregate",
+          "event_time": "disconnect",
+          "historical_request_grain": "HOUR requested in two-day chunks because hourly requests must span less than three days",
+          "acquired": true
+        },
+        "formula": "Sum Amazon-provided CONTACTS_ABANDONED HOUR results across queues into weekday(local_interval_start) x hour(local_interval_start). No profile weights or proportional allocation.",
+        "snowflake": {
+          "target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+          "semantic": "contacts_abandoned",
+          "column": "CONTACTS_ABANDONED",
+          "grain": "queue x local day x hour",
+          "primary_key": "(instance_id, queue_id, channel, interval_start_ts, interval_period='HOUR')",
+          "aggregation": "GROUP BY DIM_DATE.DAY_OF_WEEK, HOUR_OF_DAY in America/New_York",
+          "additive_across_intervals": true,
+          "tests": [
+            "168_cell_sum_equals_window_TOTAL",
+            "local_hour_bucketing_is_dst_correct",
+            "one_month_window_equals_published_6904"
+          ]
+        }
+      }
+    ],
+    "dashboard_surface": {
+      "view": "call-center-metrics",
+      "dictionary_view": "call-center-metrics-dictionary",
+      "source_link_contract": "Every KPI card, the director-priority strip, both shape visuals, and every action-guidance row exposes a button[data-cc-jump-view=\"call-center-metrics-dictionary\"][data-cc-jump-target=\"ccm-def-*\"]. Activating it must switch the view, scroll the row into view, move focus to the row, and flash it. Verified by scripts/verify-ccm-source-links.mjs.",
+      "action_guidance_contract": "Every governed centerwide signal carries a state, the exception it represents, an owner, and the next decision. Action text must not restate the metric definition; the definition is reached through the row link.",
+      "shape_verification_rule": "Every visual distinguishes exact API points from provisional archive points. The heat map is API verified from HOUR results; only Sep 2025-May 2026 trend values remain provisional.",
+      "viewports_verified": [
+        "1440x900",
+        "390x760"
+      ]
+    },
+    "historical_request_grain": {
+      "published_totals": "Interval.IntervalPeriod=TOTAL over the stated window, TimeZone=America/New_York, end time exclusive, complete ET calendar days only.",
+      "trend_required": "One Interval.IntervalPeriod=TOTAL request per ET calendar month. Jun-Aug 2026 acquired; older nine months require the durable Snowflake/data-lake archive because GetMetricDataV2 rejects the older range.",
+      "heatmap_required": "Interval.IntervalPeriod=HOUR in two-day chunks, TimeZone=America/New_York, collapsed to weekday x hour. Acquired and reconciled for 1 week, 2 weeks, and 1 month.",
+      "warehouse_key": "Request-envelope hash + metric + filter set + threshold + interval grain. Connect valid interval enums are FIFTEEN_MIN, THIRTY_MIN, HOUR, DAY, WEEK, TOTAL."
+    }
+  },
+  "timezone": "America/New_York",
+  "office_hours": {
+    "start": "08:00:00",
+    "end": "22:00:00",
+    "end_exclusive": true
+  },
+  "default_cohort_timestamp": "InitiationTimestamp",
+  "default_channel": "VOICE",
+  "inbound_native_only_display": {
+    "effective_reporting_window": "2026-08-12T04:00:00Z/2026-08-16T04:00:00Z",
+    "queue_scope": "all_enumerated_standard_queues",
+    "channel": "VOICE",
+    "dashboard_contract": {
+      "purpose": "Single governed registry shared by the Inbound Dashboard and Inbound Data Dictionary.",
+      "reporting_window_inclusive_et": "2026-08-12/2026-08-15",
+      "api_window_utc_end_exclusive": "2026-08-12T04:00:00Z/2026-08-16T04:00:00Z",
+      "timezone": "America/New_York",
+      "queue_scope": "all_enumerated_standard_queues",
+      "channel": "VOICE",
+      "interval_period": "TOTAL",
+      "ui_filter_rule": "A date selection remains pending until a successful API refresh replaces the governed snapshot; never relabel frozen values with an unqueried window.",
+      "metrics": [
+        {
+          "semantic_name": "original_inbound_created",
+          "display_value": 2452,
+          "classification": "AMAZON_PROVIDED",
+          "amazon_metric": "CONTACTS_CREATED",
+          "metric_filters": {"INITIATION_METHOD": ["INBOUND"]},
+          "grain": "Amazon Connect historical metric result for one request envelope",
+          "snowflake_target": "MART_CALL_CENTER.FCT_INBOUND_DAILY.ORIGINAL_INBOUND_CREATED",
+          "tests": ["value_nonnegative", "equals_table_1a_inbound_component", "request_envelope_hash_matches_raw_result"]
+        },
+        {
+          "semantic_name": "original_inbound_handled",
+          "display_value": 1689,
+          "classification": "AMAZON_PROVIDED",
+          "amazon_metric": "CONTACTS_HANDLED",
+          "metric_filters": {"INITIATION_METHOD": ["INBOUND"]},
+          "grain": "Amazon Connect historical metric result for one request envelope",
+          "snowflake_target": "MART_CALL_CENTER.FCT_INBOUND_DAILY.ORIGINAL_INBOUND_HANDLED",
+          "tests": ["handled_lte_created", "equals_table_1b_answered_row"]
+        },
+        {
+          "semantic_name": "original_inbound_missed",
+          "display_value": 763,
+          "classification": "DERIVED_CONTROL",
+          "formula": "original_inbound_created - original_inbound_handled",
+          "inputs": ["original_inbound_created", "original_inbound_handled"],
+          "grain": "Same request envelope as both inputs",
+          "snowflake_target": "MART_CALL_CENTER.FCT_INBOUND_DAILY.ORIGINAL_INBOUND_MISSED",
+          "tests": ["2452_minus_1689_equals_763", "handled_plus_missed_equals_created", "never_labeled_as_native_amazon_metric"]
+        },
+        {
+          "semantic_name": "contacts_abandoned",
+          "display_value": 984,
+          "classification": "AMAZON_PROVIDED",
+          "amazon_metric": "CONTACTS_ABANDONED",
+          "metric_filters": {},
+          "grain": "Queued contact legs at disconnect under Amazon's native definition",
+          "snowflake_target": "MART_CALL_CENTER.FCT_INBOUND_DAILY.CONTACTS_ABANDONED",
+          "tests": ["value_nonnegative", "equals_native_all_origin_queue_abandon_parent"]
+        },
+        {
+          "semantic_name": "original_inbound_contacts_abandoned",
+          "display_value": 612,
+          "classification": "AMAZON_PROVIDED",
+          "amazon_metric": "CONTACTS_ABANDONED",
+          "metric_filters": {"INITIATION_METHOD": ["INBOUND"]},
+          "grain": "Queued original-inbound contact legs at disconnect",
+          "snowflake_target": "MART_CALL_CENTER.FCT_INBOUND_DAILY.ORIGINAL_INBOUND_CONTACTS_ABANDONED",
+          "tests": ["original_inbound_abandoned_lte_all_origin_abandoned", "equals_table_1c_native_portion"]
+        },
+        {
+          "semantic_name": "non_primary_contacts_abandoned",
+          "display_value": 372,
+          "classification": "DERIVED_CONTROL",
+          "formula": "contacts_abandoned - original_inbound_contacts_abandoned",
+          "inputs": ["contacts_abandoned", "original_inbound_contacts_abandoned"],
+          "grain": "Same request envelope as both inputs",
+          "snowflake_target": "MART_CALL_CENTER.FCT_INBOUND_DAILY.NON_PRIMARY_CONTACTS_ABANDONED",
+          "tests": ["984_minus_612_equals_372", "primary_plus_non_primary_equals_all_origin_abandoned"]
+        },
+        {
+          "semantic_name": "original_inbound_answer_rate",
+          "display_value": 68.9,
+          "unit": "PERCENT",
+          "classification": "DERIVED_KPI",
+          "formula": "original_inbound_handled / original_inbound_created * 100",
+          "inputs": ["original_inbound_handled", "original_inbound_created"],
+          "grain": "Same request envelope as both inputs; non-additive percentage",
+          "snowflake_target": "MART_CALL_CENTER.FCT_INBOUND_DAILY.ORIGINAL_INBOUND_ANSWER_RATE",
+          "tests": ["1689_divided_by_2452_rounds_to_68_9", "numerator_lte_denominator", "never_average_interval_percentages"]
+        },
+        {
+          "semantic_name": "queue_abandonment_rate",
+          "display_value": 26.226,
+          "unit": "PERCENT",
+          "classification": "AMAZON_PROVIDED",
+          "amazon_metric": "ABANDONMENT_RATE",
+          "metric_filters": {},
+          "grain": "Amazon native non-additive percentage for one request envelope",
+          "snowflake_target": "MART_CALL_CENTER.FCT_INBOUND_DAILY.QUEUE_ABANDONMENT_RATE",
+          "tests": ["native_value_preserved", "request_envelope_hash_matches_raw_result", "never_average_interval_percentages"]
+        }
+      ],
+      "warehouse_contract": {
+        "raw_target": "RAW_CONNECT.METRIC_RESULT",
+        "curated_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "semantic_target": "MART_CALL_CENTER.FCT_INBOUND_DAILY",
+        "required_lineage_columns": ["window_start_utc", "window_end_utc", "timezone", "queue_scope_hash", "channel", "metric_filters_hash", "source_classification", "source_fact", "formula_version", "refreshed_at_utc"]
+      }
+    },
+    "connect_assistant_alignment": {
+      "extractor": "scripts/pull-connect-assistant-inbound.py",
+      "frozen_snapshot": "data/amazon-connect-assistant-inbound-2026-08-12_15.json",
+      "comparison_snapshots": [
+        {
+          "reporting_window_inclusive_et": "2026-08-01/2026-08-26",
+          "api_window_utc_end_exclusive": "2026-08-01T04:00:00Z/2026-08-27T04:00:00Z",
+          "file": "data/amazon-connect-assistant-inbound-2026-08-01_26.json",
+          "values": {
+            "contacts_incoming": 17844,
+            "contacts_handled_incoming": 11205,
+            "contacts_queued": 25050,
+            "contacts_abandoned": 6904,
+            "contacts_transferred_out_from_queue": 0
+          }
+        }
+      ],
+      "api": "GetMetricDataV2",
+      "timezone": "America/New_York",
+      "interval_period": "TOTAL",
+      "metric_attribution": "contact completion/disconnect time unless the requested metric explicitly uses an event-time variant",
+      "metrics": {
+        "contacts_incoming": {
+          "amazon_metric": "CONTACTS_CREATED",
+          "filters": {
+            "INITIATION_METHOD": [
+              "INBOUND",
+              "TRANSFER",
+              "QUEUE_TRANSFER"
+            ]
+          },
+          "value": 2694,
+          "components": {
+            "INBOUND": 2452,
+            "TRANSFER": 242,
+            "QUEUE_TRANSFER": 0
+          }
+        },
+        "contacts_handled_incoming": {
+          "amazon_metric": "CONTACTS_HANDLED",
+          "filters": {
+            "INITIATION_METHOD": [
+              "INBOUND",
+              "TRANSFER",
+              "QUEUE_TRANSFER"
+            ]
+          },
+          "value": 1849,
+          "components": {
+            "INBOUND": 1689,
+            "TRANSFER": 160,
+            "QUEUE_TRANSFER": 0
+          }
+        },
+        "contacts_queued": {
+          "amazon_metric": "CONTACTS_QUEUED",
+          "value": 3752
+        },
+        "contacts_abandoned": {
+          "amazon_metric": "CONTACTS_ABANDONED",
+          "value": 984
+        },
+        "contacts_transferred_out_from_queue": {
+          "amazon_metric": "CONTACTS_TRANSFERRED_OUT_FROM_QUEUE",
+          "value": 0
+        }
+      },
+      "display_rules": [
+        "Connect assistant phrase total incoming calls entered a queue maps to CONTACTS_QUEUED",
+        "Amazon Contacts incoming maps to CONTACTS_CREATED filtered to INBOUND,TRANSFER,QUEUE_TRANSFER",
+        "Do not derive an audited residual by subtracting handled and abandoned from queued",
+        "Do not compare the completion-timed results with a SearchContacts initiation-timestamp cohort"
+      ],
+      "snowflake": {
+        "raw_target": "RAW_CONNECT.METRIC_RESULT",
+        "curated_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "primary_key": "instance_id + start_time_utc + end_time_utc + queue_scope_hash + channel + metric_name + metric_filters_hash + threshold_hash",
+        "tests": [
+          "contacts_incoming_component_sum_equals_parent",
+          "contacts_handled_incoming_component_sum_equals_parent",
+          "dashboard_request_envelope_hash_equals_warehouse_request_envelope_hash",
+          "dashboard_value_equals_latest_successful_warehouse_value_for_identical_key"
+        ]
+      }
+    },
+    "connect_assistant_metric_dictionary": {
+      "version": "2026-08-29",
+      "purpose": "Govern the common questions a call center director asks Connect Assistant and reproduce each answer through Amazon Connect APIs and Snowflake without changing population, event time, or grain.",
+      "amazon_defaults": {
+        "historical_api": "GetMetricDataV2",
+        "current_api": "GetCurrentMetricData",
+        "channel": "VOICE",
+        "queue_scope": "all_enumerated_standard_queues",
+        "timezone": "America/New_York",
+        "historical_interval": "TOTAL",
+        "historical_attribution": "contact completion/disconnect unless the selected metric is explicitly event-driven",
+        "metric_filter_value_semantics": "Multiple values in one MetricFilterValues array are OR-evaluated. An INITIATION_METHOD metric filter can coexist with explicit QUEUE resource IDs and CHANNEL=VOICE."
+      },
+      "assistant_verification": {
+        "verified_on": "2026-08-29",
+        "role": "Terminology and console-label cross-check only; official API documentation plus a reproducible API request govern conflicts.",
+        "confirmed": [
+          "multi_value_metric_filter_values_are_or_evaluated",
+          "initiation_method_metric_filter_can_coexist_with_explicit_queue_ids_and_voice_channel",
+          "queue_metric_identifiers_and_threshold_requirements",
+          "office_hours_counts_are_additive_across_nonoverlapping_daily_windows",
+          "rates_and_averages_must_not_be_simple_averaged",
+          "handling_metric_identifiers"
+        ],
+        "live_api_correction": {
+          "invalid_claim": "CONTACTS_HANDLED_INCOMING is a standalone GetMetricDataV2 metric name.",
+          "observed_error": "InvalidRequestException: Invalid metric name: CONTACTS_HANDLED_INCOMING",
+          "governed_contract": "Use CONTACTS_HANDLED with INITIATION_METHOD values INBOUND, TRANSFER, and QUEUE_TRANSFER. The phrase Contacts handled incoming is a display label, not the V2 metric name."
+        },
+        "live_api_validation": {
+          "historical_metric_batch": "Accepted by GetMetricDataV2 with explicit standard queue ID and CHANNEL=VOICE: CONTACTS_CREATED, CONTACTS_QUEUED, CONTACTS_HANDLED, CONTACTS_ABANDONED, ABANDONMENT_RATE, AVG_ABANDON_TIME, AVG_QUEUE_ANSWER_TIME, MAX_QUEUED_TIME, AVG_HANDLE_TIME, AVG_INTERACTION_TIME, AVG_HOLD_TIME, AVG_AFTER_CONTACT_WORK_TIME, CONTACTS_PUT_ON_HOLD, CONTACTS_HOLD_ABANDONS, CONTACTS_TRANSFERRED_OUT, AGENT_ANSWER_RATE, AGENT_NON_RESPONSE, CONTACTS_TRANSFERRED_OUT_INTERNAL, CONTACTS_TRANSFERRED_OUT_EXTERNAL.",
+          "threshold_metric_batch": "Accepted by GetMetricDataV2 with Threshold=[{Comparison:LT,ThresholdValue:x}]: SUM_CONTACTS_ABANDONED_IN_X, SERVICE_LEVEL, SUM_CONTACTS_ANSWERED_IN_X. The V2 Threshold shape contains Comparison and ThresholdValue; it has no unit field.",
+          "current_metric_batch": "Accepted by GetCurrentMetricData: CONTACTS_IN_QUEUE with Unit=COUNT and OLDEST_CONTACT_AGE with Unit=SECONDS."
+        }
+      },
+      "snowflake_defaults": {
+        "raw_metric_target": "RAW_CONNECT.METRIC_RESULT",
+        "curated_metric_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "contact_target": "ANALYTICS_CONNECT.FCT_CONTACT_LEG",
+        "offer_attempt_target": "ANALYTICS_CONNECT.FCT_AGENT_OFFER_ATTEMPT",
+        "current_snapshot_target": "ANALYTICS_CONNECT.SNAPSHOT_QUEUE_CURRENT",
+        "metric_primary_key": "instance_id + start_time_utc + end_time_utc + queue_scope_hash + channel + metric_name + metric_filters_hash + threshold_hash",
+        "refresh": "MERGE by immutable key; retain retrieval timestamp, payload hash, batch ID, and raw response; reprocess the approved late-arrival window"
+      },
+      "office_hours": {
+        "timezone": "America/New_York",
+        "daily_window": "[08:00:00,22:00:00)",
+        "api_pattern": "Issue one UTC-converted request per local ET date or use native hourly buckets; sum count metrics only.",
+        "non_additive_rule": "Never simple-average rate, percentage, maximum, or average metrics across daily or hourly buckets. Preserve native numerator/denominator where available or calculate from contact records.",
+        "snowflake_filter": "local_event_time >= 08:00:00 AND local_event_time < 22:00:00",
+        "tests": [
+          "daily_windows_do_not_overlap",
+          "daily_windows_cover_exactly_14_local_hours",
+          "dst_conversion_uses_america_new_york"
+        ]
+      },
+      "metrics": [
+        {
+          "id": "contacts_incoming",
+          "question": "How many incoming contacts did we receive?",
+          "classification": "AMAZON_PROVIDED",
+          "amazon": {
+            "metric": "CONTACTS_CREATED",
+            "metric_filters": {
+              "INITIATION_METHOD": [
+                "INBOUND",
+                "TRANSFER",
+                "QUEUE_TRANSFER"
+              ]
+            },
+            "event_time": "completion/disconnect",
+            "grain": "contact_leg"
+          },
+          "snowflake": {
+            "semantic": "contacts_incoming",
+            "sql": "SUM(metric_value) for the exact request-envelope key",
+            "tests": [
+              "initiation_components_sum_to_parent"
+            ]
+          }
+        },
+        {
+          "id": "original_inbound_created",
+          "question": "How many original external inbound calls did we receive?",
+          "classification": "AMAZON_PROVIDED",
+          "amazon": {
+            "metric": "CONTACTS_CREATED",
+            "metric_filters": {
+              "INITIATION_METHOD": [
+                "INBOUND"
+              ]
+            },
+            "event_time": "completion/disconnect",
+            "grain": "original_inbound_contact_leg"
+          },
+          "snowflake": {
+            "semantic": "original_inbound_created",
+            "sql": "SUM(metric_value) for INITIATION_METHOD=INBOUND",
+            "tests": [
+              "validate_against_contact_leg_initiation_method"
+            ]
+          }
+        },
+        {
+          "id": "contacts_queued",
+          "question": "How many incoming contacts entered a queue?",
+          "classification": "AMAZON_PROVIDED",
+          "amazon": {
+            "metric": "CONTACTS_QUEUED",
+            "event_time": "completion/disconnect",
+            "grain": "queued_contact_leg"
+          },
+          "snowflake": {
+            "semantic": "contacts_queued",
+            "sql": "SUM(metric_value)",
+            "tests": [
+              "validate_queue_info_enqueue_timestamp_present",
+              "do_not_force_equal_contacts_incoming"
+            ]
+          }
+        },
+        {
+          "id": "contacts_handled_incoming",
+          "question": "How many incoming contacts connected to an agent?",
+          "classification": "AMAZON_PROVIDED",
+          "amazon": {
+            "metric": "CONTACTS_HANDLED",
+            "metric_filters": {
+              "INITIATION_METHOD": [
+                "INBOUND",
+                "TRANSFER",
+                "QUEUE_TRANSFER"
+              ]
+            },
+            "event_time": "completion/disconnect",
+            "grain": "handled_contact_leg"
+          },
+          "snowflake": {
+            "semantic": "contacts_handled_incoming",
+            "sql": "SUM(metric_value) for the three accepted initiation methods",
+            "tests": [
+              "initiation_components_sum_to_parent"
+            ]
+          }
+        },
+        {
+          "id": "original_inbound_handled",
+          "question": "How many original inbound calls connected to an agent?",
+          "classification": "AMAZON_PROVIDED",
+          "amazon": {
+            "metric": "CONTACTS_HANDLED",
+            "metric_filters": {
+              "INITIATION_METHOD": [
+                "INBOUND"
+              ]
+            },
+            "event_time": "completion/disconnect",
+            "grain": "original_inbound_handled_contact_leg"
+          },
+          "snowflake": {
+            "semantic": "original_inbound_handled",
+            "sql": "SUM(metric_value) for INITIATION_METHOD=INBOUND",
+            "tests": [
+              "connected_to_agent_timestamp_present"
+            ]
+          }
+        },
+        {
+          "id": "original_inbound_missed",
+          "question": "How many original inbound calls were missed?",
+          "classification": "DERIVED",
+          "amazon": {
+            "inputs": [
+              "CONTACTS_CREATED filtered INITIATION_METHOD=INBOUND",
+              "CONTACTS_HANDLED filtered INITIATION_METHOD=INBOUND"
+            ],
+            "formula": "created_inbound - handled_inbound",
+            "event_time": "same completed-period request envelope",
+            "grain": "original_inbound_contact_leg"
+          },
+          "snowflake": {
+            "semantic": "original_inbound_missed",
+            "sql": "original_inbound_created - original_inbound_handled",
+            "tests": [
+              "result_nonnegative",
+              "handled_plus_missed_equals_created"
+            ]
+          }
+        },
+        {
+          "id": "original_inbound_answer_rate",
+          "question": "What is the original inbound answer rate?",
+          "classification": "DERIVED",
+          "amazon": {
+            "inputs": [
+              "CONTACTS_HANDLED filtered INITIATION_METHOD=INBOUND",
+              "CONTACTS_CREATED filtered INITIATION_METHOD=INBOUND"
+            ],
+            "formula": "handled_inbound / NULLIF(created_inbound,0)",
+            "grain": "period_queue_channel"
+          },
+          "snowflake": {
+            "semantic": "original_inbound_answer_rate",
+            "sql": "original_inbound_handled / NULLIF(original_inbound_created,0)",
+            "tests": [
+              "ratio_between_zero_and_one",
+              "numerator_and_denominator_scope_match"
+            ]
+          }
+        },
+        {
+          "id": "contacts_abandoned",
+          "question": "How many contacts abandoned in queue?",
+          "classification": "AMAZON_PROVIDED",
+          "amazon": {
+            "metric": "CONTACTS_ABANDONED",
+            "event_time": "completion/disconnect",
+            "grain": "abandoned_queued_contact_leg",
+            "exclusions": [
+              "queued_callbacks",
+              "agent_connected",
+              "next_contact_present",
+              "transfer_completed_while_in_queue"
+            ]
+          },
+          "snowflake": {
+            "semantic": "contacts_abandoned",
+            "sql": "SUM(metric_value)",
+            "tests": [
+              "validate_native_abandonment_rule"
+            ]
+          }
+        },
+        {
+          "id": "queue_abandonment_rate",
+          "question": "What percentage of queued contacts abandoned?",
+          "classification": "AMAZON_PROVIDED",
+          "amazon": {
+            "metric": "ABANDONMENT_RATE",
+            "event_time": "completion/disconnect",
+            "grain": "period_queue_channel",
+            "statistic": "AVG"
+          },
+          "snowflake": {
+            "semantic": "queue_abandonment_rate",
+            "sql": "preserve native metric_value",
+            "tests": [
+              "value_between_zero_and_one_hundred",
+              "do_not_simple_average_intervals"
+            ]
+          }
+        },
+        {
+          "id": "contacts_abandoned_lt_5s",
+          "question": "How many contacts abandoned in under 5 seconds?",
+          "classification": "AMAZON_PROVIDED",
+          "amazon": {
+            "metric": "SUM_CONTACTS_ABANDONED_IN_X",
+            "threshold": {
+              "value": 5,
+              "comparison": "LT"
+            },
+            "event_time": "completion/disconnect",
+            "grain": "abandoned_queued_contact_leg"
+          },
+          "snowflake": {
+            "semantic": "contacts_abandoned_lt_5s",
+            "sql": "SUM(metric_value) for threshold_hash",
+            "tests": [
+              "value_lte_contacts_abandoned"
+            ]
+          }
+        },
+        {
+          "id": "abandon_wait_band",
+          "question": "Where do abandons fall by wait-duration band?",
+          "classification": "DERIVED",
+          "amazon": {
+            "inputs": [
+              "cumulative SUM_CONTACTS_ABANDONED_IN_X thresholds",
+              "QueueInfo.Duration when threshold filters are incompatible"
+            ],
+            "formula": "subtract adjacent cumulative thresholds or assign one CASE band",
+            "grain": "abandoned_queued_contact_leg"
+          },
+          "snowflake": {
+            "semantic": "abandon_wait_band",
+            "sql": "CASE on queue_duration_ms using versioned exclusive bounds",
+            "tests": [
+              "exactly_one_band_per_parent",
+              "band_sum_equals_contacts_abandoned"
+            ]
+          }
+        },
+        {
+          "id": "avg_abandon_time_seconds",
+          "question": "How long did customers wait before abandoning?",
+          "classification": "AMAZON_PROVIDED",
+          "amazon": {
+            "metric": "AVG_ABANDON_TIME",
+            "event_time": "completion/disconnect",
+            "grain": "period_queue_channel",
+            "statistic": "AVG"
+          },
+          "snowflake": {
+            "semantic": "avg_abandon_time_seconds",
+            "sql": "preserve native metric_value",
+            "tests": [
+              "validate_from_abandoned_queue_duration",
+              "do_not_simple_average_intervals"
+            ]
+          }
+        },
+        {
+          "id": "avg_queue_answer_time_seconds",
+          "question": "How long did answered customers wait in queue?",
+          "classification": "AMAZON_PROVIDED",
+          "amazon": {
+            "metric": "AVG_QUEUE_ANSWER_TIME",
+            "event_time": "completion/disconnect",
+            "grain": "period_queue_channel",
+            "statistic": "AVG"
+          },
+          "snowflake": {
+            "semantic": "avg_queue_answer_time_seconds",
+            "sql": "preserve native metric_value",
+            "tests": [
+              "validate_from_handled_queue_duration",
+              "do_not_simple_average_intervals"
+            ]
+          }
+        },
+        {
+          "id": "service_level_30s",
+          "question": "What was service level within 30 seconds?",
+          "classification": "AMAZON_PROVIDED",
+          "amazon": {
+            "metric": "SERVICE_LEVEL",
+            "threshold": {
+              "value": 30,
+              "comparison": "LT"
+            },
+            "required_setting": "versioned short-abandon treatment",
+            "event_time": "completion/disconnect",
+            "grain": "period_queue_channel_threshold",
+            "statistic": "AVG"
+          },
+          "snowflake": {
+            "semantic": "service_level_30s",
+            "sql": "preserve native metric_value with threshold and request settings",
+            "tests": [
+              "threshold_and_short_abandon_setting_present",
+              "do_not_compare_different_settings"
+            ]
+          }
+        },
+        {
+          "id": "contacts_answered_lt_30s",
+          "question": "How many contacts were answered in under 30 seconds?",
+          "classification": "AMAZON_PROVIDED",
+          "amazon": {
+            "metric": "SUM_CONTACTS_ANSWERED_IN_X",
+            "threshold": {
+              "value": 30,
+              "comparison": "LT"
+            },
+            "event_time": "completion/disconnect",
+            "grain": "handled_queued_contact_leg"
+          },
+          "snowflake": {
+            "semantic": "contacts_answered_lt_30s",
+            "sql": "SUM(metric_value) for threshold_hash",
+            "tests": [
+              "do_not_add_cumulative_thresholds"
+            ]
+          }
+        },
+        {
+          "id": "max_queued_time_seconds",
+          "question": "What was the longest completed queue wait?",
+          "classification": "AMAZON_PROVIDED",
+          "amazon": {
+            "metric": "MAX_QUEUED_TIME",
+            "event_time": "completion/disconnect",
+            "grain": "period_queue_channel",
+            "statistic": "MAX"
+          },
+          "snowflake": {
+            "semantic": "max_queued_time_seconds",
+            "sql": "preserve native metric_value",
+            "tests": [
+              "retain_longest_contact_key_for_validation",
+              "do_not_max_across_incompatible_scopes"
+            ]
+          }
+        },
+        {
+          "id": "avg_handle_time_seconds",
+          "question": "What was average handle time?",
+          "classification": "AMAZON_PROVIDED",
+          "amazon": {
+            "metric": "AVG_HANDLE_TIME",
+            "event_time": "completion/disconnect",
+            "grain": "handled_contact_leg",
+            "statistic": "AVG"
+          },
+          "snowflake": {
+            "semantic": "avg_handle_time_seconds",
+            "sql": "preserve native metric_value",
+            "tests": [
+              "validate_components_using_amazon_inclusion_rules",
+              "do_not_simple_average_intervals"
+            ]
+          }
+        },
+        {
+          "id": "avg_interaction_time_seconds",
+          "question": "What was average agent interaction time?",
+          "classification": "AMAZON_PROVIDED",
+          "amazon": {
+            "metric": "AVG_INTERACTION_TIME",
+            "event_time": "completion/disconnect",
+            "grain": "handled_contact_leg",
+            "statistic": "AVG"
+          },
+          "snowflake": {
+            "semantic": "avg_interaction_time_seconds",
+            "sql": "preserve native metric_value",
+            "tests": [
+              "validate_agent_interaction_duration",
+              "do_not_simple_average_intervals"
+            ]
+          }
+        },
+        {
+          "id": "avg_hold_time_seconds",
+          "question": "What was average customer hold time?",
+          "classification": "AMAZON_PROVIDED",
+          "amazon": {
+            "metric": "AVG_HOLD_TIME",
+            "event_time": "completion/disconnect",
+            "grain": "handled_contact_leg",
+            "statistic": "AVG"
+          },
+          "snowflake": {
+            "semantic": "avg_hold_time_seconds",
+            "sql": "preserve native metric_value",
+            "tests": [
+              "validate_customer_hold_duration_with_native_null_zero_rules"
+            ]
+          }
+        },
+        {
+          "id": "avg_after_contact_work_seconds",
+          "question": "What was average after-contact work time?",
+          "classification": "AMAZON_PROVIDED",
+          "amazon": {
+            "metric": "AVG_AFTER_CONTACT_WORK_TIME",
+            "event_time": "completion/disconnect",
+            "grain": "handled_contact_leg",
+            "statistic": "AVG"
+          },
+          "snowflake": {
+            "semantic": "avg_after_contact_work_seconds",
+            "sql": "preserve native metric_value",
+            "tests": [
+              "validate_after_contact_work_duration"
+            ]
+          }
+        },
+        {
+          "id": "contacts_put_on_hold",
+          "question": "How many contacts were put on hold?",
+          "classification": "AMAZON_PROVIDED",
+          "amazon": {
+            "metric": "CONTACTS_PUT_ON_HOLD",
+            "event_time": "completion/disconnect",
+            "grain": "held_contact_leg"
+          },
+          "snowflake": {
+            "semantic": "contacts_put_on_hold",
+            "sql": "SUM(metric_value)",
+            "tests": [
+              "validate_agent_number_of_holds_present"
+            ]
+          }
+        },
+        {
+          "id": "contacts_hold_disconnect",
+          "question": "How many contacts disconnected while on hold?",
+          "classification": "AMAZON_PROVIDED",
+          "amazon": {
+            "metric": "CONTACTS_HOLD_ABANDONS",
+            "event_time": "completion/disconnect",
+            "grain": "hold_disconnect_contact_leg"
+          },
+          "snowflake": {
+            "semantic": "contacts_hold_disconnect",
+            "sql": "SUM(metric_value)",
+            "tests": [
+              "validate_pre_disconnect_state_connected_onhold"
+            ]
+          }
+        },
+        {
+          "id": "contacts_transferred_out",
+          "question": "How many contacts were transferred out?",
+          "classification": "AMAZON_PROVIDED",
+          "amazon": {
+            "metric": "CONTACTS_TRANSFERRED_OUT",
+            "diagnostic_metrics": [
+              "CONTACTS_TRANSFERRED_OUT_INTERNAL",
+              "CONTACTS_TRANSFERRED_OUT_EXTERNAL",
+              "CONTACTS_TRANSFERRED_OUT_FROM_QUEUE"
+            ],
+            "event_time": "completion/disconnect",
+            "grain": "transferred_contact_leg",
+            "scope_warning": "The parent includes transfer paths that are not guaranteed to be exhausted by the internal and external agent-transfer diagnostics."
+          },
+          "snowflake": {
+            "semantic": "contacts_transferred_out",
+            "sql": "preserve the parent and each related diagnostic as separate exact-envelope rows",
+            "tests": [
+              "do_not_force_internal_plus_external_to_parent_without_proving_exhaustiveness"
+            ]
+          }
+        },
+        {
+          "id": "agent_answer_rate",
+          "question": "What percentage of agent offers were accepted?",
+          "classification": "AMAZON_PROVIDED",
+          "amazon": {
+            "metric": "AGENT_ANSWER_RATE",
+            "event_time": "agent_offer_event",
+            "grain": "routing_offer_attempt",
+            "statistic": "AVG"
+          },
+          "snowflake": {
+            "semantic": "agent_answer_rate",
+            "sql": "preserve native metric_value in offer-attempt mart",
+            "tests": [
+              "never_reconcile_directly_to_distinct_call_count"
+            ]
+          }
+        },
+        {
+          "id": "agent_non_response_attempts",
+          "question": "How many agent offers received no response?",
+          "classification": "AMAZON_PROVIDED",
+          "amazon": {
+            "metric": "AGENT_NON_RESPONSE",
+            "event_time": "agent_offer_event",
+            "grain": "routing_offer_attempt"
+          },
+          "snowflake": {
+            "semantic": "agent_non_response_attempts",
+            "sql": "SUM(metric_value) at offer-attempt grain",
+            "tests": [
+              "retain_contact_and_attempt_keys",
+              "separate_attempt_count_from_affected_contacts"
+            ]
+          }
+        },
+        {
+          "id": "contacts_incoming_office_hours",
+          "question": "How many incoming calls occurred between 8 AM and 10 PM ET?",
+          "classification": "DERIVED",
+          "amazon": {
+            "inputs": [
+              "daily CONTACTS_CREATED with incoming initiation methods"
+            ],
+            "formula": "SUM native daily [08:00,22:00) ET counts",
+            "grain": "local_date_contact_leg"
+          },
+          "snowflake": {
+            "semantic": "contacts_incoming_office_hours",
+            "sql": "SUM(metric_value) across nonoverlapping daily native [08:00,22:00) ET request envelopes",
+            "tests": [
+              "office_hours_window_contract"
+            ]
+          }
+        },
+        {
+          "id": "contacts_handled_incoming_office_hours",
+          "question": "How many incoming contacts connected to an agent between 8 AM and 10 PM ET?",
+          "classification": "DERIVED",
+          "amazon": {
+            "inputs": [
+              "daily CONTACTS_HANDLED with incoming initiation methods"
+            ],
+            "formula": "SUM native daily [08:00,22:00) ET counts",
+            "grain": "local_date_handled_contact_leg"
+          },
+          "snowflake": {
+            "semantic": "contacts_handled_incoming_office_hours",
+            "sql": "SUM(metric_value) across nonoverlapping daily native [08:00,22:00) ET request envelopes",
+            "tests": [
+              "office_hours_window_contract"
+            ]
+          }
+        },
+        {
+          "id": "original_inbound_missed_office_hours",
+          "question": "How many original inbound calls were missed between 8 AM and 10 PM ET?",
+          "classification": "DERIVED",
+          "amazon": {
+            "inputs": [
+              "daily CONTACTS_CREATED(INBOUND)",
+              "daily CONTACTS_HANDLED(INBOUND)"
+            ],
+            "formula": "SUM(created_daily - handled_daily) for [08:00,22:00) ET",
+            "grain": "local_date_original_inbound_contact_leg"
+          },
+          "snowflake": {
+            "semantic": "original_inbound_missed_office_hours",
+            "sql": "SUM(created_metric_value - handled_metric_value) after joining identical daily native [08:00,22:00) ET request envelopes",
+            "tests": [
+              "each_daily_remainder_nonnegative",
+              "office_hours_window_contract"
+            ]
+          }
+        },
+        {
+          "id": "contacts_abandoned_office_hours",
+          "question": "How many contacts abandoned between 8 AM and 10 PM ET?",
+          "classification": "DERIVED",
+          "amazon": {
+            "inputs": [
+              "daily CONTACTS_ABANDONED"
+            ],
+            "formula": "SUM native daily [08:00,22:00) ET counts",
+            "grain": "local_date_abandoned_contact_leg"
+          },
+          "snowflake": {
+            "semantic": "contacts_abandoned_office_hours",
+            "sql": "SUM(metric_value) across nonoverlapping daily native [08:00,22:00) ET request envelopes",
+            "tests": [
+              "office_hours_window_contract"
+            ]
+          }
+        },
+        {
+          "id": "contacts_in_queue_current",
+          "question": "How many contacts are waiting right now?",
+          "classification": "AMAZON_PROVIDED",
+          "amazon": {
+            "api": "GetCurrentMetricData",
+            "metric": "CONTACTS_IN_QUEUE",
+            "unit": "COUNT",
+            "event_time": "observed_at",
+            "grain": "queue_snapshot"
+          },
+          "snowflake": {
+            "semantic": "contacts_in_queue_current",
+            "target": "ANALYTICS_CONNECT.SNAPSHOT_QUEUE_CURRENT",
+            "primary_key": "instance_id + queue_id + observed_at_utc",
+            "sql": "append the native COUNT observation at DataSnapshotTime for each queue",
+            "tests": [
+              "snapshot_timestamp_present"
+            ]
+          }
+        },
+        {
+          "id": "oldest_contact_age_seconds",
+          "question": "How long has the oldest waiting contact been in queue?",
+          "classification": "AMAZON_PROVIDED",
+          "amazon": {
+            "api": "GetCurrentMetricData",
+            "metric": "OLDEST_CONTACT_AGE",
+            "unit": "SECONDS",
+            "event_time": "observed_at",
+            "grain": "queue_snapshot"
+          },
+          "snowflake": {
+            "semantic": "oldest_contact_age_seconds",
+            "target": "ANALYTICS_CONNECT.SNAPSHOT_QUEUE_CURRENT",
+            "primary_key": "instance_id + queue_id + observed_at_utc",
+            "sql": "append the native SECONDS observation at DataSnapshotTime for each queue",
+            "tests": [
+              "do_not_compare_as_historical_maximum"
+            ]
+          }
+        }
+      ],
+      "governance_tests": [
+        "all_displayed_dictionary_rows_have_amazon_and_snowflake_contracts",
+        "amazon_provided_rows_contain_no_arithmetic",
+        "derived_rows_name_every_native_or_record-level input",
+        "event_time_and_grain_are_persisted_with_every_result",
+        "office_hours_counts_use_daily_et_windows",
+        "non_additive_metrics_are_never_simple_averaged"
+      ]
+    },
+    "policy": "Display Amazon-native metrics and filters wherever available. The explicitly approved original-inbound answer bridge may display calculated remainders, but they must be labeled calculated and must not be relabeled as abandonment.",
+    "native_partitions": [
+      {
+        "parent": "CONTACTS_HANDLED filtered to INBOUND,TRANSFER,QUEUE_TRANSFER",
+        "children": [
+          "CONTACTS_HANDLED filtered to INBOUND",
+          "CONTACTS_HANDLED filtered to TRANSFER",
+          "CONTACTS_HANDLED filtered to QUEUE_TRANSFER"
+        ],
+        "values": [
+          1849,
+          1689,
+          160,
+          0
+        ]
+      },
+      {
+        "parent": "CONTACTS_HANDLED filtered to INITIATION_METHOD=INBOUND",
+        "children": [
+          "CUSTOMER_DISCONNECT",
+          "AGENT_DISCONNECT",
+          "THIRD_PARTY_DISCONNECT",
+          "OTHER"
+        ],
+        "values": [
+          1689,
+          1256,
+          262,
+          36,
+          135
+        ]
+      },
+      {
+        "parent": "CONTACTS_HOLD_ABANDONS filtered to INITIATION_METHOD=INBOUND",
+        "children": [
+          "CUSTOMER_DISCONNECT",
+          "AGENT_DISCONNECT",
+          "OTHER"
+        ],
+        "values": [
+          42,
+          17,
+          0,
+          25
+        ]
+      },
+      {
+        "parent": "CONTACTS_ABANDONED across all displayed initiation methods",
+        "children": [
+          "INBOUND",
+          "TRANSFER",
+          "API",
+          "CALLBACK",
+          "QUEUE_TRANSFER"
+        ],
+        "values": [
+          984,
+          612,
+          82,
+          288,
+          2,
+          0
+        ]
+      }
+    ],
+    "native_diagnostics": {
+      "CONTACTS_QUEUED": 3752,
+      "CONTACTS_ABANDONED": 984,
+      "CONTACTS_TRANSFERRED_OUT_FROM_QUEUE": 0,
+      "CONTACTS_PUT_ON_HOLD_INBOUND": 405,
+      "AGENT_NON_RESPONSE": 435,
+      "AGENT_NON_RESPONSE_WITHOUT_CUSTOMER_ABANDONS": 49,
+      "AGENT_ANSWER_RATE": 85.7564
+    },
+    "approved_derived_controls": {
+      "original_inbound_answer_reconciliation": {
+        "classification": "DERIVED_CONTROL",
+        "parent": {
+          "metric": "CONTACTS_CREATED",
+          "filters": {
+            "INITIATION_METHOD": [
+              "INBOUND"
+            ]
+          },
+          "value": 2452
+        },
+        "answered": {
+          "metric": "CONTACTS_HANDLED",
+          "filters": {
+            "INITIATION_METHOD": [
+              "INBOUND"
+            ]
+          },
+          "value": 1689
+        },
+        "not_answered_formula": "2452 - 1689",
+        "not_answered_value": 763,
+        "native_abandoned_component": {
+          "metric": "CONTACTS_ABANDONED",
+          "filters": {
+            "INITIATION_METHOD": [
+              "INBOUND"
+            ]
+          },
+          "value": 612
+        },
+        "other_not_answered_formula": "763 - 612",
+        "other_not_answered_value": 151,
+        "warning": "Neither remainder is a native Amazon metric. Other not answered requires contact-record terminal-path classification; do not relabel it as abandonment."
+      }
+    },
+    "display_flow_connections": [
+      {
+        "key": "original_inbound_created",
+        "from": "table_1a.contacts_created_inbound",
+        "to": "table_1b.original_inbound_contacts_created",
+        "amazon_metric": "CONTACTS_CREATED",
+        "filters": {
+          "INITIATION_METHOD": [
+            "INBOUND"
+          ]
+        },
+        "rule": "Connect only when reporting window, instance, channel, queue scope, filters, and contact-leg grain are identical."
+      },
+      {
+        "key": "original_inbound_answered",
+        "from": "table_1b.original_inbound_contacts_answered",
+        "through": [
+          "table_4.contacts_handled_inbound",
+          "table_5.contacts_handled_inbound"
+        ],
+        "amazon_metric": "CONTACTS_HANDLED",
+        "filters": {
+          "INITIATION_METHOD": [
+            "INBOUND"
+          ]
+        },
+        "rule": "Each destination carries the same 10,067 original-inbound answered contact legs into a different native diagnostic view."
+      },
+      {
+        "key": "original_inbound_not_answered",
+        "from": "table_1b.original_inbound_contacts_not_answered",
+        "to": "table_1c.original_inbound_contacts_not_answered",
+        "formula": "CONTACTS_CREATED(INBOUND) - CONTACTS_HANDLED(INBOUND)",
+        "value": 763,
+        "rule": "Carry forward only when both native inputs use an identical request envelope; this is an approved arithmetic control, not a native metric."
+      },
+      {
+        "key": "original_inbound_abandoned",
+        "from": "table_1c.original_inbound_contacts_abandoned",
+        "through": [
+          "table_1d.original_inbound_contacts_abandoned",
+          "table_2.original_inbound_contacts_abandoned"
+        ],
+        "amazon_metric": "CONTACTS_ABANDONED",
+        "filters": {
+          "INITIATION_METHOD": [
+            "INBOUND"
+          ]
+        },
+        "rule": "Carry the same native 612 parent into Table 1D and Table 2. Table 1D bands must be derived from QueueInfo.Duration at contact-record grain because SUM_CONTACTS_ABANDONED_IN_X does not support INITIATION_METHOD; withhold band values until their sum equals 612."
+      },
+      {
+        "key": "queue_abandoned",
+        "from": "table_2.contacts_abandoned",
+        "to": "table_3.contacts_abandoned",
+        "amazon_metric": "CONTACTS_ABANDONED",
+        "rule": "The same all-standard-queue abandoned population is carried into the exclusive wait-band partition."
+      },
+      {
+        "key": "other_initiation_abandoned",
+        "from": "table_2.other_initiation_abandoned",
+        "to": "table_2a.other_initiation_abandoned",
+        "amazon_metric": "CONTACTS_ABANDONED",
+        "filters": {
+          "INITIATION_METHOD": [
+            "TRANSFER",
+            "API",
+            "CALLBACK",
+            "QUEUE_TRANSFER"
+          ]
+        },
+        "value": 372,
+        "rule": "The same 372 non-original-inbound abandoned queue legs are carried into their native initiation-method detail: 82 transfer + 288 API + 2 callback + 0 queue transfer."
+      },
+      {
+        "key": "original_inbound_held",
+        "from": "table_5.contacts_put_on_hold",
+        "to": "table_5a.contacts_put_on_hold",
+        "amazon_metric": "CONTACTS_PUT_ON_HOLD",
+        "filters": {
+          "INITIATION_METHOD": [
+            "INBOUND"
+          ]
+        },
+        "rule": "The same held-contact population is carried into the mutually exclusive hold-outcome control."
+      },
+      {
+        "key": "hold_disconnect",
+        "from": "table_5a.contacts_hold_abandons",
+        "to": "table_5b.contacts_hold_abandons",
+        "amazon_metric": "CONTACTS_HOLD_ABANDONS",
+        "filters": {
+          "INITIATION_METHOD": [
+            "INBOUND"
+          ]
+        },
+        "rule": "The same hold-disconnect population is carried into the disconnect-reason partition."
+      }
+    ],
+    "cumulative_abandon_thresholds": {
+      "metric": "SUM_CONTACTS_ABANDONED_IN_X",
+      "comparison": "LT",
+      "values_by_seconds": {
+        "5": 246,
+        "10": 444,
+        "15": 513,
+        "20": 536,
+        "30": 571,
+        "60": 712,
+        "120": 821
+      },
+      "additive": false
+    },
+    "snowflake_contract": {
+      "raw_target": "RAW_CONNECT.METRIC_RESULT",
+      "curated_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+      "required_request_dimensions": [
+        "INSTANCE_ID",
+        "START_TIME_UTC",
+        "END_TIME_UTC",
+        "QUEUE_SCOPE",
+        "CHANNEL",
+        "METRIC_NAME",
+        "METRIC_FILTERS",
+        "THRESHOLD",
+        "COMPARISON"
+      ],
+      "tests": [
+        "native_partitions_reconcile_only_when_children_are_mutually_exclusive",
+        "cumulative_thresholds_are_never_summed",
+        "diagnostic_subsets_are_not_presented_as_exhaustive_partitions"
+      ]
+    }
+  },
+  "metrics": {
+    "connected_to_agent": {
+      "classification": "AMAZON_PROVIDED",
+      "amazon": {
+        "source": "GetMetricDataV2",
+        "metric": "CONTACTS_HANDLED",
+        "filters": {
+          "INITIATION_METHOD": [
+            "INBOUND"
+          ]
+        },
+        "grain": "aggregate_period_filter_set",
+        "cohort_timestamp": "InitiationTimestamp"
+      },
+      "snowflake": {
+        "native_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "validation_target": "ANALYTICS_CONNECT.FCT_CONTACT_LEG",
+        "validation_rule": "CONNECTED_TO_AGENT_TIMESTAMP IS NOT NULL",
+        "tests": [
+          "native_equals_validation_when_scope_matches"
+        ]
+      }
+    },
+    "contacts_abandoned_in_queue": {
+      "classification": "AMAZON_PROVIDED",
+      "amazon": {
+        "source": "GetMetricDataV2",
+        "metric": "CONTACTS_ABANDONED",
+        "grain": "aggregate_period_filter_set"
+      },
+      "snowflake": {
+        "native_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "validation_target": "ANALYTICS_CONNECT.FCT_CONTACT_LEG"
+      }
+    },
+    "abandoned_without_agent_offer": {
+      "classification": "DERIVED",
+      "amazon": {
+        "source": "contact_record_and_agent_offer_events",
+        "grain": "distinct_contact_leg",
+        "formula": "abandoned contacts ANTI JOIN agent offer attempts"
+      },
+      "snowflake": {
+        "target": "MART_CALL_CENTER.MONTHLY_INBOUND_AUDIT",
+        "joins": [
+          "FCT_CONTACT_LEG to FCT_AGENT_OFFER_ATTEMPT on INSTANCE_ID, CONTACT_ID"
+        ],
+        "tests": [
+          "no_offer_plus_after_offer_equals_abandoned"
+        ]
+      }
+    },
+    "customer_disconnect": {
+      "classification": "AMAZON_PROVIDED",
+      "amazon": {
+        "source": "GetMetricDataV2",
+        "metric": "CONTACTS_HANDLED",
+        "filters": {
+          "DISCONNECT_REASON": [
+            "CUSTOMER_DISCONNECT"
+          ]
+        }
+      },
+      "snowflake": {
+        "native_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "validation_rule": "DISCONNECT_REASON = 'CUSTOMER_DISCONNECT' AND CONNECTED_TO_AGENT_TIMESTAMP IS NOT NULL"
+      }
+    },
+    "agent_disconnect": {
+      "classification": "AMAZON_PROVIDED",
+      "amazon": {
+        "source": "GetMetricDataV2",
+        "metric": "CONTACTS_HANDLED",
+        "filters": {
+          "DISCONNECT_REASON": [
+            "AGENT_DISCONNECT"
+          ]
+        }
+      },
+      "snowflake": {
+        "native_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "validation_rule": "DISCONNECT_REASON = 'AGENT_DISCONNECT' AND CONNECTED_TO_AGENT_TIMESTAMP IS NOT NULL"
+      }
+    },
+    "average_customer_hold_time": {
+      "classification": "AMAZON_PROVIDED",
+      "amazon": {
+        "source": "GetMetricDataV2",
+        "metric": "AVG_HOLD_TIME",
+        "excludes": [
+          "queue_wait"
+        ]
+      },
+      "snowflake": {
+        "native_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "validation_field": "Agent.CustomerHoldDuration",
+        "tests": [
+          "apply_amazon_null_zero_inclusion_rules"
+        ]
+      }
+    },
+    "contacts_queued": {
+      "classification": "AMAZON_PROVIDED",
+      "amazon": {
+        "source": "GetMetricDataV2",
+        "metric": "CONTACTS_QUEUED",
+        "grain": "aggregate_period_filter_set",
+        "validation_field": "QueueInfo.EnqueueTimestamp"
+      },
+      "snowflake": {
+        "native_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "validation_target": "ANALYTICS_CONNECT.FCT_CONTACT_LEG",
+        "validation_rule": "QUEUE_ENQUEUE_TIMESTAMP IS NOT NULL",
+        "flow_connection": [
+          "table_1_inbound_population",
+          "table_2_not_connected_outcomes",
+          "table_3_queue_outcomes"
+        ],
+        "tests": [
+          "native_equals_validation_when_scope_matches",
+          "queued_outcomes_reconcile_to_contacts_queued"
+        ]
+      }
+    },
+    "maximum_queued_time": {
+      "classification": "AMAZON_PROVIDED",
+      "amazon": {
+        "source": "GetMetricDataV2",
+        "metric": "MAX_QUEUED_TIME",
+        "grain": "aggregate_period_filter_set"
+      },
+      "snowflake": {
+        "native_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "validation_target": "ANALYTICS_CONNECT.FCT_CONTACT_LEG",
+        "validation_field": "QueueInfo.Duration",
+        "flow_connection": [
+          "table_3_queue_abandon_duration"
+        ],
+        "tests": [
+          "native_equals_max_queue_duration_when_scope_matches"
+        ]
+      }
+    },
+    "average_agent_interaction_time": {
+      "classification": "AMAZON_PROVIDED",
+      "amazon": {
+        "source": "GetMetricDataV2",
+        "metric": "AVG_INTERACTION_TIME",
+        "grain": "aggregate_period_filter_set",
+        "excludes": [
+          "customer_hold",
+          "after_contact_work",
+          "agent_pause"
+        ]
+      },
+      "snowflake": {
+        "native_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "validation_target": "ANALYTICS_CONNECT.FCT_CONTACT_LEG",
+        "validation_field": "Agent.AgentInteractionDuration",
+        "flow_connection": [
+          "table_4_connected_contact_outcomes",
+          "table_5_post_connection_experience"
+        ],
+        "tests": [
+          "apply_amazon_null_zero_inclusion_rules"
+        ]
+      }
+    },
+    "average_holds_per_contact": {
+      "classification": "AMAZON_PROVIDED",
+      "amazon": {
+        "source": "GetMetricDataV2",
+        "metric": "AVG_HOLDS",
+        "grain": "aggregate_period_filter_set",
+        "validation_field": "Agent.NumberOfHolds"
+      },
+      "snowflake": {
+        "native_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "validation_target": "ANALYTICS_CONNECT.FCT_CONTACT_LEG",
+        "validation_field": "Agent.NumberOfHolds",
+        "flow_connection": [
+          "table_5_post_connection_experience"
+        ],
+        "tests": [
+          "contacts_without_holds_contribute_zero"
+        ]
+      }
+    },
+    "agent_answer_rate": {
+      "classification": "AMAZON_PROVIDED",
+      "amazon": {
+        "source": "GetMetricDataV2",
+        "metric": "AGENT_ANSWER_RATE",
+        "grain": "aggregate_period_filter_set",
+        "formula": "accepted_agent_offers / routing_attempts * 100"
+      },
+      "snowflake": {
+        "native_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "validation_target": "ANALYTICS_CONNECT.FCT_AGENT_OFFER_ATTEMPT",
+        "validation_rule": "accepted_offer_attempts / all_offer_attempts * 100",
+        "flow_connection": [
+          "table_6_agent_offer_quality"
+        ],
+        "tests": [
+          "attempt_grain_not_mixed_with_distinct_contact_grain",
+          "rate_between_zero_and_one_hundred"
+        ]
+      }
+    },
+    "agent_non_response_caller_abandoned_attempts": {
+      "classification": "DERIVED",
+      "amazon": {
+        "source": "GetMetricDataV2",
+        "formula": "AGENT_NON_RESPONSE - AGENT_NON_RESPONSE_WITHOUT_CUSTOMER_ABANDONS",
+        "grain": "agent_offer_attempt"
+      },
+      "snowflake": {
+        "target": "ANALYTICS_CONNECT.FCT_AGENT_OFFER_ATTEMPT",
+        "flow_connection": [
+          "table_6_agent_offer_quality"
+        ],
+        "tests": [
+          "result_nonnegative",
+          "attempt_grain_not_mixed_with_distinct_contact_grain"
+        ]
+      }
+    },
+    "outbound_recipients_targeted": {
+      "classification": "AMAZON_PROVIDED",
+      "amazon": {
+        "source": "GetMetricDataV2",
+        "metric": "RECIPIENTS_TARGETED",
+        "filters": {
+          "CHANNEL": [
+            "VOICE"
+          ]
+        },
+        "grain": "campaign_execution_filter_set",
+        "availability": "customer_segment_campaigns_only"
+      },
+      "snowflake": {
+        "native_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "validation_target": "ANALYTICS_CONNECT.FCT_CAMPAIGN_RECIPIENT",
+        "flow_connection": [
+          "outbound_table_1_targeting"
+        ],
+        "tests": [
+          "targeted_equals_attempted_plus_excluded_plus_pending",
+          "recipient_grain_not_mixed_with_send_attempt_grain"
+        ]
+      }
+    },
+    "outbound_recipients_attempted": {
+      "classification": "AMAZON_PROVIDED",
+      "amazon": {
+        "source": "GetMetricDataV2",
+        "metric": "RECIPIENTS_ATTEMPTED",
+        "grain": "campaign_execution_filter_set",
+        "availability": "customer_segment_campaigns_only",
+        "precision": "approximate"
+      },
+      "snowflake": {
+        "native_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "validation_target": "ANALYTICS_CONNECT.FCT_CAMPAIGN_RECIPIENT",
+        "validation_rule": "COUNT(DISTINCT recipient_key) WHERE attempted_flag",
+        "flow_connection": [
+          "outbound_table_1_targeting",
+          "outbound_table_2_delivery"
+        ],
+        "tests": [
+          "recipient_grain_not_mixed_with_send_attempt_grain"
+        ]
+      }
+    },
+    "outbound_recipients_excluded_before_send": {
+      "classification": "DERIVED",
+      "amazon": {
+        "source": "outbound_campaign_events_and_governance_sources",
+        "grain": "distinct_recipient_per_campaign_execution",
+        "formula": "COUNT(DISTINCT recipient_key) WHERE exclusion_event_or_approved_suppression_rule"
+      },
+      "snowflake": {
+        "target": "ANALYTICS_CONNECT.FCT_CAMPAIGN_RECIPIENT",
+        "validation_rule": "one terminal exclusion reason per excluded recipient",
+        "flow_connection": [
+          "outbound_table_1_targeting",
+          "outbound_table_1a_exclusions"
+        ],
+        "tests": [
+          "exclusion_reason_sum_equals_excluded_recipient_parent",
+          "mutually_exclusive_exclusion_reason"
+        ]
+      }
+    },
+    "outbound_recipients_pending_at_cutoff": {
+      "classification": "DERIVED",
+      "amazon": {
+        "source": "outbound_campaign_events",
+        "grain": "distinct_recipient_per_campaign_execution",
+        "formula": "targeted recipients minus attempted recipients minus excluded recipients as of reporting cutoff"
+      },
+      "snowflake": {
+        "target": "ANALYTICS_CONNECT.FCT_CAMPAIGN_RECIPIENT",
+        "validation_rule": "targeted_flag AND NOT attempted_flag AND NOT excluded_flag at snapshot timestamp",
+        "flow_connection": [
+          "outbound_table_1_targeting"
+        ],
+        "tests": [
+          "pending_nonnegative",
+          "targeted_equals_attempted_plus_excluded_plus_pending"
+        ]
+      }
+    },
+    "outbound_campaign_send_attempts": {
+      "classification": "AMAZON_PROVIDED",
+      "amazon": {
+        "source": "GetMetricDataV2",
+        "metric": "CAMPAIGN_SEND_ATTEMPTS",
+        "grain": "campaign_execution_filter_set"
+      },
+      "snowflake": {
+        "native_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "validation_target": "ANALYTICS_CONNECT.FCT_CAMPAIGN_DELIVERY_ATTEMPT",
+        "flow_connection": [
+          "outbound_table_1_targeting",
+          "outbound_table_2_delivery"
+        ],
+        "tests": [
+          "one_latest_delivery_state_per_attempt"
+        ]
+      }
+    },
+    "outbound_delivery_attempts": {
+      "classification": "AMAZON_PROVIDED",
+      "amazon": {
+        "source": "GetMetricDataV2",
+        "metric": "DELIVERY_ATTEMPTS",
+        "filters": {
+          "SUBTYPE": [
+            "connect:Telephony"
+          ]
+        },
+        "grain": "campaign_filter_set"
+      },
+      "snowflake": {
+        "native_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "validation_target": "ANALYTICS_CONNECT.FCT_CAMPAIGN_DELIVERY_ATTEMPT",
+        "flow_connection": [
+          "outbound_table_2_delivery",
+          "outbound_table_3_mode"
+        ],
+        "tests": [
+          "delivery_attempts_equal_final_disposition_sum",
+          "voice_mode_children_equal_voice_delivery_parent"
+        ]
+      }
+    },
+    "outbound_delivery_mode": {
+      "classification": "AMAZON_PROVIDED_FILTER_AND_DERIVED_CONTROL",
+      "amazon": {
+        "source": "GetMetricDataV2",
+        "metric": "DELIVERY_ATTEMPTS",
+        "filters": {
+          "SUBTYPE": [
+            "connect:Telephony"
+          ],
+          "DELIVERY_MODE": [
+            "AGENT_ASSISTED_VOICE",
+            "AUTOMATED_VOICE"
+          ]
+        },
+        "grain": "campaign_delivery_mode_filter_set"
+      },
+      "snowflake": {
+        "native_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "validation_target": "ANALYTICS_CONNECT.FCT_CAMPAIGN_DELIVERY_ATTEMPT",
+        "validation_rule": "exactly one delivery_mode per voice delivery_attempt_id",
+        "flow_connection": [
+          "outbound_table_3_mode",
+          "outbound_table_4a_agent_amd",
+          "outbound_table_4b_automated_amd"
+        ],
+        "tests": [
+          "agent_assisted_plus_automated_equals_voice_delivery_attempts",
+          "voice_delivery_mode_not_null"
+        ]
+      }
+    },
+    "outbound_human_answered": {
+      "classification": "AMAZON_PROVIDED",
+      "amazon": {
+        "source": "GetMetricDataV2",
+        "metric": "HUMAN_ANSWERED",
+        "filters": {
+          "DELIVERY_MODE": [
+            "AGENT_ASSISTED_VOICE"
+          ],
+          "AMD_ENABLED": [
+            "TRUE"
+          ]
+        },
+        "grain": "campaign_filter_set"
+      },
+      "snowflake": {
+        "native_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "validation_target": "ANALYTICS_CONNECT.FCT_CONTACT_LEG",
+        "validation_rule": "CAMPAIGN_ID IS NOT NULL AND DELIVERY_MODE='AGENT_ASSISTED_VOICE' AND ANSWERING_MACHINE_DETECTION_STATUS = 'HUMAN_ANSWERED'",
+        "flow_connection": [
+          "outbound_table_4a_agent_amd",
+          "outbound_table_5a_human_answer"
+        ],
+        "tests": [
+          "native_equals_contact_record_validation"
+        ]
+      }
+    },
+    "outbound_automated_human_answered": {
+      "classification": "AMAZON_PROVIDED",
+      "amazon": {
+        "source": "GetMetricDataV2",
+        "metric": "HUMAN_ANSWERED",
+        "filters": {
+          "DELIVERY_MODE": [
+            "AUTOMATED_VOICE"
+          ],
+          "AMD_ENABLED": [
+            "TRUE"
+          ]
+        },
+        "grain": "campaign_filter_set"
+      },
+      "snowflake": {
+        "native_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "validation_target": "ANALYTICS_CONNECT.FCT_CONTACT_LEG",
+        "validation_rule": "CAMPAIGN_ID IS NOT NULL AND DELIVERY_MODE='AUTOMATED_VOICE' AND ANSWERING_MACHINE_DETECTION_STATUS='HUMAN_ANSWERED'",
+        "flow_connection": [
+          "outbound_table_4b_automated_amd",
+          "outbound_table_5b_automated_outcome"
+        ],
+        "tests": [
+          "native_equals_contact_record_validation"
+        ]
+      }
+    },
+    "outbound_automated_flow_outcome": {
+      "classification": "DERIVED",
+      "amazon": {
+        "source": "contact_records_and_contact_flow_events",
+        "grain": "distinct_automated_voice_contact_leg",
+        "formula": "one of FLOW_COMPLETED, AGENT_TRANSFER_REQUESTED, CUSTOMER_DISCONNECT_BEFORE_COMPLETION, FLOW_OR_SYSTEM_ERROR"
+      },
+      "snowflake": {
+        "target": "ANALYTICS_CONNECT.FCT_AUTOMATED_VOICE_OUTCOME",
+        "required_fields": [
+          "INSTANCE_ID",
+          "CONTACT_ID",
+          "CAMPAIGN_ID",
+          "DELIVERY_MODE",
+          "FLOW_ID",
+          "FLOW_VERSION",
+          "TERMINAL_OUTCOME",
+          "OUTCOME_TIMESTAMP"
+        ],
+        "flow_connection": [
+          "outbound_table_5b_automated_outcome"
+        ],
+        "tests": [
+          "one_automated_terminal_outcome_per_human_answer",
+          "automated_outcomes_equal_automated_human_answers"
+        ]
+      }
+    },
+    "outbound_automated_transfer_outcome": {
+      "classification": "DERIVED",
+      "amazon": {
+        "source": "contact_records_and_contact_events",
+        "grain": "distinct_automated_voice_transfer_request",
+        "formula": "one of CONNECTED_TO_AGENT, CUSTOMER_ABANDONED_BEFORE_AGENT, TRANSFER_OR_FLOW_FAILURE"
+      },
+      "snowflake": {
+        "target": "ANALYTICS_CONNECT.FCT_AUTOMATED_VOICE_OUTCOME",
+        "required_fields": [
+          "TRANSFER_REQUEST_TIMESTAMP",
+          "CONNECTED_TO_AGENT_TIMESTAMP",
+          "DISCONNECT_TIMESTAMP",
+          "DISCONNECT_REASON",
+          "QUEUE_ID",
+          "NEXT_CONTACT_ID"
+        ],
+        "flow_connection": [
+          "outbound_table_5b_automated_outcome",
+          "outbound_table_6b_automated_transfer"
+        ],
+        "tests": [
+          "one_transfer_outcome_per_transfer_request",
+          "automated_transfer_children_equal_transfer_request_parent"
+        ]
+      }
+    },
+    "outbound_human_answer_abandoned_before_agent": {
+      "classification": "DERIVED",
+      "amazon": {
+        "source": "contact_record_and_contact_events",
+        "grain": "distinct_campaign_contact_leg",
+        "formula": "AnsweringMachineDetectionStatus=HUMAN_ANSWERED AND ConnectedToSystemTimestamp IS NOT NULL AND ConnectedToAgentTimestamp IS NULL AND customer disconnected"
+      },
+      "snowflake": {
+        "target": "MART_CALL_CENTER.MONTHLY_OUTBOUND_AUDIT",
+        "validation_target": "ANALYTICS_CONNECT.FCT_CONTACT_LEG",
+        "flow_connection": [
+          "outbound_table_5a_human_answer",
+          "outbound_table_6a_abandon_duration",
+          "outbound_director_trend"
+        ],
+        "tests": [
+          "agent_assisted_human_answer_equals_agent_connected_plus_abandoned_plus_other_exit"
+        ]
+      }
+    },
+    "outbound_campaign_abandons_after_2_seconds": {
+      "classification": "AMAZON_PROVIDED",
+      "amazon": {
+        "source": "GetMetricDataV2",
+        "metric": "CAMPAIGN_CONTACTS_ABANDONED_AFTER_X_FROM_SYSTEM_CONNECTION",
+        "threshold_seconds": 2,
+        "timing_origin": "ConnectedToSystemTimestamp",
+        "grain": "campaign_filter_set"
+      },
+      "snowflake": {
+        "native_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "validation_target": "ANALYTICS_CONNECT.FCT_CONTACT_LEG",
+        "validation_rule": "DELIVERY_MODE='AGENT_ASSISTED_VOICE' AND abandoned_before_agent AND DATEDIFF(milliseconds, CONNECTED_TO_SYSTEM_TIMESTAMP, DISCONNECT_TIMESTAMP) >= 2000",
+        "flow_connection": [
+          "outbound_table_6a_abandon_duration",
+          "outbound_table_10_kpi"
+        ],
+        "tests": [
+          "threshold_and_timing_origin_stored_with_value"
+        ]
+      }
+    },
+    "outbound_average_wait_after_customer_connection": {
+      "classification": "AMAZON_PROVIDED",
+      "amazon": {
+        "source": "GetMetricDataV2",
+        "metric": "AVG_WAIT_TIME_AFTER_CUSTOMER_CONNECTION",
+        "filters": {
+          "DELIVERY_MODE": [
+            "AGENT_ASSISTED_VOICE"
+          ]
+        },
+        "grain": "campaign_filter_set"
+      },
+      "snowflake": {
+        "native_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "validation_target": "ANALYTICS_CONNECT.FCT_CONTACT_LEG",
+        "flow_connection": [
+          "outbound_table_5a_human_answer",
+          "outbound_table_6a_abandon_duration",
+          "outbound_table_10_kpi"
+        ],
+        "tests": [
+          "native_equals_timestamp_validation_when_scope_matches"
+        ]
+      }
+    },
+    "outbound_agent_answer_rate": {
+      "classification": "AMAZON_PROVIDED",
+      "amazon": {
+        "source": "GetMetricDataV2",
+        "metric": "AGENT_ANSWER_RATE",
+        "filters": {
+          "CAMPAIGN": [
+            "IN_SCOPE"
+          ]
+        },
+        "grain": "agent_offer_attempt_filter_set"
+      },
+      "snowflake": {
+        "native_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "validation_target": "ANALYTICS_CONNECT.FCT_AGENT_OFFER_ATTEMPT",
+        "validation_rule": "accepted_agent_assisted_campaign_offer_attempts / all_agent_assisted_campaign_offer_attempts * 100",
+        "flow_connection": [
+          "outbound_table_9a_agent_offer",
+          "outbound_table_10_kpi"
+        ],
+        "tests": [
+          "attempt_grain_not_mixed_with_contact_grain",
+          "accepted_offers_equal_agent_assisted_connected_campaign_contacts"
+        ]
+      }
+    },
+    "agent_online_current": {
+      "classification": "AMAZON_PROVIDED",
+      "amazon": {
+        "source": "GetCurrentMetricData",
+        "metric": "AGENTS_ONLINE",
+        "grain": "point_in_time_filter_set",
+        "definition": "CCP status is not Offline"
+      },
+      "snowflake": {
+        "native_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "validation_target": "ANALYTICS_CONNECT.FCT_AGENT_STATE_INTERVAL",
+        "tests": [
+          "native_equals_distinct_latest_online_agents_when_scope_matches"
+        ]
+      }
+    },
+    "agent_available_current": {
+      "classification": "AMAZON_PROVIDED",
+      "amazon": {
+        "source": "GetCurrentMetricData",
+        "metric": "AGENTS_AVAILABLE",
+        "grain": "point_in_time_filter_set"
+      },
+      "snowflake": {
+        "native_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "validation_target": "ANALYTICS_CONNECT.FCT_AGENT_STATE_INTERVAL",
+        "tests": [
+          "do_not_derive_as_online_minus_overlapping_native_states"
+        ]
+      }
+    },
+    "agent_exclusive_current_state": {
+      "classification": "DERIVED",
+      "amazon": {
+        "source": "Kinesis agent event stream",
+        "fields": [
+          "AgentARN",
+          "EventTimestamp",
+          "EventType",
+          "CurrentAgentSnapshot.AgentStatus",
+          "CurrentAgentSnapshot.Contacts"
+        ],
+        "grain": "latest_event_per_agent_at_snapshot",
+        "formula": "exactly one of READY, ACTIVE_CONTACT, ACW_ONLY, CUSTOM_UNAVAILABLE, ERROR_BLOCKED"
+      },
+      "snowflake": {
+        "target": "ANALYTICS_CONNECT.FCT_AGENT_STATE_INTERVAL",
+        "primary_key": [
+          "INSTANCE_ID",
+          "AGENT_ARN",
+          "INTERVAL_START_TS"
+        ],
+        "tests": [
+          "one_canonical_state_per_online_agent",
+          "canonical_state_sum_equals_agents_online"
+        ]
+      }
+    },
+    "agent_online_time": {
+      "classification": "AMAZON_PROVIDED",
+      "amazon": {
+        "source": "GetMetricDataV2",
+        "metric": "SUM_ONLINE_TIME_AGENT",
+        "grain": "agent_activity_filter_set",
+        "unit": "seconds",
+        "unsupported_grouping": [
+          "QUEUE"
+        ]
+      },
+      "snowflake": {
+        "native_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "validation_field": "agent_statistic_record.online_time / 1000.0",
+        "tests": [
+          "contact_plus_idle_plus_custom_status_equals_online"
+        ]
+      }
+    },
+    "agent_contact_time": {
+      "classification": "AMAZON_PROVIDED",
+      "amazon": {
+        "source": "GetMetricDataV2",
+        "metric": "SUM_CONTACT_TIME_AGENT",
+        "grain": "agent_activity_filter_set",
+        "unit": "seconds"
+      },
+      "snowflake": {
+        "native_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "tests": [
+          "same_scope_as_online_time_rollup"
+        ]
+      }
+    },
+    "agent_idle_time": {
+      "classification": "AMAZON_PROVIDED",
+      "amazon": {
+        "source": "GetMetricDataV2",
+        "metric": "SUM_IDLE_TIME_AGENT",
+        "grain": "agent_activity_filter_set",
+        "unit": "seconds",
+        "includes": [
+          "routing_time",
+          "error_state_duration"
+        ]
+      },
+      "snowflake": {
+        "native_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "validation_field": "agent_statistic_record.idle_time / 1000.0",
+        "tests": [
+          "error_time_not_double_counted_in_online_rollup"
+        ]
+      }
+    },
+    "agent_custom_status_time": {
+      "classification": "AMAZON_PROVIDED",
+      "amazon": {
+        "source": "GetMetricDataV2",
+        "metric": "SUM_NON_PRODUCTIVE_TIME_AGENT",
+        "grain": "agent_activity_filter_set",
+        "unit": "seconds",
+        "business_note": "custom status does not necessarily mean unproductive work"
+      },
+      "snowflake": {
+        "native_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "validation_target": "ANALYTICS_CONNECT.FCT_AGENT_STATE_INTERVAL",
+        "tests": [
+          "raw_status_mapped_to_approved_business_reason"
+        ]
+      }
+    },
+    "agent_error_status_time": {
+      "classification": "AMAZON_PROVIDED",
+      "amazon": {
+        "source": "GetMetricDataV2",
+        "metric": "SUM_ERROR_STATUS_TIME_AGENT",
+        "grain": "agent_activity_filter_set",
+        "unit": "seconds"
+      },
+      "snowflake": {
+        "native_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "tests": [
+          "reported_as_non_additive_diagnostic",
+          "not_added_to_idle_time"
+        ]
+      }
+    },
+    "agent_handled_by_channel": {
+      "classification": "AMAZON_PROVIDED",
+      "amazon": {
+        "source": "GetMetricDataV2",
+        "metric": "CONTACTS_HANDLED",
+        "filters": {
+          "CHANNEL": [
+            "VOICE",
+            "CHAT",
+            "TASK"
+          ]
+        },
+        "grain": "disconnect_time_contact_filter_set"
+      },
+      "snowflake": {
+        "native_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "validation_target": "ANALYTICS_CONNECT.FCT_CONTACT_LEG",
+        "validation_rule": "CONNECTED_TO_AGENT_TIMESTAMP IS NOT NULL",
+        "tests": [
+          "enabled_channel_children_equal_handled_parent"
+        ]
+      }
+    },
+    "agent_total_routing_attempts": {
+      "classification": "DERIVED",
+      "amazon": {
+        "source": "agent_events_and_GetMetricDataV2",
+        "formula": "accepted_offer_attempts + AGENT_NON_RESPONSE",
+        "grain": "agent_offer_attempt"
+      },
+      "snowflake": {
+        "target": "ANALYTICS_CONNECT.FCT_AGENT_OFFER_ATTEMPT",
+        "primary_key": [
+          "INSTANCE_ID",
+          "CONTACT_ID",
+          "ATTEMPT_ORDINAL"
+        ],
+        "tests": [
+          "accepted_plus_nonresponse_equals_all_attempts",
+          "attempt_grain_not_mixed_with_contact_grain"
+        ]
+      }
+    },
+    "agent_non_response": {
+      "classification": "AMAZON_PROVIDED",
+      "amazon": {
+        "source": "GetMetricDataV2",
+        "metric": "AGENT_NON_RESPONSE",
+        "grain": "agent_offer_attempt",
+        "note": "one contact may count multiple times"
+      },
+      "snowflake": {
+        "native_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "validation_target": "ANALYTICS_CONNECT.FCT_AGENT_OFFER_ATTEMPT",
+        "tests": [
+          "attempt_grain_preserved"
+        ]
+      }
+    },
+    "agent_handling_efficiency": {
+      "classification": "AMAZON_PROVIDED",
+      "amazon": {
+        "source": "GetMetricDataV2",
+        "metrics": [
+          "AVG_HANDLE_TIME",
+          "AVG_INTERACTION_TIME",
+          "AVG_HOLD_TIME",
+          "AVG_AFTER_CONTACT_WORK_TIME",
+          "AVG_HOLDS",
+          "AGENT_OCCUPANCY",
+          "AGENT_ANSWER_RATE"
+        ],
+        "grain": "metric_filter_set",
+        "statistics": {
+          "AGENT_OCCUPANCY": "AVG",
+          "AGENT_ANSWER_RATE": "AVG"
+        }
+      },
+      "snowflake": {
+        "native_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "validation_target": "ANALYTICS_CONNECT.FCT_CONTACT_LEG",
+        "validation_fields": [
+          "AgentInteractionDuration",
+          "CustomerHoldDuration",
+          "AfterContactWorkDuration",
+          "AgentPauseDuration",
+          "NumberOfHolds"
+        ],
+        "tests": [
+          "independent_averages_not_summed_to_recreate_aht",
+          "amazon_null_zero_rules_applied"
+        ]
+      }
+    },
+    "agent_schedule_adherence": {
+      "classification": "AMAZON_PROVIDED_OPTIONAL",
+      "amazon": {
+        "source": "GetMetricDataV2",
+        "metrics": [
+          "AGENT_SCHEDULED_TIME",
+          "AGENT_ADHERENT_TIME",
+          "AGENT_NON_ADHERENT_TIME",
+          "AGENT_SCHEDULE_ADHERENCE"
+        ],
+        "availability": "Forecasting_and_Scheduling_enabled_with_published_schedules",
+        "grain": "agent_schedule_filter_set"
+      },
+      "snowflake": {
+        "native_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "validation_target": "ANALYTICS_CONNECT.FCT_AGENT_SCHEDULE_INTERVAL",
+        "primary_key": [
+          "INSTANCE_ID",
+          "AGENT_ARN",
+          "SCHEDULE_INTERVAL_START_TS",
+          "SCHEDULE_VERSION"
+        ],
+        "tests": [
+          "adherent_plus_nonadherent_equals_scheduled",
+          "schedule_version_preserved"
+        ]
+      }
+    },
+    "agent_availability_gap": {
+      "classification": "DERIVED",
+      "amazon": {
+        "source": "schedule_metrics_and_agent_state_intervals",
+        "grain": "interval_queue_or_demand_group",
+        "formula": "GREATEST(required_agents - ready_for_routing_agents, 0)"
+      },
+      "snowflake": {
+        "target": "MART_CALL_CENTER.AGENT_INTERVAL_STAFFING",
+        "tests": [
+          "available_not_substituted_with_online",
+          "timezone_and_interval_stored"
+        ]
+      }
+    },
+    "agent_quality_metrics": {
+      "classification": "MIXED",
+      "amazon": {
+        "source": "GetMetricDataV2",
+        "native_metrics": [
+          "EVALUATIONS_PERFORMED",
+          "AVG_WEIGHTED_EVALUATION_SCORE",
+          "CONTACTS_ON_HOLD_CUSTOMER_DISCONNECT",
+          "CONTACTS_TRANSFERRED_OUT",
+          "CONTACTS_HANDLED"
+        ],
+        "derived_metrics": {
+          "evaluation_coverage": "evaluated_distinct_contact_id / eligible_handled_distinct_contact_id",
+          "transfer_out_rate": "CONTACTS_TRANSFERRED_OUT / CONTACTS_HANDLED"
+        }
+      },
+      "snowflake": {
+        "native_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
+        "evaluation_target": "ANALYTICS_CONNECT.FCT_CONTACT_EVALUATION",
+        "semantic_target": "MART_CALL_CENTER.AGENT_DAILY_PERFORMANCE",
+        "tests": [
+          "calibration_evaluations_excluded",
+          "evaluation_form_version_preserved",
+          "rate_denominators_nonzero_or_null",
+          "native_numerators_and_denominators_same_scope"
+        ]
+      }
+    }
+  }
+}

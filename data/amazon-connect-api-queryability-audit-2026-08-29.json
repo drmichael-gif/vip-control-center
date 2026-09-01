@@ -1,0 +1,100 @@
+{
+  "audited_at": "2026-08-29",
+  "region": "us-east-1",
+  "instance_id": "6b3f17ba-68a4-472a-9b20-db1991507009",
+  "aws_profile": "vip-connect",
+  "inbound_test_window": {
+    "start_utc": "2026-08-12T04:00:00Z",
+    "end_utc": "2026-08-16T04:00:00Z",
+    "timezone": "America/New_York"
+  },
+  "inbound": {
+    "status": "live_validated",
+    "query_api": "GetMetricDataV2",
+    "validated_metric_contracts": [
+      "CONTACTS_CREATED",
+      "CONTACTS_HANDLED",
+      "CONTACTS_ABANDONED",
+      "CONTACTS_QUEUED",
+      "SUM_CONTACTS_ABANDONED_IN_X",
+      "SUM_CONTACTS_ANSWERED_IN_X",
+      "CONTACTS_PUT_ON_HOLD",
+      "CONTACTS_HOLD_ABANDONS",
+      "CONTACTS_ON_HOLD_CUSTOMER_DISCONNECT",
+      "CONTACTS_ON_HOLD_AGENT_DISCONNECT",
+      "CONTACTS_TRANSFERRED_OUT",
+      "CONTACTS_TRANSFERRED_OUT_BY_AGENT",
+      "CONTACTS_TRANSFERRED_OUT_INTERNAL",
+      "CONTACTS_TRANSFERRED_OUT_EXTERNAL",
+      "CONTACTS_HANDLED_CONNECTED_TO_AGENT_TIME",
+      "CONTACTS_QUEUED_BY_ENQUEUE",
+      "AVG_CONTACT_DURATION",
+      "AVG_INTERACTION_AND_HOLD_TIME",
+      "AVG_HOLDS",
+      "AVG_TALK_TIME",
+      "AVG_NON_TALK_TIME",
+      "PERCENT_TALK_TIME",
+      "PERCENT_NON_TALK_TIME",
+      "AVG_TALK_TIME_CUSTOMER",
+      "AVG_HOLD_TIME_ALL_CONTACTS",
+      "ABANDONMENT_RATE",
+      "AVG_QUEUE_ANSWER_TIME",
+      "AVG_ABANDON_TIME",
+      "SERVICE_LEVEL",
+      "MAX_QUEUED_TIME",
+      "AVG_HANDLE_TIME",
+      "AVG_INTERACTION_TIME",
+      "AVG_HOLD_TIME",
+      "AVG_AFTER_CONTACT_WORK_TIME",
+      "AVG_RESOLUTION_TIME",
+      "AGENT_NON_RESPONSE",
+      "AGENT_NON_RESPONSE_WITHOUT_CUSTOMER_ABANDONS",
+      "AGENT_ANSWER_RATE"
+    ],
+    "corrected_v2_contracts": [
+      {
+        "legacy_or_invalid_label": "CONTACTS_TRANSFERRED_IN",
+        "v2_contract": "CONTACTS_CREATED with INITIATION_METHOD in (TRANSFER, QUEUE_TRANSFER)"
+      },
+      {
+        "legacy_or_invalid_label": "CONTACTS_TRANSFERRED_IN_BY_AGENT",
+        "v2_contract": "CONTACTS_CREATED with INITIATION_METHOD=TRANSFER"
+      },
+      {
+        "legacy_or_invalid_label": "CONTACTS_TRANSFERRED_IN_FROM_QUEUE",
+        "v2_contract": "CONTACTS_CREATED with INITIATION_METHOD=QUEUE_TRANSFER"
+      },
+      {
+        "legacy_or_invalid_label": "CONTACTS_AGENT_HUNG_UP_FIRST",
+        "v2_contract": "CONTACTS_HANDLED with DISCONNECT_REASON=AGENT_DISCONNECT"
+      },
+      {
+        "legacy_or_invalid_label": "CALLBACK_CONTACTS_HANDLED",
+        "v2_contract": "CONTACTS_HANDLED with INITIATION_METHOD=CALLBACK"
+      },
+      {
+        "legacy_or_invalid_label": "AVG_CUSTOMER_TALK_TIME",
+        "v2_contract": "AVG_TALK_TIME_CUSTOMER"
+      },
+      {
+        "legacy_or_invalid_label": "AVG_CUSTOMER_HOLD_TIME_ALL_CONTACTS",
+        "v2_contract": "AVG_HOLD_TIME_ALL_CONTACTS"
+      }
+    ],
+    "removed_from_active_dashboard": [
+      "CONTACTS_CONSULTED because the identifier is not accepted by GetMetricDataV2 for this instance and request scope"
+    ]
+  },
+  "outbound": {
+    "status": "official_contract_validated_but_not_live_executed",
+    "reason": [
+      "The current AWS identity is denied connect-campaigns:ListCampaigns.",
+      "Campaign-filtered GetMetricDataV2 calls are denied by the applicable resource policy without an authorized campaign resource."
+    ],
+    "required_access_for_final_live_validation": [
+      "connect-campaigns:ListCampaigns",
+      "connect:GetMetricDataV2 for the relevant campaign resources and filter scope"
+    ],
+    "contract_correction": "HUMAN_ANSWERED is the documented V2 metric identifier; HUMAN_ANSWERED_CALLS was removed from the implementation contract."
+  }
+}
