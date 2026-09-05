@@ -1,2 +1,13 @@
 __pycache__/
 *.py[cod]
+.env
+.env.*
+!.env.example
+.aws/
+**/credentials
+**/*.pem
+**/*.key
+config/*.local.json
+private-data/
+artifacts/
+node_modules/

@@ -17,7 +17,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 
-DEFAULT_INSTANCE_ID = "6b3f17ba-68a4-472a-9b20-db1991507009"
+DEFAULT_INSTANCE_ID = "00000000-0000-0000-0000-000000000000"
 DEFAULT_REGION = "us-east-1"
 DEFAULT_PROFILE = "vip-connect"
 

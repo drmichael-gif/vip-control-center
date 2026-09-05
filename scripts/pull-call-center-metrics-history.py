@@ -22,8 +22,8 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 
-DEFAULT_INSTANCE_ID = "6b3f17ba-68a4-472a-9b20-db1991507009"
-DEFAULT_ACCOUNT_ID = "165505826690"
+DEFAULT_INSTANCE_ID = "00000000-0000-0000-0000-000000000000"
+DEFAULT_ACCOUNT_ID = "000000000000"
 
 
 def parse_args() -> argparse.Namespace:
