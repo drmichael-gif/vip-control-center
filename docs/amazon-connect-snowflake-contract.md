@@ -1,5 +1,141 @@
 # Amazon Connect → Snowflake metric contract
 
+PUBLIC EDITION: All metric mappings and formulas below are retained; private snapshots and raw evidence are withheld. Historical aggregate comparison examples document design decisions, not live public data or a current verification badge. Deployment IDs are placeholders. See `PUBLICATION.md` for private implementation instructions. No API keys or credentials were changed.
+
+Navigation: enter Call Center Operations through its main home card only. The top-level audit tab is removed; the six dashboard/dictionary choices remain inside Operations. This navigation change does not alter metrics, filters or warehouse mappings.
+
+## Current agent dashboard and dictionary — September 4, 2026
+
+This section and `data/agent-operations-registry.json` supersede all legacy agent examples below. The active pair uses `agent-operations.js`, `agent-chart-data.js` and `data/agent-operations-snapshot.json`. Old mock agent identities, 5,820 handled contacts, 82.4% occupancy, invented targets and evaluation coverage have been removed from the page. The centerwide **Call Center Metrics** and **Call Center Metrics Dictionary** panels and navigation entries are removed; old centerwide contracts below are archival, not active dashboard inputs. Call Center Operations now opens the inbound dashboard and has three dashboard/reference pairs.
+
+### Acquisition and scope
+
+`scripts/verify-agent-api.py` issues read-only, fully paginated `GetMetricDataV2` requests for Aug 12 00:00 through Aug 16 00:00 exclusive, 2026 America/New_York (`2026-08-12T04:00:00Z` → `2026-08-16T04:00:00Z`). Each native metric is independently requested as ungrouped TOTAL, ungrouped DAY, AGENT TOTAL and AGENT DAY. No current-day records enter historical figures. Snapshot request/response pages, request hash, retrieval time and errors are retained.
+
+- Voice contact, response, handling and quality/schedule requests use all 96 currently enumerated STANDARD queue IDs plus `CHANNEL=VOICE`, without an initiation-method filter. These are not inbound-only agent results.
+- Occupancy and activity time use all 67 currently enumerated routing-profile IDs, **no queue or channel filter**. Do not present them as voice-only. The populations differ from the voice workload group.
+- Full-period or single-day selectors pick existing native results. Agent selection picks `Dimensions.AGENT`; native ungrouped values remain the team authority. Unknown agent dimensions are retained. Missing rows/values stay unavailable.
+- Names are obtained from `ListUsers` and `DescribeUser`, using `User.Id` as the join key; `IdentityInfo.FirstName` and `LastName`, then `Username`, then ID are display fallbacks. Directory names are current, not historical SCD names.
+- `--agent-days` refreshes AGENT DAY evidence. `--current` retrieves `GetCurrentUserData` separately and retains only User ID/ARN, status, channel slots and routing-profile fields; no Contacts or customer identifiers. Current state is timestamped, not live, and never changes historical totals. A missing agent or channel key is not automatically Offline or zero.
+
+### Active native fields
+
+| Topic | Exact GetMetricDataV2 field | Returned measure / semantic mapping |
+|---|---|---|
+| Workload | `CONTACTS_HANDLED` | Contact legs; `Agent_Contacts_Handled` |
+| Routing response | `AGENT_NON_RESPONSE` | Attempts; `Agent_Non_Response_Attempts` |
+| Routing response | `AGENT_NON_RESPONSE_WITHOUT_CUSTOMER_ABANDONS` | Attempts excluding connecting customer abandons; `Agent_Non_Response_Without_Customer_Abandons` |
+| Routing response | `AGENT_ANSWER_RATE` | Native percentage; `Agent_Answer_Rate` |
+| Handling | `AVG_HANDLE_TIME` | Native seconds; `Agent_Average_Handle_Seconds` |
+| Handling | `AVG_INTERACTION_TIME` | Native seconds; `Agent_Average_Interaction_Seconds` |
+| Handling | `AVG_HOLD_TIME` | Native seconds; `Agent_Average_Customer_Hold_Seconds` |
+| Handling | `AVG_AFTER_CONTACT_WORK_TIME` | Native seconds; `Agent_Average_After_Contact_Work_Seconds` |
+| Activity | `AGENT_OCCUPANCY` | Observed native ratio; `Agent_Occupancy_Rate` |
+| Activity | `SUM_ONLINE_TIME_AGENT` | Native seconds; `Agent_Online_Seconds` |
+| Activity | `SUM_CONTACT_TIME_AGENT` | Native seconds; `Agent_Contact_Seconds` |
+| Activity | `SUM_IDLE_TIME_AGENT` | Native seconds; `Agent_Idle_Seconds` |
+| Activity | `SUM_NON_PRODUCTIVE_TIME_AGENT` | Native custom-status seconds; `Agent_Non_Productive_Seconds` |
+| Scheduling | `AGENT_SCHEDULE_ADHERENCE` | No returned rows; `Agent_Schedule_Adherence_Rate` remains unavailable |
+| Quality | `AVG_WEIGHTED_EVALUATION_SCORE` | Native score; `Agent_Weighted_Evaluation_Score`; mixed-form/coverage caveat, not a leaderboard |
+
+Definitions checked against [Amazon metric definitions](https://docs.aws.amazon.com/connect/latest/adminguide/metrics-definitions.html) and [GetMetricDataV2](https://docs.aws.amazon.com/connect/latest/APIReference/API_GetMetricDataV2.html). Individual-agent request support was tested, not inferred from the Assistant's tool registry. No custom offer denominator, reconstructed AHT, evaluation-coverage ratio, schedule adherence or staffing target has been introduced.
+
+### Display conversions, reconciliation and Assistant comparison
+
+Native TOTAL handled = **5,262**; DAY counts **1,799 + 1,695 + 1,639 + 129** and AGENT counts each reconcile to it. Routing attempts are a different grain and must not be added to handled contacts. Handling averages have different eligibility/denominators: do not stack or sum them to reconstruct AHT.
+
+The raw occupancy result is **0.15278318112852876**, displayed as **15.278318112852876%** with explicit `native_value * 100` conversion. Same-scope native contact seconds **987,376.583** / (contact seconds + idle seconds **5,475,223.395**) independently validates its ratio scale. Tests repeat this check for available agents and days. The derived *display conversion* is labeled in the registry; it is not a newly computed occupancy metric. Never guess scale because an arbitrary percentage is less than 1. Refuse publication when the observed unit contract changes. Activity-time graphs use native seconds / 3,600 for hours and retain raw seconds in the dictionary.
+
+`data/agent-assistant-verification.json` records independent Assistant queries followed by discrepancy investigation. Native non-response **435**, excluding-abandons **49**, answer rate **85.75638506876227%**, and handling/wrap averages (rounded comparison) matched. Assistant repeatedly returned handled **5,264**, and occupancy **15.77307834915337%**, using QUEUE_TYPE filtering and an unfiltered activity population respectively. Both discrepancies remain visible. Its queue-deletion/population/weighting explanations are hypotheses, not established causes. No per-agent values, identity records, current states or other chart points get an Assistant-verified badge from a team-total comparison.
+
+### UX, charts and warehouse implementation
+
+Eight chart families: handled daily volume; non-response/subset comparison; answer-rate trend; interaction/wrap averages; handle/hold averages; occupancy trend; activity-hour bars; top-eight handled workloads. Every family links to its matching definition. Daily charts keep all four loaded days for the selected agent; team ranking retains the selected date window but ignores individual-agent selection explicitly. Top eight is not an exhaustive partition. The roster follows the historical window and searches names/IDs independently. No arbitrary “good/bad” threshold colors or fair-performance ranking is implied.
+
+The dictionary uses inbound's topic navigation, search, expandable metric definitions, exact request/result, semantic alias and Snowflake disclosures. Chart-source clicks clear topic/search filters, expand the matching definition, switch tabs and focus it. Current status and identity endpoints have their own reference. Neither page falls back to old examples on a load error.
+
+`docs/agent-operations-snowflake.sql` defines the proposed `FCT_CONNECT_METRIC_INTERVAL`, `DIM_CONNECT_USER`, `FCT_CONNECT_USER_SNAPSHOT` and `VW_AGENT_OPERATIONS`. Native grain is instance + metric specification + scope + UTC interval start/end + interval kind + dimensions. Normalize a returned agent ARN to user ID and join inside the same instance. Keep current-status facts separate from historical intervals. Store raw requests/pages immutably; MERGE only complete retrievals into latest-result facts by the full key. Preserve NULL/EMPTY/ERROR/zero distinctions, current directory lineage, timezone and retrieval time. Production migration must reconcile existing prototype table/column names; this SQL is an implementation contract, not an executed migration or live Snowflake equality claim.
+
+Validation: `scripts/verify-agent-operations.cjs` checks all 60 metric request shapes and raw row equality, count/time sums, occupancy scale, names, missing-data behavior, badges and removal of old panels. `scripts/verify-agent-ui.cjs` tests dictionary filtering, native agent/day controls, source navigation/focus, roster search and eight chart views using jsdom. Existing inbound/outbound checks must continue to pass. Role-based access to names/coaching data is required before deployment.
+
+## Current outbound verification and charts — September 4, 2026
+
+The authoritative current pair uses `data/outbound-operations-registry.json`, `data/outbound-operations-snapshot.json`, and `data/outbound-assistant-verification.json`, rendered by `outbound-operations.js`. This supersedes legacy outbound statements below about verified customer answers, campaign access, date ranges and sample request syntax. Superseded outbound tables and the old-reference disclosure have been removed from the page at the user's request; current limitations and raw evidence remain. The final dictionary follows the inbound reference format: topic navigation, search, expandable metric rows, request/result and Snowflake disclosures, and contract/evidence downloads. Chart source links clear filters and expand their definition. Load failures never show old metrics.
+
+### Amazon acquisition
+
+`scripts/verify-outbound-api.py` reproduces 13 direct OUTBOUND native values for Aug 12–15 ET using the exact saved STANDARD queue IDs and VOICE filter, plus four campaign values for the separately named campaign Aug 27–28 ET. It retains every successful request, raw response page and request hash. No absent result is coerced to zero. Metric names and both initiation/disconnect filters are explicit in the registry and request. There are 17 native definitions plus one provisional subtraction; the latter is not in the core performance cards. The API result is the authority for the numeric value, not a retyped HTML literal.
+
+Daily results use native DAY; actual hour results use HOUR in two-day chunks; queue ranking uses QUEUE-grouped TOTAL. The nine charts across eight mapped families are fully enumerated in `registry.charts` and inherit metric/filter/time/warehouse contracts. Created and handled are independent lines. Hold/transfer lines overlap and must not be stacked. Disconnect reason components may reconcile only if the same-scope sum equals handled. The campaign comparison is not an additive funnel. Date filters select only the loaded Aug 12–15 range; counts sum disjoint complete native days, native averages are never averaged. Queue ranking requires the full window; campaign Aug 27–28 does not follow direct-call dates. Missing hours remain unavailable, not zero.
+
+### Snowflake implementation
+
+Use `fct_connect_metric_interval`, keyed by `instance_id, metric_spec_hash, scope_hash, interval_start, interval_end, interval_period, dimensions_hash`. Preserve `metric_name`, complete metric/resource filter JSON, UTC boundaries, reporting timezone, dimensions, unit, full-precision numeric value, status, request hash and extraction time. Retain immutable raw response history and upsert the newest value by the complete key. The per-metric `semantic` identifier in the registry is the governed semantic-layer name. Native TOTAL reads select `value` at the requested complete key. DAY/HOUR graphs select those native interval rows directly; queue ranking sorts QUEUE/TOTAL rows and limits to six without claiming an exhaustive population.
+
+For the provisional remainder only, join CREATED and HANDLED on all scope/window/statistic keys and subtract if both populated and nonnegative. Its label must remain provisional; arithmetic does not establish a record-level unanswered-customer population. Do not implement native CREATED with an unrestricted `count(*)` over raw contact records. Do not implement ACW with naive `avg(nullable_duration)` because Amazon includes zero for certain connected contacts lacking an ACW duration. Raw-contact reconstruction requires eligibility, timestamps, null policy and cohort validation in addition to field names. No live Snowflake equality is claimed.
+
+### Validation and Assistant evidence
+
+Independent handled DAY checks also match: August 12 = 898, August 13 = 859, August 14 = 851, August 15 = 39. Only that daily series receives the additional Assistant-matched badge; hourly, queue and other daily series do not inherit it.
+
+`node scripts/verify-outbound-charts.cjs` verifies 17 native raw request/response values, count agreement with DAY/HOUR/QUEUE results, five independently queried Assistant total matches, distinct semantic identifiers, chart source mappings, invalid date rejection, duplicate/missing-day handling, and average-of-averages prevention. Five full-window matches are outbound handled 2,647; campaign send attempts 44; campaign connected 7; targeted recipients 85; progress 100%. Exact Assistant queue IDs are not exposed. Its tool cannot query most metric-level OUTBOUND filters. The green badge applies only to recorded matched scope/values, never automatically to every graph point.
+
+Remaining limitations: CREATED attribution is disputed; 175 is provisional. Handled does not establish human reach; hold disconnect includes agent and customer; transfers may occur before agent connection. Connection-timestamp handled is distinct from disconnect-timestamp handled even when totals equal. SUM_CONNECTING_TIME_AGENT is agent activity-driven. Campaign connected eligibility depends on answering machine detection configuration; progress is attempted recipients / targeted recipients, not sends / targets. Detailed evidence and superseded wording findings are in `docs/outbound-operations-review.md`.
+
+## Current inbound implementation — September 4, 2026
+
+This section and `data/inbound-operations-registry.json` supersede the legacy inbound presentation definitions below. The current dashboard and dictionary are rendered by `inbound-operations.js` from the same 29-metric registry and `data/inbound-operations-snapshot.json`. There are 27 native measures and two disclosed subtractions. The registry specifies every field, metric-level filter, threshold, unit, population, operating question, group, formula, source documentation, shared warehouse schema, primary key, SQL lookup, and tests. No current inbound number is sourced from the earlier inline mock tables.
+
+### API acquisition and observed results
+
+`python3 scripts/inbound_operations.py --start 2026-08-12 --end 2026-08-15` retrieves all native TOTAL values, exact HOUR series in two-day chunks, and QUEUE-grouped TOTAL values. The artifact retains every exact request, SHA-256 request hash, response page, retrieval time, null/error state and comparison check. AWS credentials stay in the named local `vip-connect` profile. `python3 scripts/inbound_operations.py --serve 4318` serves the application and read-only `/api/inbound?start=YYYY-MM-DD&end=YYYY-MM-DD&queue=all` on loopback. Queue values must be enumerated standard queue IDs. Date windows are inclusive ET dates transformed to start-inclusive/end-exclusive UTC; current days are rejected. Range limit is 31 completed days within 89 days. Requests are cached for five minutes; refresh failure preserves the explicitly dated previous snapshot.
+
+All 27 final native requests returned values for August 12–15. Initial tests rejected `INITIATION_METHOD=INBOUND` on `AVG_HANDLE_TIME` and `AVG_HOLD_TIME`; those rows now request and label **all-voice** context. Original failed requests remain in `data/inbound-operations-initial-audit.json`. Native primary metrics still use accepted metric-level initiation filters, never a guessed top-level filter. Normalizing response metadata must treat omitted `Negate` and `Negate=false` identically.
+
+Primary incoming = 2,452; primary handled = 1,689; all queue abandons = 984; primary queue abandons = 612; queued = 3,752. The incoming initiation partition is 2,452 + 242 + 0 = 2,694. The abandonment complement is 612 + 372 = 984. The 763 created-minus-handled value is marked **provisional reporting remainder** because the assistant disputes time attribution and contact-level evidence has not closed that disagreement. An arithmetic tie-out alone is not semantic verification.
+
+Current docs classify CONTACTS_CREATED, CONTACTS_HANDLED, CONTACTS_QUEUED and CONTACTS_ABANDONED as contact-record metrics; the historical guide describes disconnect-date attribution. The dashboard must not call this an initiation-date cohort or assert that queue-scoped created includes every unqueued IVR exit. The assistant's conflicting creation-time claim remains recorded in the verification artifact. Queue-hour charts show native reporting timing, not a proven arrival-time staffing forecast.
+
+### Dashboard, dictionary, charts and filters
+
+- Five linked priority cards: primary incoming, provisional primary not answered, all-origin queue abandonment, primary queue abandonment, and non-primary queue abandonment.
+- Native service indicators: abandonment rate, average queue answer time, service level LT20, and all-voice handle time.
+- Daily/hourly trend selector: seven count measures plus native abandonment rate, service level and answer speed. Daily values use separate native DAY queries, including native averages and rates; missing intervals are not interpolated. Calculated remainder requires both operands in the same interval and a nonnegative result. Never average hourly percentages or averages to produce daily points.
+- Full 24-hour weekday heatmap: the five priority counts. It sums returned hourly count cells in America/New_York; missing cells retain an em dash. Sparse cells are permissible only with disclosed gaps; a check verifies returned counts sum to the corresponding TOTAL. No placeholder activity is generated.
+- Queue table: primary incoming, queued, abandoned, abandonment rate, average answer time, service level LT20. Rows are native QUEUE-grouped results sorted by abandoned volume. Native averages/rates are used per queue. They are not aggregated by the browser. Queue selection re-queries the entire dashboard.
+- Handling, hold, routing and waiting diagnostics use the same registry. AHT components are not summed because eligibility differs. Cumulative abandon thresholds are not summed or silently turned into primary bands. Transfer-out children are not assumed exhaustive.
+- Every metric control switches to its actual dictionary definition, opens it, scrolls and focuses it. Dictionary topics and text search filter the shared registry. Technical requests, responses and semantic SQL sit in disclosures.
+- CSV exports carry metric ID, value/unit, classification, exact dates, queue scope, retrieval time and API/assistant status. JSON exports provide the registry or the exact request/response evidence. Targets and severity are not invented.
+
+### Additional operational comparison graphs
+
+Four additional graphs use the same selected snapshot and registry; no API metrics or new derived definitions are introduced. Their full acquisition and Snowflake mappings inherit the registry keys and filters described above.
+
+| Graph | Amazon acquisition | Presentation and warehouse projection |
+|---|---|---|
+| Incoming versus answered | Native DAY CONTACTS_CREATED and CONTACTS_HANDLED, each with INITIATION_METHOD=INBOUND | Two independent reporting series from `MART_CALL_CENTER.VW_INBOUND_OPERATIONS`, metric IDs `primary_incoming` and `primary_answered`. No stacked outcome/funnel interpretation. |
+| Abandonment by origin | Native DAY CONTACTS_ABANDONED, unfiltered and INBOUND-filtered | `primary_abandoned` plus existing derived `non_primary_abandoned = abandoned_total - primary_abandoned`. Join identical instance, queue scope, VOICE, DAY start/end, timezone and version keys. A stack is shown only if both operands exist and the subset is nonnegative; it must equal native DAY total. |
+| Service level and abandonment rate | Native DAY SERVICE_LEVEL with LT20 and ABANDONMENT_RATE, all eligible voice origins | Two native percentage lines. No sum, average, complement or invented target. Preserve native daily percentages at full precision in the semantic view. |
+| Queues with the most abandons | Native TOTAL CONTACTS_ABANDONED grouped by QUEUE | Select matching queue-grain semantic rows; `ORDER BY metric_value DESC, queue_name LIMIT 6`, excluding unavailable values. Queue dimension join uses instance+queue ID without fanout. This subset is not a roll-up. Clicking re-queries the existing date window for that queue. |
+
+All four respect completed-date and queue filters. Daily categories use Eastern calendar days and preserve missing points, including native zero versus absent data. Duplicate daily metric results are ambiguous and not plotted; percentages are never summed. Legends link directly to each metric definition; daily charts also expose exact values in accessible disclosures. Existing raw-evidence retention, full-key idempotent refresh and no-Snowflake-execution caveat apply. Tests in `scripts/verify-inbound-charts.cjs` cover baseline totals, same-day stacks, native rates, missing and negative inputs, duplicate daily records, single-day selection and top-six ranking. These visuals do not expand the earlier assistant-verification claims.
+
+### Amazon assistant verification (existing evidence)
+
+Live assistant conversation on September 4 independently reported 984 abandoned, 3,752 queued, 26.23% abandonment, 62.29% SL20, 154.3-second ASA, about 232.2-second all-voice AHT, 435 non-responses and 1,849 handled incoming for the completed August 12–15 window. The corresponding API values match at reported precision. Assistant does not expose exact queue IDs, so the UI says **Value matched**, not fully identical-envelope verified. It could not apply metric-level initiation filters and therefore could not independently reproduce primary values. Repeating values supplied in our follow-up does not count as verification.
+
+The assistant incorrectly described default short-abandon exclusions, enqueue attribution for ordinary CONTACTS_QUEUED, and an answered-only service-level numerator. Dictionary definitions follow the official Amazon references; conflicting explanations are retained. No claim that all metrics or the Snowflake implementation have been independently verified is allowed.
+
+In its final follow-up, the assistant corrected those three explanations and acknowledged API support for initiation-method filtering on CONTACTS_ABANDONED. It independently returned eight more matching values: average abandon wait 1,415.7s, maximum queued time 604,790.9s, answered under 20s 1,801, abandoned under 5s 246, abandoned under 20s 536, average hold 144.8s, offer acceptance 85.76%, and queue transfer-out 0. Sixteen displayed native values now have an independent assistant value comparison. Its primary-filtered numerical checks remain unavailable, and the created-minus-handled interpretation remains disputed. The nearly-seven-day maximum is a genuine source outlier; expose it and investigate records rather than suppressing it.
+
+### Warehouse implementation
+
+Canonical raw object: `RAW_CONNECT.METRIC_RESPONSE`; curated long-form fact: `ANALYTICS_CONNECT.FCT_METRIC_RESULT`; semantic view: `MART_CALL_CENTER.VW_INBOUND_OPERATIONS`. Full key: instance, metric semantic ID (including native filter/threshold identity), queue-scope hash, channel, interval period, interval start/end, timezone, contract version. Store raw request/response, full-precision value, unit, status, request hash and retrieval time. Keep TOTAL, HOUR and QUEUE-grouped results at distinct keys. Join queue dimensions only for queue-grouped rows and never fan out all-queue values. Idempotent MERGE retains the latest successfully acquired result for a full key; keep failed attempts in immutable raw storage. Re-pull recent completed periods for late records.
+
+Derived complement SQL joins its operands on the same instance/queue/window/interval/channel/timezone/version key. Both must be available and the subset cannot exceed the parent. Averages, rates and maxima require native TOTAL retrieval at a selected window, not average-of-averages. Snowflake is **mapped, not connected or executed** in this application; warehouse validation remains a deployment acceptance step. See `docs/inbound-operations-snowflake.sql` for the executable schema and native semantic view.
+
+Official references: [Historical reporting attribution](https://docs.aws.amazon.com/connect/latest/adminguide/historical-metrics.html), [Metric definitions](https://docs.aws.amazon.com/connect/latest/adminguide/metrics-definitions.html), [GetMetricDataV2](https://docs.aws.amazon.com/connect/latest/APIReference/API_GetMetricDataV2.html).
+
 This is the implementation contract behind the Call Center display. It exists so the UI can move from representative values to live Amazon Connect data without changing metric meaning.
 
 The required end-to-end verification and maintenance workflow is defined in [`call-center-metric-governance-playbook.md`](call-center-metric-governance-playbook.md). Every metric change must compare the director question, Connect Assistant interpretation and value, reproducible Amazon API result, Snowflake semantic result, and dashboard display using an identical request envelope.
