@@ -105,3 +105,20 @@
 - Keep Derived TRUE_SLA as its **own** column forever next to Amazon SL20.
 - Archival LT30 stays unmapped until a true Amazon LT30 series exists.
 - No dashboard bind until envelope hashes are populated.
+
+## Warehouse Phase 2 propose-only package (Call Center Warehouse)
+
+**Builder hold until Phase 3** = no Snowflake `CREATE` / no dashboard PARTIAL binds. Packaging only.
+
+Authoritative Joe stubs from warehouse audit:
+- OOBD: `docs/phase2-OOBD.md`
+- SQL stubs `00`–`06`: `docs/phase2-proposed-sql/`
+  - `00-README.md` — hard rules
+  - `01-raw-metric-result.sql` — RAW envelope landing
+  - `02-fct-connect-metric-interval.sql` — ANALYTICS_CONNECT interval facts (Amazon SL20 ≠ TRUE_SLA)
+  - `03-fct-current-snapshot.sql` — GetCurrentMetricData snapshot
+  - `04-fct-campaign-metric-interval.sql` — campaign_id retained
+  - `05-mart-inbound-operations.sql` — MART inbound 29 projection
+  - `06-gap-coverage.md` — which stubs unlock which gaps
+
+Every statement is **PROPOSE ONLY / DO NOT CREATE until Phase 3**. Prefer these warehouse stubs over the sketch views above when implementing.

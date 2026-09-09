@@ -2754,6 +2754,21 @@
       "live_inbound_service_level_20": "Amazon native SERVICE_LEVEL threshold 20",
       "warehouse_SERVICE_LEVEL": "Derived TRUE_SLA 20s \u2014 do not equate",
       "archival_service_level_lt_30": "Amazon LT30 \u2014 MISSING; do not map to TRUE_SLA"
+    },
+    "warehouse_phase2": {
+      "oobd": "docs/phase2-OOBD.md",
+      "proposed_sql_dir": "docs/phase2-proposed-sql/",
+      "files": [
+        "00-README.md",
+        "01-raw-metric-result.sql",
+        "02-fct-connect-metric-interval.sql",
+        "03-fct-current-snapshot.sql",
+        "04-fct-campaign-metric-interval.sql",
+        "05-mart-inbound-operations.sql",
+        "06-gap-coverage.md"
+      ],
+      "apply": "NONE until Phase 3",
+      "builder_hold": "no Snowflake CREATE; no dashboard PARTIAL binds"
     }
   }
 }

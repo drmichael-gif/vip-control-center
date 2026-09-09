@@ -43,3 +43,7 @@ Archival `service_level_lt_30_seconds` and `queue_abandonment_rate` stay **MISSI
 - Lineage: `docs/joe-phase2-lineage.md` + `data/joe-phase2-lineage.csv`
 - Proposed SQL (stubs only): `docs/joe-phase2-proposed-sql.md`
 - Phase 1 provenance: `docs/phase1-metric-map-live.md`, `data/phase1-metric-map-live.csv`, archival pair
+
+## Warehouse propose-only SQL
+
+See `docs/phase2-OOBD.md` and `docs/phase2-proposed-sql/` (00–06). **Do not apply** until Phase 3 / MC unlock for `ANALYTICS_CONNECT`.

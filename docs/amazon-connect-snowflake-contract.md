@@ -570,3 +570,7 @@ Authoritative live lineage/scorecard for Joe (zero-variance):
 **TRUE_SLA vs Amazon SERVICE_LEVEL:** warehouse `CORE_CONTACT_CENTER.*.SERVICE_LEVEL` is Derived TRUE_SLA 20s and must **never** be silently equated to live inbound `service_level_20` (Amazon native `SERVICE_LEVEL` threshold 20) or archival `service_level_lt_30_seconds` (LT30). Keep columns/concepts separate; see proposed `VW_QUEUE_SLA_COMPARE` stub.
 
 Live stack only: `PRD_RAW_DB.AMAZON_CONNECT` → `STAGING_AMAZON_CONNECT` → `INTERMEDIATE_AMAZON_CONNECT` → `CORE_CONTACT_CENTER`. Contract schemas `ANALYTICS_CONNECT` / `MART_CALL_CENTER` / `RAW_CONNECT` do not exist yet.
+
+### Warehouse Phase 2 propose-only SQL (packaged)
+
+Joe implementation stubs (do not apply until Phase 3): `docs/phase2-OOBD.md`, `docs/phase2-proposed-sql/` (`00`–`06`). Builder hold = no Snowflake CREATE and no dashboard PARTIAL binds.
