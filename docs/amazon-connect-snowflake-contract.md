@@ -555,3 +555,18 @@ Agent-event ingestion is append-only and idempotent by `EventId`. Rebuild state 
 - Interval grain is part of the metric request key: `TOTAL`, `WEEK`, `DAY`, `HOUR`, `THIRTY_MIN`, and `FIFTEEN_MIN` rows for the same metric and filter set coexist and never upsert one another.
 - Non-additive metrics (rates, thresholds, current-state snapshots) are stored with their own window and are never re-aggregated across intervals.
 - A visual with partial API history must label exact API points and provisional archive points separately; API-verified heat-map cells must reconcile exactly to their window total.
+
+## Joe Phase 2 package (2026-09-09) — documentation + proposed SQL only
+
+Product rule (locked): **no temporary PARTIAL dashboard binds**; wait for envelope facts. Phase 2 does not apply Snowflake DDL and does not change live dashboard binds.
+
+Authoritative live lineage/scorecard for Joe (zero-variance):
+- Scorecard: `docs/joe-phase2-scorecard.md` — live **0 MATCH / 47 PARTIAL / 15 MISSING** of 62 (inbound 29 + outbound 18 + agent 15). `ANALYTICS_CONNECT` absent.
+- Glossary: `docs/joe-phase2-metric-glossary.md` (aligned to live `*-operations-registry.json` + archival centerwide 10 stubs)
+- Lineage: `docs/joe-phase2-lineage.md` + `data/joe-phase2-lineage.csv`
+- Proposed SQL stubs only: `docs/joe-phase2-proposed-sql.md`
+- Phase 1 provenance: `docs/phase1-metric-map-live.md`, `data/phase1-metric-map-live.csv`, archival pair
+
+**TRUE_SLA vs Amazon SERVICE_LEVEL:** warehouse `CORE_CONTACT_CENTER.*.SERVICE_LEVEL` is Derived TRUE_SLA 20s and must **never** be silently equated to live inbound `service_level_20` (Amazon native `SERVICE_LEVEL` threshold 20) or archival `service_level_lt_30_seconds` (LT30). Keep columns/concepts separate; see proposed `VW_QUEUE_SLA_COMPARE` stub.
+
+Live stack only: `PRD_RAW_DB.AMAZON_CONNECT` → `STAGING_AMAZON_CONNECT` → `INTERMEDIATE_AMAZON_CONNECT` → `CORE_CONTACT_CENTER`. Contract schemas `ANALYTICS_CONNECT` / `MART_CALL_CENTER` / `RAW_CONNECT` do not exist yet.

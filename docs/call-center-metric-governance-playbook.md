@@ -455,3 +455,12 @@ A call-center metric, table, chart, filter, or connector is complete only when:
 9. Automated validation passes.
 
 Future work must update this file whenever it discovers a new source contradiction, scope rule, grain rule, mapping correction, or Snowflake requirement. Do not let critical knowledge live only in a chat transcript.
+
+## Joe Phase 2 zero-variance package
+
+When packaging warehouse gaps for Joe:
+1. Use live registries (inbound 29 / outbound 18 / agent 15) as dashboard authority — not archival Domain(42) alone.
+2. Publish lineage with MATCH/PARTIAL/MISSING from Phase 1 maps; do not upgrade status without envelopes.
+3. Propose SQL as CREATE VIEW stubs only; do not apply; do not bind PARTIAL metrics to Control Center dashboards.
+4. Always separate Derived TRUE_SLA from Amazon SERVICE_LEVEL LT20 and archival LT30.
+5. Package files: `docs/joe-phase2-*.md`, `data/joe-phase2-lineage.csv`, Phase 1 provenance maps.

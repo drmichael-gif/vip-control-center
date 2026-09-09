@@ -1,6 +1,12 @@
 {
   "contract_version": 3,
-  "public_publication": {"status":"SANITIZED_MAPPING_ONLY","live_data":"Withheld; no private records or raw API evidence are published.","authority":"Metric registries, API field/filter definitions, disclosed formulas and warehouse mappings remain intact. Historical verification prose below records design decisions, not a public verification claim. Current public dashboards show no live values.","credentials":"No API keys or credentials changed or included. Deployment IDs are placeholders; configure an existing AWS profile and deployment variables privately.","history":"Previously tracked raw data is replaced at this revision; older Git history was not rewritten."},
+  "public_publication": {
+    "status": "SANITIZED_MAPPING_ONLY",
+    "live_data": "Withheld; no private records or raw API evidence are published.",
+    "authority": "Metric registries, API field/filter definitions, disclosed formulas and warehouse mappings remain intact. Historical verification prose below records design decisions, not a public verification claim. Current public dashboards show no live values.",
+    "credentials": "No API keys or credentials changed or included. Deployment IDs are placeholders; configure an existing AWS profile and deployment variables privately.",
+    "history": "Previously tracked raw data is replaced at this revision; older Git history was not rewritten."
+  },
   "operations_navigation": "Call Center Operations is entered only through its main home card, not a top-level audit tab. The card opens Inbound Dashboard; the six existing dashboard/dictionary choices remain inside Operations. Metric definitions and acquisition scopes are unchanged.",
   "current_agent_contract": {
     "registry": "data/agent-operations-registry.json",
@@ -14,7 +20,16 @@
     "period": "2026-08-12T04:00:00Z inclusive to 2026-08-16T04:00:00Z exclusive; America/New_York",
     "scopes": "VOICE with 96 explicitly enumerated STANDARD queue IDs and all initiation methods; activity/occupancy uses 67 routing-profile IDs and all channels, without queue/channel filter. Exact IDs are saved in snapshot request evidence.",
     "filters": "Full native TOTAL or one native DAY; optional AGENT dimension. Never average native averages or rates. Daily charts retain all four loaded days for selected agent. Team top-eight comparison ignores individual agent selector and says so. Current-state roster ignores historical filters.",
-    "charts": ["Daily handled volume","Daily non-response and excluding-customer-abandons comparison","Daily agent answer rate","Daily interaction and wrap-up averages","Daily handle and customer-hold averages","Daily occupancy","Agent activity hours","Top-eight handled agent workloads"],
+    "charts": [
+      "Daily handled volume",
+      "Daily non-response and excluding-customer-abandons comparison",
+      "Daily agent answer rate",
+      "Daily interaction and wrap-up averages",
+      "Daily handle and customer-hold averages",
+      "Daily occupancy",
+      "Agent activity hours",
+      "Top-eight handled agent workloads"
+    ],
     "conversions": "Occupancy presentation = raw V2 ratio * 100, classified DERIVED_DISPLAY_CONVERSION, not a new native percentage result. Native activity seconds displayed as hours / 3600 are presentation conversions. Raw values and native units remain unchanged. Unit gates validate occupancy against same-scope native contact/(contact+idle) for each available agent/interval.",
     "identity": "ListUsers + DescribeUser IdentityInfo FirstName/LastName; fallback Username then User.Id. Join instance_id + normalized Dimensions.AGENT user ID. Current directory names are not historical identity snapshots.",
     "current": "GetCurrentUserData with explicit queue IDs; native StatusName, StatusStartTimestamp and VOICE available/active slots only. Request and retrieval timestamp retained; customer Contacts array excluded. Not live, not historical availability, missing keys not zero.",
@@ -23,7 +38,10 @@
     "warehouse": "See docs/agent-operations-snowflake.sql and current registry: immutable raw evidence; fct_connect_metric_interval keyed by instance+metric_spec_hash+scope_hash+interval+dimensions; dim_connect_user join; fct_connect_user_snapshot separate. Semantic projections retain native TOTAL/DAY/AGENT, never roll up averages. Snowflake is a mapping contract, not a deployed or equality-verified database."
   },
   "retired_centerwide_views": {
-    "panels": ["call-center-metrics", "call-center-metrics-dictionary"],
+    "panels": [
+      "call-center-metrics",
+      "call-center-metrics-dictionary"
+    ],
     "status": "Removed from page and navigation at user request. Their legacy contract records are archival only; current operations navigation has inbound, outbound and agent dashboard/dictionary pairs."
   },
   "current_outbound_contract": {
@@ -35,11 +53,13 @@
     "authority": "This registry is the sole current outbound dashboard/dictionary source. Superseded outbound tables and the historical disclosure are removed from the page. Current verification limitations remain visible; raw evidence is retained.",
     "dictionary_presentation": "Uses the inbound dictionary components: topic navigation, search, expandable metric rows, exact request/response and Snowflake disclosures, contract/evidence downloads, and dashboard return. Source links clear topic/search filters and expand the matching definition. A load failure must not fall back to old metrics.",
     "native_metric_count": 17,
-    "derived_metric_ids": ["remainder"],
+    "derived_metric_ids": [
+      "remainder"
+    ],
     "derived_publication": "Created-minus-handled is a provisional reporting remainder, excluded from the core performance cards; not a certified customer-not-answered outcome or native metric.",
-    "assistant_matching": "Five independently queried full-window totals match. The four handled DAY values independently match too: 898, 859, 851, 39 for August 12–15. Badge requires evidence status and value equality. Other daily series, HOUR and QUEUE breakdowns are API-backed only; exact Assistant queue IDs are unavailable.",
+    "assistant_matching": "Five independently queried full-window totals match. The four handled DAY values independently match too: 898, 859, 851, 39 for August 12\u201315. Badge requires evidence status and value equality. Other daily series, HOUR and QUEUE breakdowns are API-backed only; exact Assistant queue IDs are unavailable.",
     "dashboard": "Nine charts across eight mapped families: daily volume; handled reporting-timestamp comparison; date/hour handled heatmap; disconnect breakdown; hold/transfer daily counts; interaction/wrap daily averages; connecting daily seconds; top-six handled queue totals; separately scoped campaign comparison.",
-    "filter_behavior": "Only completed Aug 12–15 loaded dates are selectable. Disjoint native DAY counts can sum for subranges; no average-of-averages. Queue ranking requires full window. Campaign Aug 27–28 scope is fixed and separately labeled.",
+    "filter_behavior": "Only completed Aug 12\u201315 loaded dates are selectable. Disjoint native DAY counts can sum for subranges; no average-of-averages. Queue ranking requires full window. Campaign Aug 27\u201328 scope is fixed and separately labeled.",
     "warehouse": "fct_connect_metric_interval; full instance + metric/filter/scope/interval/dimension key. Preserve raw request/response hashes, null/error/zero distinctions and late-update audit history. Registry includes per-metric semantic names, units, exact filter contracts and shared joins/tests. Do not infer contact-level classifications from aggregate arithmetic."
   },
   "current_inbound_contract": {
@@ -50,16 +70,48 @@
     "authority": "The referenced registry supersedes legacy inbound mappings below for the current Inbound Dashboard and Inbound Data Dictionary. Other domain mappings remain unchanged.",
     "metric_count": 29,
     "native_metric_count": 27,
-    "derived_metric_ids": ["primary_not_answered", "non_primary_abandoned"],
+    "derived_metric_ids": [
+      "primary_not_answered",
+      "non_primary_abandoned"
+    ],
     "comparison_charts": {
-      "daily_demand_answers": {"ids":["primary_incoming","primary_answered"],"interval":"DAY","display":"independent lines; not a same-caller funnel"},
-      "daily_abandonment_origins": {"ids":["primary_abandoned","non_primary_abandoned"],"interval":"DAY","display":"stack only when both components are available","formula":"non_primary_abandoned = abandoned_total - primary_abandoned; same native DAY interval and scope"},
-      "daily_service_rates": {"ids":["service_level_20","abandonment_rate"],"interval":"DAY","display":"native rates on one percent scale; not complementary, not summed or averaged"},
-      "top_queue_abandons": {"ids":["abandoned_total"],"interval":"TOTAL","grouping":"QUEUE","display":"six largest returned native values; excludes nulls; click re-queries queue; not exhaustive"},
-      "contract_inheritance":"Each metric inherits its exact Amazon field, filters, grain, timestamp attribution and warehouse key from the current registry. No new acquisition or semantic metrics.",
-      "warehouse":"Read MART_CALL_CENTER.VW_INBOUND_OPERATIONS by the full selected scope key; DAY for daily graphs, queue-scoped TOTAL for ranking. Join daily subtraction inputs on all scope and interval keys.",
-      "missing_policy":"Missing daily points remain gaps. Duplicate native metric/day entries are ambiguous and hidden, never summed. Failed/negative subtraction hides the whole stack for that day.",
-      "tests":"scripts/verify-inbound-charts.cjs"
+      "daily_demand_answers": {
+        "ids": [
+          "primary_incoming",
+          "primary_answered"
+        ],
+        "interval": "DAY",
+        "display": "independent lines; not a same-caller funnel"
+      },
+      "daily_abandonment_origins": {
+        "ids": [
+          "primary_abandoned",
+          "non_primary_abandoned"
+        ],
+        "interval": "DAY",
+        "display": "stack only when both components are available",
+        "formula": "non_primary_abandoned = abandoned_total - primary_abandoned; same native DAY interval and scope"
+      },
+      "daily_service_rates": {
+        "ids": [
+          "service_level_20",
+          "abandonment_rate"
+        ],
+        "interval": "DAY",
+        "display": "native rates on one percent scale; not complementary, not summed or averaged"
+      },
+      "top_queue_abandons": {
+        "ids": [
+          "abandoned_total"
+        ],
+        "interval": "TOTAL",
+        "grouping": "QUEUE",
+        "display": "six largest returned native values; excludes nulls; click re-queries queue; not exhaustive"
+      },
+      "contract_inheritance": "Each metric inherits its exact Amazon field, filters, grain, timestamp attribution and warehouse key from the current registry. No new acquisition or semantic metrics.",
+      "warehouse": "Read MART_CALL_CENTER.VW_INBOUND_OPERATIONS by the full selected scope key; DAY for daily graphs, queue-scoped TOTAL for ranking. Join daily subtraction inputs on all scope and interval keys.",
+      "missing_policy": "Missing daily points remain gaps. Duplicate native metric/day entries are ambiguous and hidden, never summed. Failed/negative subtraction hides the whole stack for that day.",
+      "tests": "scripts/verify-inbound-charts.cjs"
     },
     "primary_not_answered_publication": "Provisional reporting remainder; interpretation disputed by Assistant. Do not use as a verified unique-caller count or initiation-date cohort.",
     "filter_behavior": "Live read-only refresh on Apply, complete days only, maximum 31 days within 89 days. A failed refresh retains the previous explicitly dated snapshot.",
@@ -407,10 +459,18 @@
         "display_window": "2026-08-27/2026-08-29 America/New_York",
         "meaning": "Share of campaign send attempts that produced a connected campaign contact. This is attempt-based, not recipient-based reach.",
         "amazon": {
-          "apis": ["connectcampaignsv2:ListCampaigns", "connect:GetMetricDataV2"],
+          "apis": [
+            "connectcampaignsv2:ListCampaigns",
+            "connect:GetMetricDataV2"
+          ],
           "campaign_id": "00000000-0000-0000-0000-000000000000",
           "campaign_name": "NY-NL-1-1032-v2-08-27",
-          "metrics": {"CAMPAIGN_SEND_ATTEMPTS": 44, "CAMPAIGN_CONTACTS_CONNECTED": 7, "RECIPIENTS_TARGETED": 85, "CAMPAIGN_PROGRESS_RATE": 100},
+          "metrics": {
+            "CAMPAIGN_SEND_ATTEMPTS": 44,
+            "CAMPAIGN_CONTACTS_CONNECTED": 7,
+            "RECIPIENTS_TARGETED": 85,
+            "CAMPAIGN_PROGRESS_RATE": 100
+          },
           "grain": "campaign_metric_interval",
           "historical_request_grain": "TOTAL over Aug 27-28 ET at campaign scope"
         },
@@ -422,7 +482,11 @@
             "connected_contacts_lte_send_attempts",
             "display_rate_equals_connected_divided_by_attempts"
           ],
-          "columns": ["CAMPAIGN_CONTACTS_CONNECTED", "CAMPAIGN_SEND_ATTEMPTS", "CAMPAIGN_CONNECTION_RATE"],
+          "columns": [
+            "CAMPAIGN_CONTACTS_CONNECTED",
+            "CAMPAIGN_SEND_ATTEMPTS",
+            "CAMPAIGN_CONNECTION_RATE"
+          ],
           "grain": "campaign x interval",
           "primary_key": "(campaign_id, interval_start_ts, interval_period)",
           "additive_across_intervals": false
@@ -436,8 +500,22 @@
         "classification": "DERIVED",
         "verification": "PARTIAL_API_HISTORY",
         "meaning": "Month-by-month view of the same queued abandoned population. Jun-Aug 2026 are API totals; Sep 2025-May 2026 are provisional archive placeholders.",
-        "api_verified_points": {"2026-06": 10889, "2026-07": 11864, "2026-08": 6904},
-        "provisional_archive_points": {"2025-09": 5210, "2025-10": 5480, "2025-11": 6120, "2025-12": 6640, "2026-01": 7180, "2026-02": 6260, "2026-03": 6015, "2026-04": 5740, "2026-05": 5905},
+        "api_verified_points": {
+          "2026-06": 10889,
+          "2026-07": 11864,
+          "2026-08": 6904
+        },
+        "provisional_archive_points": {
+          "2025-09": 5210,
+          "2025-10": 5480,
+          "2025-11": 6120,
+          "2025-12": 6640,
+          "2026-01": 7180,
+          "2026-02": 6260,
+          "2026-03": 6015,
+          "2026-04": 5740,
+          "2026-05": 5905
+        },
         "assistant_comparison": {
           "result": "NOT_APPLICABLE_SHAPE_NOT_PUBLISHED_BY_ASSISTANT"
         },
@@ -456,7 +534,11 @@
           "event_time": "disconnect",
           "historical_request_grain": "One TOTAL request per ET month; GetMetricDataV2 recent-history limit prevents a full 12-month pull",
           "acquired": true,
-          "acquired_months": ["2026-06", "2026-07", "2026-08"]
+          "acquired_months": [
+            "2026-06",
+            "2026-07",
+            "2026-08"
+          ]
         },
         "formula": "For each verified month, sum CONTACTS_ABANDONED returned for all standard queues by one TOTAL request covering that ET calendar month. Older points require the durable archive.",
         "snowflake": {
@@ -482,7 +564,11 @@
         "classification": "DERIVED",
         "verification": "API_VERIFIED",
         "meaning": "The same queued abandoned population across all 24 ET hours and all seven weekdays, at 1 week, 2 week, and 1 month windows.",
-        "verified_window_totals": {"1_week": 1805, "2_weeks": 3740, "1_month": 6904},
+        "verified_window_totals": {
+          "1_week": 1805,
+          "2_weeks": 3740,
+          "1_month": 6904
+        },
         "assistant_comparison": {
           "result": "NOT_APPLICABLE_SHAPE_NOT_PUBLISHED_BY_ASSISTANT"
         },
@@ -564,30 +650,52 @@
           "display_value": 2452,
           "classification": "AMAZON_PROVIDED",
           "amazon_metric": "CONTACTS_CREATED",
-          "metric_filters": {"INITIATION_METHOD": ["INBOUND"]},
+          "metric_filters": {
+            "INITIATION_METHOD": [
+              "INBOUND"
+            ]
+          },
           "grain": "Amazon Connect historical metric result for one request envelope",
           "snowflake_target": "MART_CALL_CENTER.FCT_INBOUND_DAILY.ORIGINAL_INBOUND_CREATED",
-          "tests": ["value_nonnegative", "equals_table_1a_inbound_component", "request_envelope_hash_matches_raw_result"]
+          "tests": [
+            "value_nonnegative",
+            "equals_table_1a_inbound_component",
+            "request_envelope_hash_matches_raw_result"
+          ]
         },
         {
           "semantic_name": "original_inbound_handled",
           "display_value": 1689,
           "classification": "AMAZON_PROVIDED",
           "amazon_metric": "CONTACTS_HANDLED",
-          "metric_filters": {"INITIATION_METHOD": ["INBOUND"]},
+          "metric_filters": {
+            "INITIATION_METHOD": [
+              "INBOUND"
+            ]
+          },
           "grain": "Amazon Connect historical metric result for one request envelope",
           "snowflake_target": "MART_CALL_CENTER.FCT_INBOUND_DAILY.ORIGINAL_INBOUND_HANDLED",
-          "tests": ["handled_lte_created", "equals_table_1b_answered_row"]
+          "tests": [
+            "handled_lte_created",
+            "equals_table_1b_answered_row"
+          ]
         },
         {
           "semantic_name": "original_inbound_missed",
           "display_value": 763,
           "classification": "DERIVED_CONTROL",
           "formula": "original_inbound_created - original_inbound_handled",
-          "inputs": ["original_inbound_created", "original_inbound_handled"],
+          "inputs": [
+            "original_inbound_created",
+            "original_inbound_handled"
+          ],
           "grain": "Same request envelope as both inputs",
           "snowflake_target": "MART_CALL_CENTER.FCT_INBOUND_DAILY.ORIGINAL_INBOUND_MISSED",
-          "tests": ["2452_minus_1689_equals_763", "handled_plus_missed_equals_created", "never_labeled_as_native_amazon_metric"]
+          "tests": [
+            "2452_minus_1689_equals_763",
+            "handled_plus_missed_equals_created",
+            "never_labeled_as_native_amazon_metric"
+          ]
         },
         {
           "semantic_name": "contacts_abandoned",
@@ -597,27 +705,43 @@
           "metric_filters": {},
           "grain": "Queued contact legs at disconnect under Amazon's native definition",
           "snowflake_target": "MART_CALL_CENTER.FCT_INBOUND_DAILY.CONTACTS_ABANDONED",
-          "tests": ["value_nonnegative", "equals_native_all_origin_queue_abandon_parent"]
+          "tests": [
+            "value_nonnegative",
+            "equals_native_all_origin_queue_abandon_parent"
+          ]
         },
         {
           "semantic_name": "original_inbound_contacts_abandoned",
           "display_value": 612,
           "classification": "AMAZON_PROVIDED",
           "amazon_metric": "CONTACTS_ABANDONED",
-          "metric_filters": {"INITIATION_METHOD": ["INBOUND"]},
+          "metric_filters": {
+            "INITIATION_METHOD": [
+              "INBOUND"
+            ]
+          },
           "grain": "Queued original-inbound contact legs at disconnect",
           "snowflake_target": "MART_CALL_CENTER.FCT_INBOUND_DAILY.ORIGINAL_INBOUND_CONTACTS_ABANDONED",
-          "tests": ["original_inbound_abandoned_lte_all_origin_abandoned", "equals_table_1c_native_portion"]
+          "tests": [
+            "original_inbound_abandoned_lte_all_origin_abandoned",
+            "equals_table_1c_native_portion"
+          ]
         },
         {
           "semantic_name": "non_primary_contacts_abandoned",
           "display_value": 372,
           "classification": "DERIVED_CONTROL",
           "formula": "contacts_abandoned - original_inbound_contacts_abandoned",
-          "inputs": ["contacts_abandoned", "original_inbound_contacts_abandoned"],
+          "inputs": [
+            "contacts_abandoned",
+            "original_inbound_contacts_abandoned"
+          ],
           "grain": "Same request envelope as both inputs",
           "snowflake_target": "MART_CALL_CENTER.FCT_INBOUND_DAILY.NON_PRIMARY_CONTACTS_ABANDONED",
-          "tests": ["984_minus_612_equals_372", "primary_plus_non_primary_equals_all_origin_abandoned"]
+          "tests": [
+            "984_minus_612_equals_372",
+            "primary_plus_non_primary_equals_all_origin_abandoned"
+          ]
         },
         {
           "semantic_name": "original_inbound_answer_rate",
@@ -625,10 +749,17 @@
           "unit": "PERCENT",
           "classification": "DERIVED_KPI",
           "formula": "original_inbound_handled / original_inbound_created * 100",
-          "inputs": ["original_inbound_handled", "original_inbound_created"],
+          "inputs": [
+            "original_inbound_handled",
+            "original_inbound_created"
+          ],
           "grain": "Same request envelope as both inputs; non-additive percentage",
           "snowflake_target": "MART_CALL_CENTER.FCT_INBOUND_DAILY.ORIGINAL_INBOUND_ANSWER_RATE",
-          "tests": ["1689_divided_by_2452_rounds_to_68_9", "numerator_lte_denominator", "never_average_interval_percentages"]
+          "tests": [
+            "1689_divided_by_2452_rounds_to_68_9",
+            "numerator_lte_denominator",
+            "never_average_interval_percentages"
+          ]
         },
         {
           "semantic_name": "queue_abandonment_rate",
@@ -639,14 +770,29 @@
           "metric_filters": {},
           "grain": "Amazon native non-additive percentage for one request envelope",
           "snowflake_target": "MART_CALL_CENTER.FCT_INBOUND_DAILY.QUEUE_ABANDONMENT_RATE",
-          "tests": ["native_value_preserved", "request_envelope_hash_matches_raw_result", "never_average_interval_percentages"]
+          "tests": [
+            "native_value_preserved",
+            "request_envelope_hash_matches_raw_result",
+            "never_average_interval_percentages"
+          ]
         }
       ],
       "warehouse_contract": {
         "raw_target": "RAW_CONNECT.METRIC_RESULT",
         "curated_target": "ANALYTICS_CONNECT.FCT_CONNECT_METRIC_INTERVAL",
         "semantic_target": "MART_CALL_CENTER.FCT_INBOUND_DAILY",
-        "required_lineage_columns": ["window_start_utc", "window_end_utc", "timezone", "queue_scope_hash", "channel", "metric_filters_hash", "source_classification", "source_fact", "formula_version", "refreshed_at_utc"]
+        "required_lineage_columns": [
+          "window_start_utc",
+          "window_end_utc",
+          "timezone",
+          "queue_scope_hash",
+          "channel",
+          "metric_filters_hash",
+          "source_classification",
+          "source_fact",
+          "formula_version",
+          "refreshed_at_utc"
+        ]
       }
     },
     "connect_assistant_alignment": {
@@ -2573,6 +2719,41 @@
           "native_numerators_and_denominators_same_scope"
         ]
       }
+    }
+  },
+  "joe_phase2": {
+    "package_date": "2026-09-09",
+    "product_rule": "no temporary PARTIAL dashboard binds; wait for envelope facts; docs + proposed SQL only",
+    "live_scorecard": {
+      "MATCH": 0,
+      "PARTIAL": 47,
+      "MISSING": 15,
+      "total": 62
+    },
+    "live_domains": {
+      "inbound": 29,
+      "outbound": 18,
+      "agent": 15
+    },
+    "archival_centerwide_stubs": 10,
+    "analytics_connect": "absent",
+    "docs": {
+      "scorecard": "docs/joe-phase2-scorecard.md",
+      "glossary": "docs/joe-phase2-metric-glossary.md",
+      "lineage": "docs/joe-phase2-lineage.md",
+      "proposed_sql": "docs/joe-phase2-proposed-sql.md",
+      "phase1_live": "docs/phase1-metric-map-live.md",
+      "phase1_archival": "docs/phase1-metric-map-archival.md"
+    },
+    "data": {
+      "lineage_csv": "data/joe-phase2-lineage.csv",
+      "phase1_live_csv": "data/phase1-metric-map-live.csv",
+      "phase1_archival_csv": "data/phase1-metric-map-archival.csv"
+    },
+    "sla_separation": {
+      "live_inbound_service_level_20": "Amazon native SERVICE_LEVEL threshold 20",
+      "warehouse_SERVICE_LEVEL": "Derived TRUE_SLA 20s \u2014 do not equate",
+      "archival_service_level_lt_30": "Amazon LT30 \u2014 MISSING; do not map to TRUE_SLA"
     }
   }
 }
